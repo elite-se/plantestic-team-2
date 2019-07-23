@@ -103,7 +103,7 @@ try {
 
 	[/if]
 } catch (Exception exception) {
-	System.out.println("An error occured during evaluating the communication with testReceiver: ");
+	System.out.println("An error occured during evaluating the communication with [testRoundtrip.requestspecification.receiver/]: ");
 	exception.printStackTrace();
 	throw exception;
 }

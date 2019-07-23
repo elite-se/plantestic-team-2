@@ -4,7 +4,7 @@
     positionCountryCode = "Muc"
     sourceEventType = "Hallo"
 
-[Voicemanager]
+[VM]
     username = "Test"
     password = "123test"
     path = "/Voicemanager"
