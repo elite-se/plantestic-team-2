@@ -98,7 +98,7 @@ class End2EndTest : StringSpec({
             .create(REROUTE_CONFIG_PATH)
     }
 
-    "End2End test receives request on mock server for rerouting - voiceEstablished == true".config(enabled = true) {
+    "End2End test receives request on mock server for rerouting - voiceEstablished == true".config(enabled = false) {
         val body_CCC_CRS = """{
             |"uiswitch" : "UISWITCH",
             |"reroute" : "REROUTE",
@@ -123,13 +123,7 @@ class End2EndTest : StringSpec({
                     .withStatus(200)
                     .withBody(body_CCC_Voicemanager_voiceenabled)))
 
-        MetaModelSetup.doSetup()
-
-        val pumlInputModelURI = URI.createFileURI(REROUTE_INPUT_PATH)
-        val pumlInputModel = ResourceSetImpl().getResource(pumlInputModelURI, true).contents[0]
-        val outputFolder = File(OUTPUT_PATH)
-
-        AcceleoCodeGenerator.generateCode(pumlInputModel, outputFolder)
+        runTransformationPipeline(REROUTE_INPUT_PATH)
 
         // Now compile the resulting code and execute it
         val compiledTest = Reflect.compile("com.mdd.test.Test", File("$OUTPUT_PATH/rerouting.java").readText()).create(REROUTE_CONFIG_PATH)
@@ -159,14 +153,14 @@ class End2EndTest : StringSpec({
                 .get(WireMock.urlPathMatching("/Voicemanager/ccc/events/123/isconnected"))
                 .willReturn(WireMock.aResponse()
                     .withStatus(400)))
+        wireMockServer.stubFor(
+            WireMock
+                .get(WireMock.anyUrl())
+                .willReturn(WireMock.aResponse()
+                    .withStatus(400))
+        )
 
-        MetaModelSetup.doSetup()
-
-        val pumlInputModelURI = URI.createFileURI(REROUTE_INPUT_PATH)
-        val pumlInputModel = ResourceSetImpl().getResource(pumlInputModelURI, true).contents[0]
-        val outputFolder = File(OUTPUT_PATH)
-
-        AcceleoCodeGenerator.generateCode(pumlInputModel, outputFolder)
+        runTransformationPipeline(REROUTE_INPUT_PATH)
 
         // Now compile the resulting code and execute it
         val compiledTest = Reflect.compile("com.mdd.test.Test", File("$OUTPUT_PATH/rerouting.java").readText()).create(REROUTE_CONFIG_PATH)
@@ -197,13 +191,7 @@ class End2EndTest : StringSpec({
                 .willReturn(WireMock.aResponse()
                     .withStatus(404)))
 
-        MetaModelSetup.doSetup()
-
-        val pumlInputModelURI = URI.createFileURI(REROUTE_INPUT_PATH)
-        val pumlInputModel = ResourceSetImpl().getResource(pumlInputModelURI, true).contents[0]
-        val outputFolder = File(OUTPUT_PATH)
-
-        AcceleoCodeGenerator.generateCode(pumlInputModel, outputFolder)
+        runTransformationPipeline(REROUTE_INPUT_PATH)
 
         // Now compile the resulting code and execute it
         val compiledTest = Reflect.compile("com.mdd.test.Test", File("$OUTPUT_PATH/rerouting.java").readText()).create(REROUTE_CONFIG_PATH)
@@ -222,19 +210,7 @@ class End2EndTest : StringSpec({
             |"warmhandover" : "WARMHANDOVER",
             |}""".trimMargin()
 
-        wireMockServer.stubFor(
-            WireMock
-                .get(WireMock.urlPathMatching("/CRS/ccc/rerouteOptions"))
-                .willReturn(WireMock.aResponse()
-                    .withStatus(200)
-                    .withBody(body_CCC_CRS)))
-        wireMockServer.stubFor(
-            WireMock
-                .get(WireMock.urlPathMatching("/Voicemanager/ccc/events/123/isconnected"))
-                .willReturn(WireMock.aResponse()
-                    .withStatus(500)))
-
-        MetaModelSetup.doSetup()
+        runTransformationPipeline(REROUTE_INPUT_PATH)
 
         val pumlInputModelURI = URI.createFileURI(REROUTE_INPUT_PATH)
         val pumlInputModel = ResourceSetImpl().getResource(pumlInputModelURI, true).contents[0]
