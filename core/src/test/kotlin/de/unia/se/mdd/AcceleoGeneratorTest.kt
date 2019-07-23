@@ -39,8 +39,16 @@ class AcceleoGeneratorTest : StringSpec({
         Reflect.compile("com.mdd.test.Test", File("$OUTPUT_PATH/minimal_hello.java").readText()).create(MINIMAL_HELLO_CONFIG_PATH)
     }
 
-    "Acceleo generation test receives request on mock server for minimal hello".config(enabled = true) {
-        wireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo("/hello")).willReturn(WireMock.aResponse().withStatus(200)))
+    "Acceleo generation test receives request on mock server for minimal hello" {
+        val body = """{
+            |"itemA" : "value1",
+            |"itemB" : "value2",
+            |}""".trimMargin()
+
+        wireMockServer.stubFor(
+            WireMock
+                .get(WireMock.urlPathMatching("/testB/test/123"))
+                .willReturn(WireMock.aResponse().withStatus(200).withBody(body)))
 
         MetaModelSetup.doSetup()
 
@@ -51,10 +59,9 @@ class AcceleoGeneratorTest : StringSpec({
         AcceleoCodeGenerator.generateCode(pumlInputModel, outputFolder)
 
         // Now compile the resulting code and execute it
-        val generatedCodeText = File("$OUTPUT_PATH/testScenario.java").readText()
-        val compiledTestClass = Reflect.compile("com.mdd.test.Test", generatedCodeText)
-        val compiledTestClassObject = compiledTestClass.create(MINIMAL_HELLO_CONFIG_PATH)
-        compiledTestClassObject.call("test")
+        val compiledTest = Reflect.compile("com.mdd.test.Test", File("$OUTPUT_PATH/minimal_hello.java").readText())
+            .create(MINIMAL_HELLO_CONFIG_PATH)
+        compiledTest.call("test")
 
         // Check if we received a correct request
         wireMockServer.allServeEvents.size shouldBe 1
@@ -96,7 +103,7 @@ class AcceleoGeneratorTest : StringSpec({
 
         wireMockServer.stubFor(
             WireMock
-                .get(WireMock.urlPathMatching("/testReceiver/test/123"))
+                .get(WireMock.urlPathMatching("/TestB/test/123"))
                 .willReturn(WireMock.aResponse().withStatus(200).withBody(body)))
 
         MetaModelSetup.doSetup()
@@ -114,7 +121,7 @@ class AcceleoGeneratorTest : StringSpec({
         compiledTestClassObject.call("test")
 
         // Check if we received a correct request
-        wireMockServer.allServeEvents.size shouldBe 1
+        wireMockServer.allServeEvents.size shouldBe 2
         wireMockServer.allServeEvents[0].response.status shouldBe 200
         wireMockServer.allServeEvents.forEach { serveEvent -> println(serveEvent.request) }
     }

@@ -2,7 +2,7 @@
 <RestAssured:TestScenario xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:RestAssured="http://www.example.org/RestAssured"
     testScenarioName="minimal_hello">
   <testroundtrip testRoundtripName="testRoundtrip">
-    <requestspecification method="GET" url="/test/${id}" receiver="testReceiver"/>
+    <requestspecification method="GET" url="/test/${id}" receiver="B"/>
     <responsespecification>
       <statusmatcher xsi:type="RestAssured:IsIn">
         <value>200</value>
