@@ -135,9 +135,7 @@ paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value/]");
     [responseSpecification.generateExpectStatusCode()/][if (responseSpecification.bodymatchergroup->notEmpty())]
         [responseSpecification.generateExpectations()/]
     [/if]
-	[if (responseSpecification.responsedatum->notEmpty())]
 	.and().extract().response()
-	[/if]
 [/template]
 
 [template private generateExpectStatusCode(responseSpecification : ResponseSpecification) post(trim())]
