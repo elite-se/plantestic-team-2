@@ -297,7 +297,6 @@ terminal PUMLID:
 terminal SL_COMMENT:
 	"'" !('\n' | '\r')* ('\r'? '\n')?;
 
-// TODO: Does not work
 // Multiline comments
 terminal ML_COMMENT:
-	"//'" ('\r'? '\n')* "'//" ;
+	"/'" -> "'/" ;
