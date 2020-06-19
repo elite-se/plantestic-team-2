@@ -289,14 +289,9 @@ terminal NEWLINE:
 	'\r'? '\n';
 
 // ID
-PUMLID:
-	(PUMLID_TERMINALS |
-	(PUMLID_TERMINALS | ':')*) |
-	('"' PUMLID_TERMINALS
-	(PUMLID_TERMINALS | ':')* '"');
-
-terminal PUMLID_TERMINALS:
-    ('a'..'z' | 'A'..'Z' | '_' | '0'..'9' | '\"\"' | '//' | '\\' | '*' | '?');
+terminal PUMLID:
+	('a'..'z' | 'A'..'Z' | '_' | '0'..'9' | '\"\"' | '//' | '\\' | '*' | '?')
+	('a'..'z' | 'A'..'Z' | '_' | '0'..'9' | '\"\"' | '//' | '\\' | ':' | '*' | '?')*;
 
 // Single line comment
 terminal SL_COMMENT:
