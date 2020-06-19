@@ -6,9 +6,27 @@ import org.eclipse.xtext.testing.extensions.InjectionExtension
 import org.eclipse.xtext.testing.util.ParseHelper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.^extension.ExtendWith
-import plantuml.puml.*
-import static org.junit.Assert.*
+import plantuml.puml.Activate
+import plantuml.puml.Alternative
+import plantuml.puml.Box
+import plantuml.puml.Delay
+import plantuml.puml.Divider
+import plantuml.puml.Else
+import plantuml.puml.Group
+import plantuml.puml.Legend
+import plantuml.puml.Newpage
+import plantuml.puml.Note
+import plantuml.puml.Participant
+import plantuml.puml.Reference
+import plantuml.puml.Request
+import plantuml.puml.Response
+import plantuml.puml.SequenceUml
+import plantuml.puml.Space
+import plantuml.puml.Title
+import plantuml.puml.UmlDiagram
+import plantuml.puml.UmlUse
 
+import static org.junit.Assert.*
 
 @ExtendWith(InjectionExtension)
 @InjectWith(PumlInjectorProvider)
@@ -342,30 +360,6 @@ class SequenceDiagramTest {
 		assertEquals("lol", ((heros.umlDiagrams.head as SequenceUml).umlElements.get(6) as UmlUse).userTwo.name)
 		assertEquals("foo", ((heros.umlDiagrams.head as SequenceUml).umlElements.get(7) as UmlUse).userOne.name)
 		assertEquals("lol", ((heros.umlDiagrams.head as SequenceUml).umlElements.get(7) as UmlUse).userTwo.name)
-	}
-
-	@Test def void testComponent() {
-		val heros = '''
-			COMPONENT @startuml
-			[ABC] AS A
-			[DEF] AS B
-			(A KI) AS C
-			A <-[#blue]- B : abch acd
-			B -d- A : ?
-			C -[#blue]r-> A : xyz
-			@enduml
-		'''.parse
-		assertEquals("A", ((heros.umlDiagrams.head as ComponentUml).umlElements.get(0) as Component).name)
-		assertEquals("KI", ((heros.umlDiagrams.head as ComponentUml).umlElements.get(2) as Interface).nameExtension.get(0))
-		
-		assertEquals("abch", ((heros.umlDiagrams.head as ComponentUml).umlElements.get(3) as Link).text.get(0));
-		assertEquals(2, ((heros.umlDiagrams.head as ComponentUml).umlElements.get(3) as Link).text.length);
-		assertEquals("A", ((heros.umlDiagrams.head as ComponentUml).umlElements.get(3) as Link).linkOne.name);
-		assertEquals("B", ((heros.umlDiagrams.head as ComponentUml).umlElements.get(3) as Link).linkTwo.name);
-		
-		assertEquals("C", ((heros.umlDiagrams.head as ComponentUml).umlElements.get(5) as Link).linkOne.name);
-		assertEquals("A", ((heros.umlDiagrams.head as ComponentUml).umlElements.get(5) as Link).linkTwo.name);
-		assertEquals(1, ((heros.umlDiagrams.head as ComponentUml).umlElements.get(5) as Link).text.length);
 	}
 
 	@Test def void testRequest() {
