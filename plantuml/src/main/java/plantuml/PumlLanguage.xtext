@@ -10,8 +10,7 @@ generate puml "http://www.eclipse.plantuml/Puml"
 // -----------------------------------------------------------------------------------------------
 UmlDiagram:
 	{UmlDiagram}
-	('SEQUENCE' umlDiagrams+=SequenceUml)
-	| ('COMPONENT' umlDiagrams+=ComponentUml);
+	('SEQUENCE' umlDiagrams+=SequenceUml);
 
 // -----------------------------------------------------------------------------------------------
 // ------------------------- Entry Points for different Diagrams ---------------------------------
@@ -21,11 +20,6 @@ UmlDiagram:
 SequenceUml:
 	{SequenceUml}
 	'@startuml' umlElements+=(SequenceElement)* '@enduml';
-
-// Component diagram
-ComponentUml:
-	{ComponentUml}
-	'@startuml' umlElements+=(ComponentElement)* '@enduml';
 
 
 // -----------------------------------------------------------------------------------------------
@@ -234,35 +228,6 @@ NamedElement:
 
 UmlUse:
 	{UmlUse};
-
-// -----------------------------------------------------------------------------------------------
-// ----------------------------------- Component Diagram -----------------------------------------
-// -----------------------------------------------------------------------------------------------
-
-ComponentElement:
-	Component
-	| Interface
-	| Link
-	| Title;
-
-Link:
-	linkOne=[NamedElement|PUMLID]
-	/**
-	 * Long list of possible clauses due to misunderstanding within the parser.
-	 * If you would split the detection into multiple ones this is not be detected in the right way.
-	 * Example:
-	 * 		('<-' | '-') (d)? ('-' | '->')
-	 * does not work because if the parser is already in PUMLID detection due to previous (':' text+=(PUMLID)*)?
-	 * it is not possible to detect the upper clause for sure.
-	 */
-	associationArrow=ARROW
-	linkTwo=[NamedElement|PUMLID] (':' text+=(PUMLID)*)?;
-
-Interface returns NamedElement:
-	{Interface} ('(' name=PUMLID nameExtension+=(PUMLID)* ')' | 'INTERFACE' description=STRING) ('AS' name=PUMLID)? (color=ColorTag)?;
-
-Component returns NamedElement:
-	{Component} ('[' name=PUMLID nameExtension+=(PUMLID | WS)* ']' | 'COMPONENT' description=STRING) ('AS' name=PUMLID)? (color=ColorTag)?;
 
 // -----------------------------------------------------------------------------------------------
 // ------------------------------- Shared Rules and Terminals ------------------------------------
