@@ -21,15 +21,6 @@ SequenceUml:
 	{SequenceUml}
 	'@startuml' umlElements+=(SequenceElement)* '@enduml';
 
-
-// -----------------------------------------------------------------------------------------------
-// ------------------------------------- Class Diagramm ------------------------------------------
-// -----------------------------------------------------------------------------------------------
-
-// Color definitions
-ColorTag:
-	COLOR | HEXCODE;
-
 // Left types of an association
 enum AssociationType:
 	BIDIRECTIONAL
@@ -51,13 +42,6 @@ terminal ARROW returns AssociationType:
 	('<' | '>' | '-' | '.' | 'o' | 'x' | '*' | '|' | 'l' | 'r' | 'u' | 'd'
 	| '[#' ( 'a'..'z' | 'A'..'Z' | '0'..'9' )+ ']'
 	)*;
-// Visibility for attributes and methods
-enum Visibility:
-	PROTECTED='#'
-	| PRIVATE='-'
-	| DEFAULT='~'
-	| PUBLIC='+';
-
 
 // -----------------------------------------------------------------------------------------------
 // ----------------------------------- Sequence Diagramm -----------------------------------------
@@ -95,22 +79,18 @@ Participant:
 	('PARTICIPANT' | 'ACTOR' | 'BOUNDARY' | 'CONTROL' | 'ENTITY' | 'DATABASE') (name=PUMLID | longname=(STRING | PUMLID) 'AS'
 	name=PUMLID);
 
-QualifiedName:
-	{QualifiedName}
-	PUMLID;
-
 RequestResponse:
     Request | Response;
 
 Request returns RequestResponse:
     {Request}
-    method=RequestMethod url=STRING ('(' requestParam+=RequestParam (',' requestParam+=RequestParam)* ')')?;
+    method=REQUEST_METHOD url=STRING ('(' requestParam+=RequestParam (',' requestParam+=RequestParam)* ')')?;
 
 RequestParam:
     {RequestParam}
     name=PUMLID ':' value=STRING;
 
-terminal RequestMethod:
+terminal REQUEST_METHOD:
     'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 Response returns RequestResponse:
@@ -157,9 +137,6 @@ Legend:
 	'LEGEND'
 	legendEntries+=(STRING | PUMLID | '=' | ':')*
 	'ENDLEGEND';
-
-LegendEntries:
-	name=PUMLID '=' value+=(PUMLID | STRING)*;
 
 Autonumber:
 	{Autonumber}
@@ -218,43 +195,9 @@ UseRight returns UmlUse:
 	//('o->' | '->o' | 'o->o' | '->' | 'o-->' | '-->o' | 'o-->o' | '-->' | 'x->' | '->x' | 'x->x' | 'x-->' | '-->x' | 'x-->x')
 	(userTwo=[Participant|PUMLID] | ']') (':' (content=RequestResponse | text+=(PUMLID)*))?;
 
-UmlElementsContainer:
-	{UmlElementsContainer}
-	umlElements+=(SequenceElement)*;
-
-NamedElement:
-	{NamedElement}
-	name=PUMLID;
-
-UmlUse:
-	{UmlUse};
-
 // -----------------------------------------------------------------------------------------------
 // ------------------------------- Shared Rules and Terminals ------------------------------------
 // -----------------------------------------------------------------------------------------------
-terminal COLOR:
-	"#" ('AliceBlue'|'AntiqueWhite'|'Aqua'|'Aquamarine'|'Azure'|'Beige'|'Bisque'|'Black'|'BlanchedAlmond'
-	|'Blue'|'BlueViolet'|'Brown'|'BurlyWood'|'CadetBlue'|'Chartreuse'|'Chocolate'|'Coral'
-	|'CornflowerBlue'|'Cornsilk'|'Crimson'|'Cyan'|'DarkBlue'|'DarkCyan'|'DarkGoldenRod'|'DarkGray'
-	|'DarkGreen'|'DarkGrey'|'DarkKhaki'|'DarkMagenta'|'DarkOliveGreen'|'DarkOrchid'|'DarkRed'
-	|'DarkSalmo'|'DarkSeaGreen'|'DarkSlateBlue'|'DarkSlateGray'|'DarkSlateGrey'|'DarkTurquoise'
-	|'DarkViolet'|'Darkorange'|'DeepPink'|'DeepSkyBlue'|'DimGray'|'DimGrey'|'DodgerBlue'
-	|'FireBrick'|'FloralWhite'|'ForestGreen'|'Fuchsia'|'Gainsboro'|'GhostWhite'|'Gold'
-	|'GoldenRod'|'Gray'|'Green'|'GreenYellow'|'Grey'|'HoneyDew'|'HotPink'|'IndianRed'
-	|'Indigo'|'Ivory'|'Khaki'|'Lavender'|'LavenderBlush'|'LawnGreen'|'LemonChiffon'
-	|'LightBlue'|'LightCoral'|'LightCyan'|'LightGoldenRodYellow'|'LightGray'|'LightGreen'
-	|'LightGrey'|'LightPink'|'LightSalmon'|'LightSeaGreen'|'LightSkyBlue'|'LightSlateGray'
-	|'LightSlateGrey'|'LightSteelBlue'|'LightYellow'|'Lime'|'LimeGreen'|'Linen'|'Magenta'
-	|'Maroon'|'MediumAquaMarine'|'MediumBlue'|'MediumOrchid'|'MediumPurple'|'MediumSeaGreen'
-	|'MediumSlateBlue'|'MediumSpringGreen'|'MediumTurquoise'|'MediumVioletRed'
-	|'MidnightBlue'|'MintCream'|'MistyRose'|'Moccasin'|'NavajoWhite'|'Navy'|'OldLace'
-	|'Olive'|'OliveDrab'|'OrangeRed'|'Orchid'|'PaleGoldenRod'|'PaleGreen'
-	|'PaleTurquoise'|'PaleVioletRed'|'PapayaWhip'|'PeachPuff'|'Peru'|'Pink'|'Plum'
-	|'PowderBlue'|'Purple'|'Red'|'RosyBrown'|'RoyalBlue'|'SaddleBrown'
-	|'Salmon'|'SandyBrown'|'SeaGreen'|'Sienna'|'Silver'|'SkyBlue'|'SlateBlue'
-	|'SlateGray'|'SlateGrey'|'Snow'|'SpringGreen'|'SteelBlue'|'Tan'|'Teal'|'Thistle'
-	|'Tomato'|'Turquoise'|'Violet'|'Wheat'|'White'|'WhiteSmoke'|'Yellow'|'YellowGreen');
-
 // Hexadecimal colors
 terminal HEXCODE:
 	"#"
@@ -262,23 +205,12 @@ terminal HEXCODE:
 	('A' .. 'F'|'0' .. '9')('A' .. 'F'|'0' .. '9')('A' .. 'F'|'0' .. '9');
 
 // Terminal to detect methods
-/*terminal METHID:
-	('a'..'z' | 'A'..'Z' | '_' | '0'..'9')
-	('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*
-	"("
-	('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*
-	")";
-*/
-// Integer
 terminal INT returns ecore::EInt:
 	'0'..'9'+;
 
 // String
 terminal STRING:
 	'"' ('\\' . | !('\\' | '"'))* '"';
-
-/*Arrow:
-	type=ARROWTYPE;*/
 
 // Tab
 terminal WS:
