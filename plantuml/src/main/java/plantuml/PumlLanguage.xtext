@@ -11,17 +11,11 @@ generate puml "http://www.eclipse.plantuml/Puml"
 UmlDiagram:
 	{UmlDiagram}
 	('SEQUENCE' umlDiagrams+=SequenceUml)
-	| ('COMPONENT' umlDiagrams+=ComponentUml)
-	| ('CLASS' umlDiagrams+=ClassUml);
+	| ('COMPONENT' umlDiagrams+=ComponentUml);
 
 // -----------------------------------------------------------------------------------------------
 // ------------------------- Entry Points for different Diagrams ---------------------------------
 // -----------------------------------------------------------------------------------------------
-
-// Class diagram
-ClassUml:
-	{ClassUml}
-	'@startuml' umlElements+=(ClassElement)* '@enduml';
 
 // Sequence diagram
 SequenceUml:
@@ -38,160 +32,10 @@ ComponentUml:
 // ------------------------------------- Class Diagramm ------------------------------------------
 // -----------------------------------------------------------------------------------------------
 
-// Elements of the class diagram
-ClassElement:
-	Association
-	| Classifier
-	| NoteClass
-	| Enum
-	| UmlClassTitle;
-
-Classifier:
-	ClassDef | InterfaceDef;
-
-// Class definition
-ClassDef:
-	{ClassDef}
-	(abstract?='abstract')? 'class' (name=PUMLID | name=STRING | longName=STRING 'as' name=PUMLID)
-	(color=ColorTag)?
-	(inheritance = Inheritance)?
-	('{' (contents+=ClassContent | divider+=DividerClass | advancedBody+=STRING)* '}')?;
-
-InterfaceDef:
-	{InterfaceDef}
-	(abstract?='abstract')? 'interface' (name=PUMLID | name=STRING | longName=STRING 'as' name=PUMLID)
-	(color=ColorTag)?
-	(inheritance = Inheritance)?
-	('{' (contents+=ClassContent | divider+=DividerClass | advancedBody+=STRING)* '}')?;
-
-Inheritance:
-	{Inheritance}
-	('extends' superTypes+=[Classifier|ClassName] (',' superTypes+=[Classifier|ClassName])*)?
-	('implements' implementedInterfaces+=[Classifier|ClassName] (',' implementedInterfaces+=[Classifier|ClassName])*)?;
-
-//Value converter
-/*Name:
-	(name=PUMLID | name=STRING | longName=STRING 'as' name=PUMLID);*/
-
-// Other possibility to create classes
-// TODO: Interferences with other rules
-/*ClassWithContent returns Class:
-	name = Name ":" classContents+=ClassContent;*/
-
-UmlClassTitle:
-	{UmlClassTitle}
-	'title' name = (PUMLID | STRING);
-
-// Important contents insPUMLIDe a class
-ClassContent:
-	Method
-	| Attribute
-	| DividerClass;
-
-// Class names
-ClassName:
-	(PUMLID | STRING);
-
-// Enums
-Enum:
-	{Enum}
-	'enum' name=PUMLID (color=ColorTag)?
-	('{' enumConstants+=EnumConstant (',' enumConstants+=EnumConstant)* '}')?;
-
-// Constants in Enums
-EnumConstant:
-	{EnumConstant}
-	name=PUMLID;
-
-// Attributes in classes
-Attribute:
-	{Attribute}
-	(static?='{static}')? (abstract?='{abstract}')?
-	(visibility=Visibility)?
-	((type=PUMLID ('[' (length=INT)? ']')? name=PUMLID)
-	|(name=PUMLID (":" type=PUMLID ('[' (length=INT)? ']')?)));
-
-// Methods in classes
-Method:
-	{Method}
-	(static?='{static}')? (abstract?='{abstract}')?
-	(visibility=Visibility)?
-	(
-		(
-			(type=PUMLID)?
-			('[' (length=INT)? ']')?
-			name=(PUMLID)
-			'(' (parameters+=Attribute (',' parameters+=Attribute)*)? ')'
-		)
-		|
-		(
-			name=(PUMLID)
-			'(' (parameters+=Attribute (',' parameters+=Attribute)*)? ')'
-			(":" type=PUMLID ('[' (length=INT)? ']')?)
-		)
-	);
-
-// Associations between classes
-Association:
-	{Association}
-	(classLeft=[Classifier|ClassName]
-	infoLeft=STRING?
-	=>associationArrow=ARROW
-	infoRight=STRING?
-	classRight=[Classifier|ClassName])
-	(':' label=PUMLID)?;
-
-
-// Notes for classes
-NoteClass:
-	{NoteClass}
-	'note' direction=NotePosition ('of' noteOf=[Classifier|ClassName])?
-	note+=PUMLIDText
-	'end note';
-
-// whitspace between words are possible and are showing correctly in the model
-PUMLIDText:
-	PUMLID+
-;
-
 // Color definitions
 ColorTag:
 	COLOR | HEXCODE;
 
-// DivPUMLIDer to separate parts of a class
-// TODO: Problem: ambiguity with association arrow
-DividerClass:
-	EQUALDIVIDER
-	//| DASHEDDIVIDER
-	| UNDERLINEDIVIDER
-	//| DOTEDDIVIDER
-;
-EQUALDIVIDER returns DividerClass:
-	{EQUALDIVIDER}
-	'==' (dividerText+=PUMLIDText '==')?
-;
-
-DASHEDDIVIDER returns DividerClass:
-	{DASHEDDIVIDER}
-	'--' (dividerText+=PUMLIDText '--')?
-;
-
-UNDERLINEDIVIDER returns DividerClass:
-	{UNDERLINEDIVIDER}
-	'__' (dividerText+=PUMLIDText '__')?
-;
-
-DOTEDDIVIDER returns DividerClass:
-	{DOTEDDIVIDER}
-	'..' (dividerText+=PUMLIDText '..')?
-;
-
-
-enum NotePosition:
-	LEFT = 'left'
-	| RIGHT = 'right'
-	| TOP = 'top'
-;
 // Left types of an association
 enum AssociationType:
 	BIDIRECTIONAL
