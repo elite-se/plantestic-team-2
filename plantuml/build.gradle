@@ -1,7 +1,9 @@
 group = "plantuml"
 version = "1.0.0-SNAPSHOT"
 
-ext.xtextVersion = "2.18.0"
+ext {
+	xtextVersion = "2.18.0"
+}
 
 repositories {
 	jcenter()
@@ -11,24 +13,25 @@ repositories {
 }
 
 apply plugin: "java"
+apply plugin: "java-library"
 apply plugin: "idea"
 apply plugin: "eclipse"
 apply plugin: "org.xtext.xtend"
 apply from: "${projectDir}/source-layout.gradle"
 
 dependencies {
-	testCompile "org.junit.jupiter:junit-jupiter-api"
-	testRuntime "org.junit.jupiter:junit-jupiter-engine"
-	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${xtextVersion}"
-	testCompile "org.eclipse.xtext:org.eclipse.xtext.xbase.testing:${xtextVersion}"
-	compile "org.eclipse.xtext:org.eclipse.xtext:${xtextVersion}"
-	compile "org.eclipse.xtext:org.eclipse.xtext.xbase:${xtextVersion}"
-	compile platform("org.eclipse.xtext:xtext-dev-bom:${xtextVersion}")
+	testImplementation "org.junit.jupiter:junit-jupiter-api"
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+	testImplementation "org.eclipse.xtext:org.eclipse.xtext.testing:${xtextVersion}"
+	testImplementation "org.eclipse.xtext:org.eclipse.xtext.xbase.testing:${xtextVersion}"
+	api "org.eclipse.xtext:org.eclipse.xtext:${xtextVersion}"
+	implementation "org.eclipse.xtext:org.eclipse.xtext.xbase:${xtextVersion}"
+	implementation platform("org.eclipse.xtext:xtext-dev-bom:${xtextVersion}")
 }
 
 configurations {
 	mwe2 {
-		extendsFrom compile
+		extendsFrom implementation
 	}
 	all {
 		exclude group: "asm"
@@ -39,10 +42,10 @@ sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
 dependencies {
-	mwe2 "org.eclipse.emf:org.eclipse.emf.mwe2.launch"
+	mwe2 "org.eclipse.emf:org.eclipse.emf.mwe2.launch:2.11.0"
 	mwe2 "org.eclipse.xtext:org.eclipse.xtext.common.types:${xtextVersion}"
 	mwe2 "org.eclipse.xtext:org.eclipse.xtext.xtext.generator:${xtextVersion}"
-	mwe2 "org.eclipse.xtext:xtext-antlr-generator"
+	mwe2 "org.eclipse.xtext:xtext-antlr-generator:2.1.1"
 }
 
 task generateXtextLanguage(type: JavaExec) {

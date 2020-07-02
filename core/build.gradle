@@ -31,8 +31,6 @@ compileTestKotlin {
 }
 
 jar {
-    baseName = "se13-plantestic-team"
-    version = "0.1.0"
     manifest {
         attributes "Main-Class": "de.unia.se.plantestic.MainKt"
     }
