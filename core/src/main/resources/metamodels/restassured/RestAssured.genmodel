@@ -35,7 +35,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RestAssured.ecore#//IsIn/value"/>
     </genClasses>
     <genClasses ecoreClass="RestAssured.ecore#//TestScenario">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RestAssured.ecore#//TestScenario/testroundtrip"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RestAssured.ecore#//TestScenario/testcomponent"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RestAssured.ecore#//TestScenario/testScenarioName"/>
     </genClasses>
     <genClasses ecoreClass="RestAssured.ecore#//HasXPath">
@@ -51,6 +51,10 @@
     <genClasses ecoreClass="RestAssured.ecore#//RequestDatum">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RestAssured.ecore#//RequestDatum/variableName"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RestAssured.ecore#//RequestDatum/value"/>
+    </genClasses>
+    <genClasses ecoreClass="RestAssured.ecore#//TestComponent"/>
+    <genClasses ecoreClass="RestAssured.ecore#//TestDelay">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RestAssured.ecore#//TestDelay/durationInMs"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>
