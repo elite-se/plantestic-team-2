@@ -2,7 +2,8 @@
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="RequestResponsePairs" nsURI="http://www.example.org/RequestResponsePairs"
     nsPrefix="RequestResponsePairs">
-  <eClassifiers xsi:type="ecore:EClass" name="Roundtrip" instanceClassName="java.lang.Object">
+  <eClassifiers xsi:type="ecore:EClass" name="Roundtrip" instanceClassName="java.lang.Object"
+      eSuperTypes="#//ScenarioComponent">
     <eStructuralFeatures xsi:type="ecore:EReference" name="httprequest" lowerBound="1"
         eType="#//HttpRequest" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="httpresponse" lowerBound="1"
@@ -28,8 +29,8 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Scenario">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="roundtrip" lowerBound="1"
-        upperBound="-1" eType="#//Roundtrip" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="component" lowerBound="1"
+        upperBound="-1" eType="#//ScenarioComponent" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="scenarioName" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
@@ -42,5 +43,9 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="variableName" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ScenarioComponent" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Delay" eSuperTypes="#//ScenarioComponent">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="durationInMs" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
   </eClassifiers>
 </ecore:EPackage>

@@ -27,7 +27,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//HttpResponse/httpStatus"/>
     </genClasses>
     <genClasses ecoreClass="RequestResponsePairs.ecore#//Scenario">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RequestResponsePairs.ecore#//Scenario/roundtrip"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RequestResponsePairs.ecore#//Scenario/component"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//Scenario/scenarioName"/>
     </genClasses>
     <genClasses ecoreClass="RequestResponsePairs.ecore#//HttpResponseDatum">
@@ -37,6 +37,10 @@
     <genClasses ecoreClass="RequestResponsePairs.ecore#//HttpRequestDatum">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//HttpRequestDatum/variableName"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//HttpRequestDatum/value"/>
+    </genClasses>
+    <genClasses ecoreClass="RequestResponsePairs.ecore#//ScenarioComponent"/>
+    <genClasses ecoreClass="RequestResponsePairs.ecore#//Delay">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//Delay/durationInMs"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>
