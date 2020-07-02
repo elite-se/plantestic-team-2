@@ -1,17 +1,37 @@
-subprojects {
-	group = "de.unia.se"
-	version = "${version}"
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        google()
+    }
 }
 
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.3.72"
+    id "org.jetbrains.kotlin.plugin.allopen" version "1.3.72"
+    id "org.jetbrains.kotlin.plugin.noarg" version "1.3.72"
+}
 
-buildscript {
-	repositories {
-		jcenter()
-		mavenCentral()
-		google()
-		gradlePluginPortal()
-	}
-	dependencies {
-		classpath "org.xtext:xtext-gradle-plugin:2.0.4"
-	}
+subprojects {
+    ext {
+        kotlin_version = "1.3.72"
+    }
+    repositories {
+        jcenter()
+        google()
+        mavenCentral()
+    }
+
+    buildscript {
+        repositories {
+            jcenter()
+            mavenCentral()
+            google()
+        }
+    }
+
+    group = "de.unia.se"
+    version = "${version}"
+
+
 }

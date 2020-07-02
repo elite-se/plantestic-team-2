@@ -1,23 +1,19 @@
+plugins {
+	id "java"
+	id "java-library"
+	id "idea"
+	id "eclipse"
+	id "org.xtext.xtend" version "2.0.8"
+}
+
+apply from: "${projectDir}/source-layout.gradle"
+
 group = "plantuml"
 version = "1.0.0-SNAPSHOT"
 
 ext {
 	xtextVersion = "2.18.0"
 }
-
-repositories {
-	jcenter()
-	mavenCentral()
-	google()
-	gradlePluginPortal()
-}
-
-apply plugin: "java"
-apply plugin: "java-library"
-apply plugin: "idea"
-apply plugin: "eclipse"
-apply plugin: "org.xtext.xtend"
-apply from: "${projectDir}/source-layout.gradle"
 
 dependencies {
 	testImplementation "org.junit.jupiter:junit-jupiter-api"
@@ -37,9 +33,6 @@ configurations {
 		exclude group: "asm"
 	}
 }
-
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
 
 dependencies {
 	mwe2 "org.eclipse.emf:org.eclipse.emf.mwe2.launch:2.11.0"
