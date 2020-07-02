@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id 'groovy'
+    id 'java-gradle-plugin'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-script-runtime"
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+//
+//plugindev {
+//    pluginImplementationClass 'de.unia.se.JooqPlugin'
+//    pluginDescription '' // TODO
+//    pluginLicenses 'Apache-2.0'
+//    pluginTags 'gradle', 'plugin', 'plantestic'
+//    authorId 'maxammann'
+//    authorName 'Max Ammann'
+//    authorEmail 'maximilian.ammann@student.uni-augsburg.de'
+//    projectUrl 'https://github.com/elite-se/plantestic-team-2/'
+//    projectInceptionYear '2020'
+//    done()
+//}

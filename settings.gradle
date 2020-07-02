@@ -1,3 +1,5 @@
 rootProject.name = 'plantestic'
 include 'plantuml'
 include 'core'
+include 'gradle-plantestic-plugin'
+
