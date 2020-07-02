@@ -16,7 +16,19 @@ mapping Scenario::scenario2testScenario(): TestScenario {
     log('Transforming Scenario to TestScenario');
 
     testScenarioName := self.scenarioName;
-    testroundtrip := self.roundtrip -> map roundtrip2testRoundtrip();
+    testComponent := self.component -> map component2testComponent();
+}
+
+mapping ScenarioComponent::component2testComponent(): TestComponent {
+	if (self.oclIsTypeOf(Roundtrip)) {
+		self.map roundtrip2testRoundtrip();
+	} elif (self.oclIsTypeOf(Delay)) {
+		self.map delay2testDelay();
+	}
+} 
+
+mapping Delay::dalay2testDelay(): Delay {
+	self.duration := duration;
 }
 
  mapping Roundtrip::roundtrip2testRoundtrip(): TestRoundtrip {

@@ -16,7 +16,7 @@ main() {
 
 mapping SequenceUml::transformUmlDiagram(): Scenario {
     scenarioName := diagramName + "_puml";
-    var roundtripId : Integer := 1;
+    var componentId : Integer := 1;
 
     var umlElements : OrderedSet(SequenceElement) := self.umlElements->flattenSequenceElements();
     var umlElementsSize : Integer := umlElements->size();
@@ -38,9 +38,9 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
                 var response : Response := useLeft.useLeft2response();
                 var httpResponseElement : HttpResponse := response.response2httpResponse();
 
-                var roundtripElement : Roundtrip := generateRoundtrip(roundtripId, httpRequestElement, httpResponseElement);
-                roundtrip += roundtripElement;
-                roundtripId := roundtripId + 1;
+                var roundtripElement : Roundtrip := generateRoundtrip(componentId, httpRequestElement, httpResponseElement);
+                component += roundtripElement;
+                componentId := componentId + 1;
             }
             elif (sequenceElement.oclIsTypeOf(Alternative)) {
                 var httpRequestElementCopy : HttpRequest := new HttpRequest();
@@ -54,20 +54,20 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
                 var response : Response := useLeft.useLeft2response();
                 var httpResponseElement : HttpResponse := response.response2httpResponse();
 
-                var roundtripElement : Roundtrip := generateRoundtrip(roundtripId, httpRequestElementCopy, httpResponseElement);
+                var roundtripElement : Component := generateRoundtrip(componentId, httpRequestElementCopy, httpResponseElement);
                 roundtripElement.precondition := alternative.text;
-                roundtrip += roundtripElement;
-                roundtripId := roundtripId + 1;
+                component += roundtripElement;
+                componentId := componentId + 1;
 
                 var elseElement : Else := alternative.elseBlocks->at(1).oclAsType(Else);
                 useLeft := elseElement.umlElements->at(1).oclAsType(UseLeft);
                 response := useLeft.useLeft2response();
                 httpResponseElement := response.response2httpResponse();
 
-                roundtripElement := generateRoundtrip(roundtripId, httpRequestElement, httpResponseElement);
+                roundtripElement := generateRoundtrip(componentId, httpRequestElement, httpResponseElement);
                 roundtripElement.precondition := elseElement.text;
-                roundtrip += roundtripElement;
-                roundtripId := roundtripId + 1;
+                component += roundtripElement;
+                componentId := componentId + 1;
 
             };
         }
@@ -81,10 +81,16 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
             var response : Response := useLeft.useLeft2response();
             var httpResponseElement : HttpResponse := response.response2httpResponse();
 
-            var roundtripElement : Roundtrip := generateRoundtrip(roundtripId, httpRequestElement, httpResponseElement);
+            var roundtripElement : Roundtrip := generateRoundtrip(componentId, httpRequestElement, httpResponseElement);
             roundtripElement.precondition := alternative.text;
-            roundtrip += roundtripElement;
-            roundtripId := roundtripId + 1;
+            component += roundtripElement;
+            componentId := componentId + 1;
+        }
+        elif (sequenceElement.oclIsTypeOf(Delay)) {
+        	var delay : Delay := sequenceElement.oclAsType(Delay);
+        	var delayElement : Delay := generateDelay(componentId, delay.text);
+        	component += delayElement;
+        	componentId := compontentId + 1;
         };
         umlElementsIndex := umlElementsIndex + 1;
     };
@@ -138,7 +144,7 @@ helper UseLeft::useLeft2request():Request {
     return requestresponse.oclAsType(Request);
 }
 
-helper generateRoundtrip(roundtripId : Integer, httpRequest : HttpRequest, httpResponse : HttpResponse):Roundtrip {
+helper generateRoundtrip(componentId : Integer, httpRequest : HttpRequest, httpResponse : HttpResponse):Roundtrip {
     var roundtripElement : Roundtrip := new Roundtrip();
     roundtripElement.roundtripName := "roundtrip" + roundtripId.toString();
     roundtripElement.httprequest := httpRequest;
