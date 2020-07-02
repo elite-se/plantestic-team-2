@@ -2,12 +2,14 @@ package de.unia.se
 
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-//import org.gradle.process.ExecOperations
+import org.gradle.process.ExecOperations
 import org.gradle.process.ExecResult
 import org.gradle.process.JavaExecSpec
 import java.io.File
@@ -15,23 +17,22 @@ import java.io.File
 /**
  * Gradle Task that runs the jOOQ source code generation.
  */
-class JooqTask @javax.inject.Inject constructor(
-    projectLayout: ProjectLayout?,
-//    execOperations: ExecOperations?,
+open class PlantesticTask constructor(
+    private val projectLayout: ProjectLayout?,
+    private val execOperations: ExecOperations?,
     jooqClasspath: FileCollection?
+//    val outputDirectory: Directory?
 ) :
     DefaultTask() {
-//    private val projectLayout: ProjectLayout?
-//    private val execOperations: ExecOperations?
-//    private val jooqClasspath: FileCollection?
+    private val plantesticClasspath: FileCollection? = jooqClasspath
 
     private var javaExecSpec: Action<in JavaExecSpec?>? = null
     private var execResultHandler: Action<in ExecResult?>? = null
 
-//    @Classpath
-//    fun getJooqClasspath(): FileCollection? {
-//        return jooqClasspath
-//    }
+    @Classpath
+    fun getPlantesticClasspath(): FileCollection? {
+        return plantesticClasspath
+    }
 
     @Internal
     fun getJavaExecSpec(): Action<in JavaExecSpec?>? {
@@ -50,10 +51,6 @@ class JooqTask @javax.inject.Inject constructor(
     fun setExecResultHandler(execResultHandler: Action<in ExecResult?>?) {
         this.execResultHandler = execResultHandler
     }
-
-//    @get:OutputDirectory
-//    val outputDirectory: Directory?
-//        get() = projectLayout.getProjectDirectory().dir(configuration.getGenerator().getTarget().getDirectory())
 
     @TaskAction
     fun generate() {
@@ -119,12 +116,5 @@ class JooqTask @javax.inject.Inject constructor(
 //            }
 //            return configuration
 //        }
-//    }
-
-//    init {
-//        this.projectLayout = projectLayout
-//        this.execOperations = execOperations
-//        this.jooqClasspath = jooqClasspath
-////        this.configuration = configuration
 //    }
 }
