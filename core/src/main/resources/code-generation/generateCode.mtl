@@ -47,13 +47,9 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 
     @Test
 	public void test() throws Exception {
-	[for (testRoundtrip : TestRoundtrip | testScenario.testroundtrip) separator('\n\n') ]
-		[if (testRoundtrip.precondition->isEmpty())][testRoundtrip.generateTestRoundtrip()/][/if]
-		[if (testRoundtrip.precondition->notEmpty())]
-		if(eval("[testRoundtrip.precondition/]")) {
-			[testRoundtrip.generateTestRoundtrip()/]
-		}
-		[/if]
+	[for (testComponent : TestComponent | testScenario.testcomponent) separator('\n\n') ]
+		[let testRoundtrip : TestRoundtrip = testComponent][testRoundtrip.generateTestRoundtripWithPrecondition()/][/let]
+		[let testDelay : TestDelay = testComponent][testDelay.generateTestDelay()/][/let]
 	[/for]
 	}
 
@@ -90,6 +86,15 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 	}
 }
 [/file]
+[/template]
+
+[template private generateTestRoundtripWithPrecondition(testRoundtrip : TestRoundtrip) post(trim())]
+[if (testRoundtrip.precondition->isEmpty())][testRoundtrip.generateTestRoundtrip()/][/if]
+[if (testRoundtrip.precondition->notEmpty())]
+if(eval("[testRoundtrip.precondition/]")) {
+	[testRoundtrip.generateTestRoundtrip()/]
+}
+[/if]
 [/template]
 
 [template private generateTestRoundtrip(testRoundtrip : TestRoundtrip) post(trim())]
@@ -162,4 +167,8 @@ paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value/]");
 	[for (responseDatum : ResponseDatum | testRoundtrip.responsespecification.responsedatum)]
 paramsMap.put("[responseDatum.variableName/]", [testRoundtrip.testRoundtripName/].jsonPath().getString("[responseDatum.xPath/]"));
 	[/for]
+[/template]
+
+[template private generateTestDelay(testDelay : TestDelay) post(trim())]
+Thread.sleep([testDelay.durationInMs/]);
 [/template]

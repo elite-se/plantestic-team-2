@@ -69,7 +69,15 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
                 component += roundtripElement;
                 componentId := componentId + 1;
 
-            };
+            }
+            elif (sequenceElement.oclIsTypeOf(Delay)) {
+                var delay : Delay := sequenceElement.oclAsType(Delay);
+                var duration : Integer := delay.value;
+                if (duration.<>(null)) {
+                    var delayElement : RequestResponsePairs::Delay := generateDelay(componentId, duration);
+                    component += delayElement;
+                };
+             };
         }
         elif (sequenceElement.oclIsTypeOf(Alternative)) {
             var alternative : Alternative := sequenceElement.oclAsType(Alternative);
@@ -88,13 +96,11 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
         }
         elif (sequenceElement.oclIsTypeOf(Delay)) {
         	var delay : Delay := sequenceElement.oclAsType(Delay);
-        	var value : String := delay.value->at(0);
-        	var duration : Integer := value.asInteger();
+        	var duration : Integer := delay.value;
         	if (duration.<>(null)) {
         		var delayElement : RequestResponsePairs::Delay := generateDelay(componentId, duration);
         		component += delayElement;
-        		componentId := componentId + 1;
-        	}
+        	};
         };
         umlElementsIndex := umlElementsIndex + 1;
     };

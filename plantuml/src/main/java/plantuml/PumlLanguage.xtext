@@ -107,7 +107,7 @@ Space:
 
 Delay:
 	{Delay}
-	'...' value+=(PUMLID)* '...';
+	'...' value=INT '...';
 
 Reference:
 	{Reference}
