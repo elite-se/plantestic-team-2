@@ -19,21 +19,8 @@ mapping Scenario::scenario2testScenario(): TestScenario {
     testcomponent := self.component -> map component2testComponent();
 }
 
-mapping ScenarioComponent::component2testComponent(): TestComponent {
-	if (self.oclIsTypeOf(Roundtrip)) {
-	    init {
-	        result := TestRoundtrip;
-	    }
-	    var roundtrip : Roundtrip := self.oclAsType(Roundtrip);
-		roundtrip.map roundtrip2testRoundtrip();
-	} elif (self.oclIsTypeOf(Delay)) {
-        init {
-            result := TestDelay;
-        }
-	    var delay : Delay := self.oclAsType(Delay);
-		delay.map delay2testDelay();
-	}
-}
+mapping ScenarioComponent::component2testComponent(): TestComponent
+disjuncts Delay::delay2testDelay,Roundtrip::roundtrip2testRoundtrip {}
 
 mapping Delay::delay2testDelay(): TestDelay {
 	durationInMs := self.durationInMs;

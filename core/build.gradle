@@ -88,6 +88,7 @@ dependencies {
     implementation "org.eclipse.uml2:org.eclipse.uml2.types:2.0.0.v20140910-1354"
     implementation "org.eclipse.uml2:org.eclipse.uml2.uml:5.0.1.v20140910-1354"
     implementation "lpg.runtime:lpg.runtime.java:2.0.17.v201004271640"
+    implementation "icu:icu4j:2.6.1"
 
     // Making Acceleo work without Eclipse
     implementation "org.eclipse.acceleo:org.eclipse.acceleo.engine:3.5.1.201409021433"
