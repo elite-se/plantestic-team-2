@@ -54,7 +54,7 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
                 var response : Response := useLeft.useLeft2response();
                 var httpResponseElement : HttpResponse := response.response2httpResponse();
 
-                var roundtripElement : Component := generateRoundtrip(componentId, httpRequestElementCopy, httpResponseElement);
+                var roundtripElement : Roundtrip := generateRoundtrip(componentId, httpRequestElementCopy, httpResponseElement);
                 roundtripElement.precondition := alternative.text;
                 component += roundtripElement;
                 componentId := componentId + 1;
@@ -88,9 +88,13 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
         }
         elif (sequenceElement.oclIsTypeOf(Delay)) {
         	var delay : Delay := sequenceElement.oclAsType(Delay);
-        	var delayElement : Delay := generateDelay(componentId, delay.text);
-        	component += delayElement;
-        	componentId := compontentId + 1;
+        	var value : String := delay.value->at(0);
+        	var duration : Integer := value.asInteger();
+        	if (duration.<>(null)) {
+        		var delayElement : RequestResponsePairs::Delay := generateDelay(componentId, duration);
+        		component += delayElement;
+        		componentId := componentId + 1;
+        	}
         };
         umlElementsIndex := umlElementsIndex + 1;
     };
@@ -146,10 +150,16 @@ helper UseLeft::useLeft2request():Request {
 
 helper generateRoundtrip(componentId : Integer, httpRequest : HttpRequest, httpResponse : HttpResponse):Roundtrip {
     var roundtripElement : Roundtrip := new Roundtrip();
-    roundtripElement.roundtripName := "roundtrip" + roundtripId.toString();
+    roundtripElement.roundtripName := "roundtrip" + componentId.toString();
     roundtripElement.httprequest := httpRequest;
     roundtripElement.httpresponse := httpResponse;
     return roundtripElement;
+}
+
+helper generateDelay(componentId : Integer, duration : Integer): RequestResponsePairs::Delay {
+	var delayElement : RequestResponsePairs::Delay := new RequestResponsePairs::Delay();
+	delayElement.durationInMs := duration;
+	return delayElement;
 }
 
 mapping Request::request2httpRequest():HttpRequest {
