@@ -16,19 +16,27 @@ mapping Scenario::scenario2testScenario(): TestScenario {
     log('Transforming Scenario to TestScenario');
 
     testScenarioName := self.scenarioName;
-    testComponent := self.component -> map component2testComponent();
+    testcomponent := self.component -> map component2testComponent();
 }
 
 mapping ScenarioComponent::component2testComponent(): TestComponent {
 	if (self.oclIsTypeOf(Roundtrip)) {
-		self.map roundtrip2testRoundtrip();
+	    init {
+	        result := TestRoundtrip;
+	    }
+	    var roundtrip : Roundtrip := self.oclAsType(Roundtrip);
+		roundtrip.map roundtrip2testRoundtrip();
 	} elif (self.oclIsTypeOf(Delay)) {
-		self.map delay2testDelay();
+        init {
+            result := TestDelay;
+        }
+	    var delay : Delay := self.oclAsType(Delay);
+		delay.map delay2testDelay();
 	}
-} 
+}
 
-mapping Delay::dalay2testDelay(): Delay {
-	self.duration := duration;
+mapping Delay::delay2testDelay(): TestDelay {
+	durationInMs := self.durationInMs;
 }
 
  mapping Roundtrip::roundtrip2testRoundtrip(): TestRoundtrip {
