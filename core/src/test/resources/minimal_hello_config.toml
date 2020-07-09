@@ -5,8 +5,11 @@ testCondition = '"SomeValue"'
     username = 'Test'
     password = 'password'
     path = '/testA'
+    swagger = '/http://localhost:8080/swagger/openapi.yaml'
+
 
 [B]
     username = 'Test'
     password = 'password'
     path = '/testB'
+    swagger = '/http://localhost:8080/swagger/openapi.yaml'
