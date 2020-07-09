@@ -11,6 +11,10 @@ import java.util.Map;
 import java.util.HashMap;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import io.restassured.filter.Filter;
+import io.restassured.filterFilterContext;
+import io.restassured.specification.FilterableRequestSpecification;
+import io.restassured.specification.FilterableResponseSpecification;
 import org.hamcrest.collection.IsIn;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,10 +25,13 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import org.junit.jupiter.api.Test;
+import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
+import com.atlassian.oai.validator.OpenApiInteractionValidator.ApiLoadException;
 
 public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 
 	Map<String, Object> paramsMap = new HashMap();
+	Map<String, Filter> swaggerParamsMap = new HashMap();
 	ScriptEngine engine;
 	StringSubstitutor substitutor;
 
@@ -54,7 +61,17 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 			[testRoundtrip.generateTestRoundtrip()/]
 		}
 		[/if]
+		String receiver = testRoundtrip.requestspecification.receiver;
+		[if not (swaggerParamsMap.containsKey(receiver))][putSwagger ([receiver/])][/if]
+		
 	[/for]
+	}
+
+	private void putSwagger(String key) {
+		//Create new Object
+		Object value = new 
+		// Put new key in swaggerKey map
+		swaggerParamsMap.put(
 	}
 
     /// Helper method to make to templating in string variables above more clean.
