@@ -88,9 +88,9 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
         }
         elif (sequenceElement.oclIsTypeOf(Delay)) {
         	var delay : Delay := sequenceElement.oclAsType(Delay);
-        	var duration : Integer := delay.value;
-        	if (duration.<>(null)) {
-        		var delayElement : RequestResponsePairs::Delay := generateDelay(componentId, duration);
+        	var text : Sequence(String) := delay.value;
+        	var delayElement : RequestResponsePairs::Delay := generateDelay(componentId, text);
+        	if (delayElement.<>(null)) {
         		component += delayElement;
         	};
         };
@@ -158,10 +158,39 @@ helper generateRoundtrip(componentId : Integer, httpRequest : HttpRequest, httpR
     return roundtripElement;
 }
 
-helper generateDelay(componentId : Integer, duration : Integer): RequestResponsePairs::Delay {
+helper generateDelay(componentId : Integer, text : Sequence(String)): RequestResponsePairs::Delay {
+	if (not (text->size() >= 3 and text->at(1).trim().equalsIgnoreCase("wait"))) {
+		return null;
+	};
 	var delayElement : RequestResponsePairs::Delay := new RequestResponsePairs::Delay();
-	delayElement.durationValue := duration;
-	delayElement.durationUnit := DurationUnit::d;
+	delayElement.durationValue := text->at(2).toInteger();
+	if (delayElement.durationValue.oclIsInvalid()) {
+		return null;
+	};
+	var unit : String := text->at(3).trim();
+	switch {
+		case (unit.equalsIgnoreCase("ns")) {
+			delayElement.durationUnit := DurationUnit::ns;
+		}
+		case (unit.equalsIgnoreCase("ms")) {
+			delayElement.durationUnit := DurationUnit::ms;
+		}
+		case (unit.equalsIgnoreCase("s")) {
+			delayElement.durationUnit := DurationUnit::s;
+		}
+		case (unit.equalsIgnoreCase("min")) {
+			delayElement.durationUnit := DurationUnit::min;
+		}
+		case (unit.equalsIgnoreCase("h")) {
+			delayElement.durationUnit := DurationUnit::h;
+		}
+		case (unit.equalsIgnoreCase("d")) {
+			delayElement.durationUnit := DurationUnit::d;
+		}
+		else {
+			return null;
+		}
+	};
 	return delayElement;
 }
 

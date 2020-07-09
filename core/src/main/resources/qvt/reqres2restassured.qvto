@@ -26,7 +26,7 @@ mapping Delay::delay2testDelay(): TestDelay {
 	log('Transforming Delay to TestDelay');
 
 	if (self.durationUnit = DurationUnit::ns) {
-		durationInMs := (self.durationValue / 1000).oclAsType(Integer);
+		durationInMs := (self.durationValue / 1000).round();
 	} else {
 		var factor : Integer = 1;
 		switch {

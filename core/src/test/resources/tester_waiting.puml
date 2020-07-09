@@ -15,7 +15,7 @@ activate XCS
 XCS --> Tester : 200
 deactivate XCS
 
-... 100 ...
+... wait "200" ms "(TODO no quotation marks)" ...
 
 Tester -> CCCMock : GET "event/${eventid}"
 activate CCCMock
