@@ -69,15 +69,7 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
                 component += roundtripElement;
                 componentId := componentId + 1;
 
-            }
-            elif (sequenceElement.oclIsTypeOf(Delay)) {
-                var delay : Delay := sequenceElement.oclAsType(Delay);
-                var duration : Integer := delay.value;
-                if (duration.<>(null)) {
-                    var delayElement : RequestResponsePairs::Delay := generateDelay(componentId, duration);
-                    component += delayElement;
-                };
-             };
+            };
         }
         elif (sequenceElement.oclIsTypeOf(Alternative)) {
             var alternative : Alternative := sequenceElement.oclAsType(Alternative);
@@ -168,7 +160,8 @@ helper generateRoundtrip(componentId : Integer, httpRequest : HttpRequest, httpR
 
 helper generateDelay(componentId : Integer, duration : Integer): RequestResponsePairs::Delay {
 	var delayElement : RequestResponsePairs::Delay := new RequestResponsePairs::Delay();
-	delayElement.durationInMs := duration;
+	delayElement.durationValue := duration;
+	delayElement.durationUnit := DurationUnit::d;
 	return delayElement;
 }
 

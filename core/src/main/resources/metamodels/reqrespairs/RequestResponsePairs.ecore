@@ -46,6 +46,17 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ScenarioComponent" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="Delay" eSuperTypes="#//ScenarioComponent">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="durationInMs" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="durationValue" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral=""/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="durationUnit" lowerBound="1"
+        eType="#//DurationUnit" defaultValueLiteral="ms"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="DurationUnit">
+    <eLiterals name="ns"/>
+    <eLiterals name="ms" value="1"/>
+    <eLiterals name="s" value="2"/>
+    <eLiterals name="min" value="3"/>
+    <eLiterals name="h" value="4"/>
+    <eLiterals name="d" value="5"/>
   </eClassifiers>
 </ecore:EPackage>

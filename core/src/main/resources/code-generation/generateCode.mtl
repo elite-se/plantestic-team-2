@@ -170,5 +170,5 @@ paramsMap.put("[responseDatum.variableName/]", [testRoundtrip.testRoundtripName/
 [/template]
 
 [template private generateTestDelay(testDelay : TestDelay) post(trim())]
-Thread.sleep([testDelay.durationInMs/]);
+Thread.sleep([testDelay.durationInMs/]L);
 [/template]

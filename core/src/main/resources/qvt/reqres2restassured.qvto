@@ -23,7 +23,28 @@ mapping ScenarioComponent::component2testComponent(): TestComponent
 disjuncts Delay::delay2testDelay,Roundtrip::roundtrip2testRoundtrip {}
 
 mapping Delay::delay2testDelay(): TestDelay {
-	durationInMs := self.durationInMs;
+	log('Transforming Delay to TestDelay');
+
+	if (self.durationUnit = DurationUnit::ns) {
+		durationInMs := (self.durationValue / 1000).oclAsType(Integer);
+	} else {
+		var factor : Integer = 1;
+		switch {
+			case (self.durationUnit = DurationUnit::s) {
+				factor := 1000;
+			}
+			case (self.durationUnit = DurationUnit::min) {
+				factor := 1000 * 60;
+			}
+			case (self.durationUnit = DurationUnit::h) {
+				factor := 1000 * 60 * 60;
+			}
+			case (self.durationUnit = DurationUnit::d) {
+				factor := 1000 * 60 * 60 * 24;
+			}
+		};
+		durationInMs := self.durationValue * factor;
+	};
 }
 
  mapping Roundtrip::roundtrip2testRoundtrip(): TestRoundtrip {

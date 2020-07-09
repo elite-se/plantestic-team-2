@@ -10,6 +10,14 @@
   <testsDirectory xsi:nil="true"/>
   <genPackages prefix="RequestResponsePairs" basePackage="request-response-pairs"
       disposableProviderFactory="true" ecorePackage="RequestResponsePairs.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="RequestResponsePairs.ecore#//DurationUnit">
+      <genEnumLiterals ecoreEnumLiteral="RequestResponsePairs.ecore#//DurationUnit/ns"/>
+      <genEnumLiterals ecoreEnumLiteral="RequestResponsePairs.ecore#//DurationUnit/ms"/>
+      <genEnumLiterals ecoreEnumLiteral="RequestResponsePairs.ecore#//DurationUnit/s"/>
+      <genEnumLiterals ecoreEnumLiteral="RequestResponsePairs.ecore#//DurationUnit/min"/>
+      <genEnumLiterals ecoreEnumLiteral="RequestResponsePairs.ecore#//DurationUnit/h"/>
+      <genEnumLiterals ecoreEnumLiteral="RequestResponsePairs.ecore#//DurationUnit/d"/>
+    </genEnums>
     <genClasses ecoreClass="RequestResponsePairs.ecore#//Roundtrip">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RequestResponsePairs.ecore#//Roundtrip/httprequest"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RequestResponsePairs.ecore#//Roundtrip/httpresponse"/>
@@ -40,7 +48,8 @@
     </genClasses>
     <genClasses ecoreClass="RequestResponsePairs.ecore#//ScenarioComponent"/>
     <genClasses ecoreClass="RequestResponsePairs.ecore#//Delay">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//Delay/durationInMs"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//Delay/durationValue"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//Delay/durationUnit"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>
