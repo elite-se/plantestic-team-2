@@ -25,7 +25,6 @@ SQ_Message:
 SQ_EntityDefiniton:
     ('actor'|'boundary'|'control'|'entity'|'database'|'participant') entity=SQ_Entity;
 
-    /// ... wait(200ms) ...
 SQ_Delay:
     {SQ_Delay}
     '...' wait=PT_Wait (':' (words+=Word)+)? '...';
