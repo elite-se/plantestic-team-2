@@ -21,6 +21,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RestAssured.ecore#//RequestSpecification/url"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RestAssured.ecore#//RequestSpecification/receiver"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RestAssured.ecore#//RequestSpecification/requestdatum"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RestAssured.ecore#//RequestSpecification/sender"/>
     </genClasses>
     <genClasses ecoreClass="RestAssured.ecore#//ResponseSpecification">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RestAssured.ecore#//ResponseSpecification/bodymatchergroup"/>

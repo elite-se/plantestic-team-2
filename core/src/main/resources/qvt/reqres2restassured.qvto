@@ -38,6 +38,7 @@ mapping HttpRequest::httprequest2requestSpecification(): RequestSpecification {
      url := self.url;
      requestdatum := self.httprequestdatum -> map httpRequestDatum2requestdatum();
      receiver := self.receiver;
+     sender := self.sender;
 }
 
 mapping HttpRequestDatum::httpRequestDatum2requestdatum(): RequestDatum {

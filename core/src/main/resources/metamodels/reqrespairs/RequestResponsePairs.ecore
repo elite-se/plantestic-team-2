@@ -20,6 +20,8 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="httprequestdatum" upperBound="-1"
         eType="#//HttpRequestDatum" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sender" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="HttpResponse" instanceTypeName="HttpResponse">
     <eStructuralFeatures xsi:type="ecore:EReference" name="httpresponsedatum" upperBound="-1"

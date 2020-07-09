@@ -21,6 +21,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//HttpRequest/url"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//HttpRequest/receiver"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RequestResponsePairs.ecore#//HttpRequest/httprequestdatum"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//HttpRequest/sender"/>
     </genClasses>
     <genClasses ecoreClass="RequestResponsePairs.ecore#//HttpResponse">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RequestResponsePairs.ecore#//HttpResponse/httpresponsedatum"/>
