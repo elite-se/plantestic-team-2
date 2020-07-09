@@ -48,7 +48,7 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
     @Test
 	public void test() throws Exception {
 	[for (testComponent : TestComponent | testScenario.testcomponent) separator('\n\n') ]
-		[let testRoundtrip : TestRoundtrip = testComponent][testRoundtrip.generateTestRoundtripWithPrecondition()/][/let]
+		[if (testComponent.oclIsTypeOf(TestRoundtrip))][let testRoundtrip : TestRoundtrip = testComponent][testRoundtrip.generateTestRoundtripWithPrecondition()/][/let][/if]
 		[let testDelay : TestDelay = testComponent][testDelay.generateTestDelay()/][/let]
 	[/for]
 	}

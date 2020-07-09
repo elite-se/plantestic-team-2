@@ -18,7 +18,7 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
     scenarioName := diagramName + "_puml";
     var componentId : Integer := 1;
 
-    var umlElements : OrderedSet(SequenceElement) := self.umlElements->flattenSequenceElements();
+    var umlElements : OrderedSet(SequenceElement) := self.umlElements->flattenAndFilterSequenceElements();
     var umlElementsSize : Integer := umlElements->size();
     var umlElementsIndex : Integer := 1;
 
@@ -106,7 +106,7 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
     };
 }
 
-helper OrderedSet(SequenceElement)::flattenSequenceElements():OrderedSet(SequenceElement) {
+helper OrderedSet(SequenceElement)::flattenAndFilterSequenceElements():OrderedSet(SequenceElement) {
     var sequenceElements : OrderedSet(SequenceElement);
     self->forEach(umlElement) {
         if (umlElement.oclIsTypeOf(UseLeft)) {
@@ -119,20 +119,24 @@ helper OrderedSet(SequenceElement)::flattenSequenceElements():OrderedSet(Sequenc
         }
         elif (umlElement.oclIsTypeOf(Activate)) {
             var activate : Activate := umlElement.oclAsType(Activate);
-            sequenceElements += activate.umlElements->flattenSequenceElements();
+            sequenceElements += activate.umlElements->flattenAndFilterSequenceElements();
+        }
+        elif (umlElement.oclIsTypeOf(Delay)) {
+			var delay : Delay := umlElement.oclAsType(Delay);
+			sequenceElements += delay;
         };
     };
     return sequenceElements;
 }
 
 mapping Alternative::flattenAlternative():Alternative {
-    umlElements += self.umlElements->flattenSequenceElements();
+    umlElements += self.umlElements->flattenAndFilterSequenceElements();
     elseBlocks += self.elseBlocks->at(1).oclAsType(Else).map flattenElse();
     text := self.text;
 }
 
 mapping Else::flattenElse():Else {
-    umlElements += self.umlElements->flattenSequenceElements();
+    umlElements += self.umlElements->flattenAndFilterSequenceElements();
     text := self.text;
 }
 
