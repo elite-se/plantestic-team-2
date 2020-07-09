@@ -3,7 +3,59 @@ grammar xyz.elite.xtext.languages.plantuml.PlantUML with org.eclipse.xtext.commo
 generate plantUML "http://www.elite.xyz/xtext/languages/plantuml/PlantUML"
 
 Model:
-    greetings+=Greeting*;
-    
-Greeting:
-    'Hello' name=ID '!';
+    ('SEQUENCE' sequence_diagrams+=SQ_Diagram)*;
+
+SQ_Diagram:
+    {SQ_Diagram}
+    DIAGRAM_START (elements+=SQ_SequenceElement)* DIAGRAM_END;
+
+// ---------------------------
+//      SEQUENCE ELEMENTS
+// ---------------------------
+SQ_SequenceElement:
+    SQ_Message 
+    | SQ_EntityDefiniton
+    | SQ_Delay;
+
+SQ_Message:
+    sender=SQ_Entity SQ_ARROW receiver=SQ_Entity;
+
+SQ_EntityDefiniton:
+    ('actor'|'boundary'|'control'|'entity'|'database'|'participant') entity=SQ_Entity;
+
+SQ_Delay:
+    {SQ_Delay}
+    '...' (words+=Word)+ '...';
+
+// ----------------------------
+//      FUNDAMENTAL TYPES
+// ----------------------------
+SQ_Entity:
+    name=IDENTIFIER;
+
+Word:
+    IDENTIFIER | INT;
+
+terminal DIAGRAM_START:
+    '@startuml';
+
+terminal DIAGRAM_END:
+    '@enduml';
+
+terminal SQ_ARROW:
+    '-'? '->' | '<-' '-'?;
+
+terminal IDENTIFIER:
+    ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '-' | '0'..'9')*;
+
+@Override
+terminal STRING:
+    '"' ( '\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\'|'"') )* '"';
+
+@Override
+terminal SL_COMMENT:
+    "'" !('\n'|'\r')* ('\r'? '\n')?;
+
+@Override
+terminal ML_COMMENT:
+    "/'" -> "'/";
