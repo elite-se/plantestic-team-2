@@ -6,4 +6,4 @@ $ cd <repo>
 $ ./gradlew jettyRun
 ```
 
-Then connect to the web ide via `localhost:8080`
+Then open to the generated puml web code editor by opening `localhost:8080` in your browser.
