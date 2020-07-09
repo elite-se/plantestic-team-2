@@ -2,6 +2,7 @@ package de.unia.se.plantestic
 
 import org.eclipse.emf.common.util.BasicMonitor
 import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EPackage
 import java.io.File
 
 object AcceleoCodeGenerator {

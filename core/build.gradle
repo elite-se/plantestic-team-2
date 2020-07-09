@@ -6,6 +6,7 @@ plugins {
     id "jacoco"
     id "idea"
     id "eclipse"
+    id 'maven-publish'
 }
 
 mainClassName = "de.unia.se.plantestic.Main"
@@ -115,3 +116,17 @@ jacocoTestCoverageVerification {
 check.dependsOn jacocoTestCoverageVerification
 // To run ktlint during the build (and fail when appropriate)
 check.dependsOn ktlint
+
+publishing {
+    publications {
+        "$project.name"(MavenPublication) {
+            groupId project.group
+            artifactId project.name
+            version project.version
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}

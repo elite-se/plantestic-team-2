@@ -5,26 +5,30 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.util.PatternSet
 import org.gradle.process.ExecOperations
 import org.gradle.process.ExecResult
 import org.gradle.process.JavaExecSpec
 import java.io.File
+import java.util.function.Consumer
+import javax.inject.Inject
 
 /**
  * Gradle Task that runs the jOOQ source code generation.
  */
-open class PlantesticTask constructor(
+open class PlantesticTask @Inject constructor(
     private val projectLayout: ProjectLayout?,
     private val execOperations: ExecOperations?,
-    jooqClasspath: FileCollection?
-//    val outputDirectory: Directory?
+    private val plantesticClasspath: FileCollection?,
+    private val outputDirectory: String,
+    private val inputSourceSet: SourceDirectorySet
 ) :
     DefaultTask() {
-    private val plantesticClasspath: FileCollection? = jooqClasspath
 
     private var javaExecSpec: Action<in JavaExecSpec?>? = null
     private var execResultHandler: Action<in ExecResult?>? = null
@@ -54,52 +58,29 @@ open class PlantesticTask constructor(
 
     @TaskAction
     fun generate() {
-        // define a config file to which the jOOQ code generation configuration is written to
-        val configFile = File(getTemporaryDir(), "config.xml")
-
-        // write jOOQ code generation configuration to config file
-//        writeConfiguration(normalizedConfiguration, configFile)
-
-        // generate the jOOQ Java sources files using the written config file
-//        val execResult: ExecResult? = executeJooq(configFile)
-
-        // invoke custom result handler
-        if (execResultHandler != null) {
-//            execResultHandler.execute(execResult)
+        for (file: File in inputSourceSet.matching(PatternSet().include("*.puml"))) {
+            val execResult: ExecResult? = executePlantestic(file)
+            if (execResultHandler != null) {
+                execResultHandler!!.execute(execResult)
+            }
         }
     }
 
-//    private fun writeConfiguration(config: Configuration?, file: File?) {
-//        try {
-//            FileOutputStream(file).use { fs ->
-//                val sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-//                val schema: Schema =
-//                    sf.newSchema(GenerationTool::class.java.getResource("/xsd/" + Constants.XSD_CODEGEN))
-//                val ctx: JAXBContext = JAXBContext.newInstance(Configuration::class.java)
-//                val marshaller = ctx.createMarshaller()
-//                marshaller!!.schema = schema
-//                marshaller.marshal(config, fs)
-//            }
-//        } catch (e: IOException) {
-//            throw TaskExecutionException(this@JooqTask, e)
-//        } catch (e: JAXBException) {
-//            throw TaskExecutionException(this@JooqTask, e)
-//        } catch (e: SAXException) {
-//            throw TaskExecutionException(this@JooqTask, e)
-//        }
-//    }
+    private fun executePlantestic(file: File): ExecResult? {
+        return execOperations!!.javaexec { spec ->
+            spec.setMain("de.unia.se.plantestic.Main")
+            print("Classpath: ")
+            println(plantesticClasspath!!.plus(projectLayout!!.files("src/dist")).forEach(Consumer { println(it.absoluteFile) }))
+            spec.setClasspath(plantesticClasspath!!.plus(projectLayout!!.files("src/dist")))
+//            spec.setWorkingDir("/home/max")
+            spec.setWorkingDir(projectLayout!!.getProjectDirectory())
+            spec.args("--input", file.absolutePath, "--output", File(outputDirectory).absolutePath)
+            if (javaExecSpec != null) {
+                javaExecSpec!!.execute(spec)
+            }
+        }
 
-//    private fun executeJooq(configFile: File?): ExecResult? {
-//        return execOperations.javaexec({ spec ->
-//            spec.setMain("org.jooq.codegen.GenerationTool")
-//            spec.setClasspath(jooqClasspath)
-//            spec.setWorkingDir(projectLayout.getProjectDirectory())
-//            spec.args(configFile)
-//            if (javaExecSpec != null) {
-//                javaExecSpec.execute(spec)
-//            }
-//        })
-//    }
+    }
 
 //    companion object {
 //        private fun relativizeTo(configuration: Configuration?, dir: File?): Configuration? {

@@ -4,6 +4,7 @@ plugins {
 	id "idea"
 	id "eclipse"
 	id "org.xtext.xtend" version "2.0.8"
+	id 'maven-publish'
 }
 
 sourceSets {
@@ -86,3 +87,17 @@ test {
 generateXtext.dependsOn(generateXtextLanguage)
 clean.dependsOn(cleanGenerateXtextLanguage)
 eclipse.classpath.plusConfigurations += [configurations.mwe2]
+
+publishing {
+	publications {
+		"$project.name"(MavenPublication) {
+			groupId project.group
+			artifactId project.name
+			version project.version
+			from components.java
+		}
+	}
+	repositories {
+		mavenLocal()
+	}
+}
