@@ -88,10 +88,10 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
         }
         elif (sequenceElement.oclIsTypeOf(Delay)) {
         	var delay : Delay := sequenceElement.oclAsType(Delay);
-        	var text : Sequence(String) := delay.value;
-        	var delayElement : RequestResponsePairs::Delay := generateDelay(componentId, text);
-        	if (delayElement.<>(null)) {
-        		component += delayElement;
+        	var wait : PT_Wait := delay.wait;
+        	if (not wait.oclIsInvalid() and not wait.oclIsUndefined()) {
+	        	var delayElement : RequestResponsePairs::Delay := generateDelay(componentId, wait);
+	        	component += delayElement;
         	};
         };
         umlElementsIndex := umlElementsIndex + 1;
@@ -158,16 +158,10 @@ helper generateRoundtrip(componentId : Integer, httpRequest : HttpRequest, httpR
     return roundtripElement;
 }
 
-helper generateDelay(componentId : Integer, text : Sequence(String)): RequestResponsePairs::Delay {
-	if (not (text->size() >= 3 and text->at(1).trim().equalsIgnoreCase("wait"))) {
-		return null;
-	};
+helper generateDelay(componentId : Integer, wait : PT_Wait): RequestResponsePairs::Delay {
 	var delayElement : RequestResponsePairs::Delay := new RequestResponsePairs::Delay();
-	delayElement.durationValue := text->at(2).toInteger();
-	if (delayElement.durationValue.oclIsInvalid()) {
-		return null;
-	};
-	var unit : String := text->at(3).trim();
+	delayElement.durationValue := wait.time;
+	var unit : String := wait.unit;
 	switch {
 		case (unit.equalsIgnoreCase("ns")) {
 			delayElement.durationUnit := DurationUnit::ns;
