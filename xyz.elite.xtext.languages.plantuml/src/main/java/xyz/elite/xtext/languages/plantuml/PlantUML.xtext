@@ -1,5 +1,7 @@
 grammar xyz.elite.xtext.languages.plantuml.PlantUML with org.eclipse.xtext.common.Terminals
 
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
 generate plantUML "http://www.elite.xyz/xtext/languages/plantuml/PlantUML"
 
 Model:
@@ -18,24 +20,50 @@ SQ_SequenceElement:
     | SQ_Delay;
 
 SQ_Message:
-    sender=SQ_Entity SQ_ARROW receiver=SQ_Entity;
+    sender=SQ_Entity SQ_ARROW receiver=SQ_Entity (':' (content=PT_RequestResponse | words+=Word)+)?;
 
 SQ_EntityDefiniton:
     ('actor'|'boundary'|'control'|'entity'|'database'|'participant') entity=SQ_Entity;
 
+    /// ... wait(200ms) ...
 SQ_Delay:
     {SQ_Delay}
-    '...' (words+=Word)+ '...';
+    '...' wait=PT_Wait (':' (words+=Word)+)? '...';
+
+// ----------------------------
+//   PLANTESTIC MODIFICATIONS
+// ----------------------------
+PT_Wait:
+    'wait(' time=INT unit=('ns'|'ms'|'s'|'min'|'h'|'d') ')';
+
+PT_RequestResponse:
+    Request | Response;
+
+Request returns RequestResponse:
+    {Request}
+    method=REQUEST_METHOD url=STRING ('(' param+=Parameter (',' param+=Parameter)* ')')?;
+
+Response returns RequestResponse:
+    {Response}
+    code+=INT (',' code+=INT)* ('-' '(' param+=Parameter (',' param+=Parameter)* ')')?;
+
+
+Parameter:
+    {Parameter}
+    name=PUMLID ':' value=STRING;
 
 // ----------------------------
 //      FUNDAMENTAL TYPES
 // ----------------------------
 SQ_Entity:
-    name=IDENTIFIER;
+    name=PUMLID;
 
-Word:
-    IDENTIFIER | INT;
+Word returns ecore::EString:
+    INT | STRING | PUMLID | ANY_OTHER;
 
+terminal REQUEST_METHOD:
+    'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+    
 terminal DIAGRAM_START:
     '@startuml';
 
@@ -45,7 +73,7 @@ terminal DIAGRAM_END:
 terminal SQ_ARROW:
     '-'? '->' | '<-' '-'?;
 
-terminal IDENTIFIER:
+terminal PUMLID:
     ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '-' | '0'..'9')*;
 
 @Override
