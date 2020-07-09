@@ -20,7 +20,7 @@ SQ_SequenceElement:
     | SQ_Delay;
 
 SQ_Message:
-    sender=SQ_Entity SQ_ARROW receiver=SQ_Entity (':' (content=PT_RequestResponse | words+=Word)+)?;
+    sender=SQ_Entity arrow=SQ_Arrow receiver=SQ_Entity (':' (content=PT_RequestResponse | words+=Word)+)?;
 
 SQ_EntityDefiniton:
     ('actor'|'boundary'|'control'|'entity'|'database'|'participant') entity=SQ_Entity ('as' alias=PUMLID)? (color=COLOR)?;
@@ -32,6 +32,9 @@ SQ_Delay:
 SQ_Entity:
     (name=PUMLID|name=STRING);
         
+SQ_Arrow:
+    '-'? '->' | '<-' '-'?;
+
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
 // ----------------------------
@@ -68,11 +71,8 @@ terminal DIAGRAM_START:
 terminal DIAGRAM_END:
     '@enduml';
 
-terminal SQ_ARROW:
-    '-'? '->' | '<-' '-'?;
-
 terminal PUMLID:
-    ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '-' | '0'..'9')*;
+    ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
 
 terminal COLOR:
     '#' (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')

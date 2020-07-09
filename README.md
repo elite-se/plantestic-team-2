@@ -20,7 +20,11 @@ actor FOO
 FOO <- "BAR()" : POST "/lol/xd/${var}" (var : "1")
 ... wait(10 d) : Dies ist ein Kommentar ...
 BAR --> FOO : 200, 201, 410 - (res: "42")
-participant CCC-Mock
+participant "CCC-Mock"
+
+Alice -> Alice: This is a signal to self.\nIt also demonstrates\nmultiline \ntext
+Bob->Bob : Dies ist eine tolle Nachricht
+Alice<--Alice : Dies ist eine tolle Nachricht
 
 @enduml
 ```
