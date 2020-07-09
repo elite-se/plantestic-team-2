@@ -23,12 +23,15 @@ SQ_Message:
     sender=SQ_Entity SQ_ARROW receiver=SQ_Entity (':' (content=PT_RequestResponse | words+=Word)+)?;
 
 SQ_EntityDefiniton:
-    ('actor'|'boundary'|'control'|'entity'|'database'|'participant') entity=SQ_Entity;
+    ('actor'|'boundary'|'control'|'entity'|'database'|'participant') entity=SQ_Entity ('as' alias=PUMLID)? (color=COLOR)?;
 
 SQ_Delay:
     {SQ_Delay}
     '...' wait=PT_Wait (':' (words+=Word)+)? '...';
 
+SQ_Entity:
+    (name=PUMLID|name=STRING);
+        
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
 // ----------------------------
@@ -46,17 +49,13 @@ Response returns RequestResponse:
     {Response}
     code+=INT (',' code+=INT)* ('-' '(' param+=Parameter (',' param+=Parameter)* ')')?;
 
-
 Parameter:
     {Parameter}
     name=PUMLID ':' value=STRING;
 
 // ----------------------------
-//      FUNDAMENTAL TYPES
+//      LEXER/PARSER ATOMS
 // ----------------------------
-SQ_Entity:
-    name=PUMLID;
-
 Word returns ecore::EString:
     INT | STRING | PUMLID | ANY_OTHER;
 
@@ -74,6 +73,10 @@ terminal SQ_ARROW:
 
 terminal PUMLID:
     ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '-' | '0'..'9')*;
+
+terminal COLOR:
+    '#' (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')
+        (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9'))?);
 
 @Override
 terminal STRING:
