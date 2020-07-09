@@ -51,13 +51,17 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 
     @Test
 	public void test() throws Exception {
+		String tester = paramsMap.get("tester");
+
 	[for (testRoundtrip : TestRoundtrip | testScenario.testroundtrip) separator('\n\n') ]
-		[if (testRoundtrip.precondition->isEmpty())][testRoundtrip.generateTestRoundtrip()/][/if]
-		[if (testRoundtrip.precondition->notEmpty())]
-		if(eval("[testRoundtrip.precondition/]")) {
-			[testRoundtrip.generateTestRoundtrip()/]
+		if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/]")) {
+			[if (testRoundtrip.precondition->isEmpty())][testRoundtrip.generateTestRoundtrip()/][/if]
+			[if (testRoundtrip.precondition->notEmpty())]
+			if(eval("[testRoundtrip.precondition/]")) {
+				[testRoundtrip.generateTestRoundtrip()/]
+			}
+			[/if]
 		}
-		[/if]
 	[/for]
 	}
 
@@ -107,9 +111,7 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 [/template]
 
 [template private generateTestRoundtrip(testRoundtrip : TestRoundtrip) post(trim())]
-	[if (testRoundtrip.requestspecification.requestdatum->notEmpty())]
-[testRoundtrip.requestspecification.generadeAddRequestParams()/]
-	[/if]
+	[if (testRoundtrip.requestspecification.requestdatum->notEmpty())][testRoundtrip.requestspecification.generadeAddRequestParams()/]	[/if]
 Response [testRoundtrip.testRoundtripName/] = RestAssured.given()
         [testRoundtrip.requestspecification.generateGivenPart()/]
     .when()
@@ -118,7 +120,6 @@ Response [testRoundtrip.testRoundtripName/] = RestAssured.given()
         [testRoundtrip.responsespecification.generateThenPart()/];
 [if (testRoundtrip.responsespecification.responsedatum->notEmpty())]
 [testRoundtrip.generateExtractions()/]
-
 	[/if]
 [/template]
 

@@ -29,6 +29,7 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
             var request : Request := useLeft.useLeft2request();
             var httpRequestElement : HttpRequest := request.request2httpRequest();
             httpRequestElement.receiver := useLeft.userTwo.name;
+            httpRequestElement.sender := useLeft.userOne.name;
 
             umlElementsIndex := umlElementsIndex + 1;
             sequenceElement := umlElements->at(umlElementsIndex);
@@ -48,6 +49,7 @@ mapping SequenceUml::transformUmlDiagram(): Scenario {
                 httpRequestElementCopy.url := httpRequestElement.url;
                 httpRequestElementCopy.httprequestdatum := httpRequestElement.httprequestdatum;
                 httpRequestElementCopy.receiver := httpRequestElement.receiver;
+                httpRequestElementCopy.sender := httpRequestElement.sender;
 
                 var alternative : Alternative := sequenceElement.oclAsType(Alternative);
                 useLeft := alternative.umlElements->at(1).oclAsType(UseLeft);
