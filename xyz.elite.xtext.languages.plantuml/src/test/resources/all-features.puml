@@ -1,11 +1,12 @@
 SEQUENCE @startuml
 
-participant "I have a really long\nlong name" as L #99FF99
+participant "I have a really long\nlong name" as L #00aa00
 participant "Alice" #aF7
 actor FOO
+actor a
 
 FOO <- "BAR()": POST "/lol/xd/${var}" (var : "1")
-... wait(10 d) : Dies ist ein Kommentar ...
+... wait(10 d) Dies ist ein Kommentar ...
 BAR --> FOO : http(200 | 201 | 410) - (res: "42")
 participant "CCC-Mock"
 
