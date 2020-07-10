@@ -39,8 +39,17 @@ class PlantUMLParsingTest {
     }
 
     @Test
-    def void failing() {
+    def void minimalFailing() {
         val result = parseHelper.parse(loadPUML("failing"))
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		print(errors)
+        Assert.assertFalse('''Errors: «errors.join(", ")»''', errors.isEmpty);
+    }
+
+    @Test
+    def void garbageLineShouldFail() {
+        val result = parseHelper.parse(loadPUML("garbage-line"))
         Assert.assertNotNull(result)
 		val errors = result.eResource.errors
         Assert.assertFalse('''Errors: «errors.join(", ")»''', errors.isEmpty);
