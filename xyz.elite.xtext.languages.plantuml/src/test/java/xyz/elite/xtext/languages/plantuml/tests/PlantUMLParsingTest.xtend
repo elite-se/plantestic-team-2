@@ -27,9 +27,29 @@ class PlantUMLParsingTest {
 	}
 
 	@Test
+    def void empty() {
+        val result = parseHelper.parse(loadPUML("empty"))
+        Assert.assertNull(result)
+    }
+
+    @Test
+    def void minimal() {
+        val result = parseHelper.parse(loadPUML("minimal"))
+        Assert.assertNotNull(result)
+    }
+
+    @Test
+    def void failing() {
+        val result = parseHelper.parse(loadPUML("failing"))
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+        Assert.assertFalse('''Errors: «errors.join(", ")»''', errors.isEmpty);
+    }
+
+	@Test
 	def void allFeatures() {
-	    val puml = loadPUML("all-features");
-		val result = parseHelper.parse(puml)
+		val result = parseHelper.parse(loadPUML("all-features"))
+
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
