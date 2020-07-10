@@ -50,7 +50,7 @@ Request returns RequestResponse:
 
 Response returns RequestResponse:
     {Response}
-    code+=INT (',' code+=INT)* ('-' '(' param+=Parameter (',' param+=Parameter)* ')')?;
+    'http(' acceptableCodes+=INT ('|' acceptableCodes+=INT)* ')' ('-' '(' param+=Parameter (',' param+=Parameter)* ')')?;
 
 Parameter:
     {Parameter}
