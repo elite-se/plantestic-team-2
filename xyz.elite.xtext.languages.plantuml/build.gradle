@@ -1,7 +1,5 @@
 dependencies {
-    
-    testCompile "org.junit.jupiter:junit-jupiter-api:5.1.0"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.1.0"
+    testImplementation "junit:junit:4.13"
     testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${xtextVersion}"
     testCompile "org.eclipse.xtext:org.eclipse.xtext.xbase.testing:${xtextVersion}"
     
@@ -34,7 +32,7 @@ task generateXtextLanguage(type: JavaExec) {
 
 
 test {
-	useJUnitPlatform()
+	useJUnit()
 }
 
 generateXtext.dependsOn(generateXtextLanguage)

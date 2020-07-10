@@ -7,37 +7,29 @@ import com.google.inject.Inject
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.testing.util.ParseHelper
-import org.junit.Assert
 import org.junit.Test
+import org.junit.Assert
 import org.junit.runner.RunWith
 import xyz.elite.xtext.languages.plantuml.plantUML.Model
+import java.nio.file.Paths
+import java.nio.file.Files
+import java.nio.charset.StandardCharsets
 
 @RunWith(XtextRunner)
 @InjectWith(PlantUMLInjectorProvider)
 class PlantUMLParsingTest {
 	@Inject
 	ParseHelper<Model> parseHelper
-	
+
+	def String loadPUML(String name) {
+	    val uri = this.getClass().getResource("/" + name + ".puml")
+        return String.join("\n", Files.readAllLines(Paths.get(uri.toURI()), StandardCharsets.UTF_8))
+	}
+
 	@Test
-	def void loadModel() {
-		val result = parseHelper.parse('''
-			SEQUENCE @startuml
-
-			participant "I have a really long\nlong name" as L #99FF99
-			participant "Alice" #aF7
-			actor FOO
-
-			FOO <- "BAR()" : POST "/lol/xd/${var}" (var : "1")
-			... wait(10 d) : Dies ist ein Kommentar ...
-			BAR --> FOO : http(200 | 201 | 410) - (res: "42")
-			participant "CCC-Mock"
-
-			Alice -> Alice: This is a signal to self.\nIt also demonstrates\nmultiline \ntext
-			Bob->Bob : Dies ist eine tolle Nachricht
-			Alice<--Alice : Dies ist eine tolle Nachricht
-
-			@enduml
-		''')
+	def void allFeatures() {
+	    val puml = loadPUML("all-features");
+		val result = parseHelper.parse(puml)
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
