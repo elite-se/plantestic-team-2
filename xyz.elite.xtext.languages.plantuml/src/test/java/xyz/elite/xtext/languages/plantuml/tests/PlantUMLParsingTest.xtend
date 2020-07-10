@@ -58,6 +58,7 @@ class PlantUMLParsingTest {
 	@Test
 	def void allFeatures() {
 		val result = parseHelper.parse(loadPUML("all-features"))
+		print(result.getSequence_diagrams())
 
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors

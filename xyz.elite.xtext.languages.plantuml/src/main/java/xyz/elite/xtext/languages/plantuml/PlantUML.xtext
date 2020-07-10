@@ -5,35 +5,44 @@ import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 generate plantUML "http://www.elite.xyz/xtext/languages/plantuml/PlantUML"
 
 Model:
-    ('SEQUENCE' sequence_diagrams+=SQ_Diagram)*;
+    NEWLINE* 'SEQUENCE' sequence_diagrams+=SQ_Diagram NEWLINE*;
 
 SQ_Diagram:
     {SQ_Diagram}
-    DIAGRAM_START (elements+=SQ_SequenceElement)* DIAGRAM_END;
+    DIAGRAM_START (NEWLINE | elements+=SQ_SequenceElement)* DIAGRAM_END;
 
 // ---------------------------
 //      SEQUENCE ELEMENTS
 // ---------------------------
 SQ_SequenceElement:
-    SQ_Message 
-    | SQ_EntityDefiniton
-    | SQ_Delay;
+    (
+        SQ_Message
+        | SQ_ParticipantDefiniton
+        | SQ_Delay
+    )
+    NEWLINE;
 
 SQ_Message:
-    sender=SQ_Entity arrow=SQ_Arrow receiver=SQ_Entity (':' (content=PT_RequestResponse | words+=Word)+)?;
+    sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant (':' (payload=PT_RequestResponse)? description=SQ_Description)?;
 
-SQ_EntityDefiniton:
-    ('actor'|'boundary'|'control'|'entity'|'database'|'participant') entity=SQ_Entity ('as' alias=PUMLID)? (color=COLOR)?;
+SQ_ParticipantDefiniton:
+    ('actor'|'boundary'|'control'|'entity'|'database'|'participant') entity=SQ_Participant ('as' alias=ID)? (color=SQ_Color)?;
 
 SQ_Delay:
     {SQ_Delay}
-    '...' wait=PT_Wait (':' (words+=Word)+)? '...';
+    '...' (wait=PT_Wait)? description=SQ_Description '...';
 
-SQ_Entity:
-    (name=PUMLID|name=STRING);
+SQ_Participant:
+    (name=ID|name=STRING);
         
 SQ_Arrow:
     '-'? '->' | '<-' '-'?;
+
+SQ_Description:
+    (ID | STRING | INT | ANY_OTHER)*;
+
+SQ_Color:
+    hexcode=COLOR | ('#' name=ID);
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
@@ -42,37 +51,31 @@ PT_Wait:
     'wait(' time=INT unit=('ns'|'ms'|'s'|'min'|'h'|'d') ')';
 
 PT_RequestResponse:
-    Request | Response;
+    PT_Request | PT_Response;
 
-Request returns RequestResponse:
-    {Request}
-    method=REQUEST_METHOD url=STRING ('(' param+=Parameter (',' param+=Parameter)* ')')?;
+PT_Request returns PT_RequestResponse:
+    {PT_Request}
+    method=PT_RequestMethod url=STRING ('(' param+=PT_Parameter (',' param+=PT_Parameter)* ')')?;
 
-Response returns RequestResponse:
-    {Response}
-    'http(' acceptableCodes+=INT ('|' acceptableCodes+=INT)* ')' ('-' '(' param+=Parameter (',' param+=Parameter)* ')')?;
+PT_RequestMethod:
+    'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-Parameter:
-    {Parameter}
-    name=PUMLID ':' value=STRING;
+PT_Response returns PT_RequestResponse:
+    {PT_Response}
+    'http(' acceptableCodes+=INT ('|' acceptableCodes+=INT)* ')' ('-' '(' param+=PT_Parameter (',' param+=PT_Parameter)* ')')?;
+
+PT_Parameter:
+    {PT_Parameter}
+    name=ID ':' value=STRING;
 
 // ----------------------------
 //      LEXER/PARSER ATOMS
 // ----------------------------
-Word returns ecore::EString:
-    INT | STRING | PUMLID | ANY_OTHER;
-
-terminal REQUEST_METHOD:
-    'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-    
 terminal DIAGRAM_START:
     '@startuml';
 
 terminal DIAGRAM_END:
     '@enduml';
-
-terminal PUMLID:
-    ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
 
 terminal COLOR:
     '#' (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')
@@ -82,10 +85,22 @@ terminal COLOR:
 terminal STRING:
     '"' ( '\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\'|'"') )* '"';
 
+// NEWLINE has to be a visible terminal in this grammar since it has a semantic meaning (end of sequence element)
+terminal NEWLINE:
+    '\r'? '\n';
+
 @Override
 terminal SL_COMMENT:
-    "'" !('\n'|'\r')* ('\r'? '\n')?;
+    "'" !('\n'|'\r')* NEWLINE?;
 
 @Override
 terminal ML_COMMENT:
     "/'" -> "'/";
+
+@Override
+terminal WS:
+    (' '|'\t')+;
+
+@Override
+terminal ANY_OTHER:
+    .;
