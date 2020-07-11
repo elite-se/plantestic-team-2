@@ -29,18 +29,14 @@ SQ_Message:
 SQ_Description:
     (
         ID | STRING | INT | HEXCOLOR | CONTROL_CHARACTER | ARROW | ANY_OTHER | 
-        SQ_ParticipantKeyword | PT_TimeUnit |
-        ',' | '(' | ')' | '#' | '|' | '-' | 'as' | 'order'
+        PT_TimeUnit | ',' | '(' | ')' | '#' | '|' | '-' | 'as' | 'order'
     )*;
 
 SQ_ParticipantDefiniton:
-    SQ_ParticipantKeyword participant=SQ_Participant 
+    ('actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant') participant=SQ_Participant 
     ('as' alias=ID)? 
     (color=SQ_Color)?
     ('order' priority=INT)?;
-
-SQ_ParticipantKeyword:
-    'actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant';
 
 SQ_Participant:
     (name=ID|name=STRING);
