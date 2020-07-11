@@ -7,7 +7,7 @@ actor a
 
 FOO <- "BAR()": POST "/lol/xd/${var}" (var : "1")
 ... wait(10 d) Dies ist ein Kommentar ...
-BAR --> FOO : http(200 | 201 | 410) - (res: "42")
+BAR --> FOO : status(200 | 201 | 410) - (res: "42")
 participant "CCC-Mock"
 
 Alice -> Alice: This is a signal to self.\nIt also demonstrates\nmultiline \ntext

@@ -62,7 +62,7 @@ PT_RequestMethod:
 
 PT_Response returns PT_RequestResponse:
     {PT_Response}
-    'http(' acceptableCodes+=INT ('|' acceptableCodes+=INT)* ')' ('-' '(' param+=PT_Parameter (',' param+=PT_Parameter)* ')')?;
+    'status(' acceptableCodes+=INT ('|' acceptableCodes+=INT)* ')' ('-' '(' param+=PT_Parameter (',' param+=PT_Parameter)* ')')?;
 
 PT_Parameter:
     {PT_Parameter}
