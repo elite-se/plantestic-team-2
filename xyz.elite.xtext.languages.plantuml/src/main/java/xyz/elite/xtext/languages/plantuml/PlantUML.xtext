@@ -24,12 +24,17 @@ SQ_SequenceElement:
     NEWLINE;
 
 SQ_Message:
-    sender=SQ_Participant arrow=ARROW receiver=SQ_Participant (':' (payload=PT_RequestResponse)? description=SQ_Description)?;
+    sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant (':' (payload=PT_RequestResponse)? description=SQ_Description)?;
+
+SQ_Arrow:
+    ((('-' ('[' color=COLOR ']')?) | ('-' ('[' color=COLOR ']')? '-')) ('>' | '>>' | '\\' | '\\\\' | '/' | '//' | '>x' | '>o'))
+    | (('<' | '<<' | '\\' | '\\\\' | '/' | '//' | 'x<' | 'o<') ((('[' color=COLOR ']')? '-') | ('-' ('[' color=COLOR ']')? '-')))
+    | (('<' | '<<' | '\\' | '\\\\' | '/' | '//' | 'x<' | 'o<') ('-' | ('-' ('[' color=COLOR ']')? '-')) ('>' | '>>' | '\\' | '\\\\' | '/' | '//' | '>x' | '>o'));
 
 SQ_Description:
     (
-        ID | STRING | INT | COLOR | CONTROL_CHARACTER | ARROW | ANY_OTHER | 
-        PT_TimeUnit | ',' | '(' | ')' | '#' | '|' | '-' | 'as' | 'order'
+        ID | STRING | INT | COLOR | CONTROL_CHARACTER | ANY_OTHER | PT_TimeUnit | 
+        ',' | '(' | ')' | '[' | ']' | '#' | '|' | '-' | '<' | '>' | 'as' | 'order'
     )*;
 
 SQ_ParticipantDefiniton:
@@ -81,11 +86,6 @@ terminal COLOR:
          ('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')
         (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9'))?
     );
-
-terminal ARROW:
-    ('-'? '-' ('>' | '>>' | '\\' | '\\\\' | '/' | '//' | '>x' | '>o'))
-    | (('<' | '<<' | '\\' | '\\\\' | '/' | '//' | 'x<' | 'o<') '-' '-'?)
-    | (('<' | '<<' | '\\' | '\\\\' | '/' | '//' | 'x<' | 'o<') '-' '-'? ('>' | '>>' | '\\' | '\\\\' | '/' | '//' | '>x' | '>o'));
 
 terminal ID:
     ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
