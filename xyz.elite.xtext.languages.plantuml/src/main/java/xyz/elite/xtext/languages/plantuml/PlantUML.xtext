@@ -39,7 +39,7 @@ SQ_Participant:
     (name=ID|name=STRING);
         
 SQ_Description:
-    (ID | STRING | INT | CONTROL_CHARACTER | ANY_OTHER)*;
+    (ID | STRING | INT | CONTROL_CHARACTER | ARROW | ANY_OTHER)*;
 
 SQ_Color:
     hexcode=COLOR | ('#' name=ID);
