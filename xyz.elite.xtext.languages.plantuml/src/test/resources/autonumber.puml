@@ -7,6 +7,8 @@ Bob -> Alice
 autonumber 15 8
 Alice -> Peter
 Peter -> Bob
+
+autonumber 10 "Message template ##"
 Bob -> Bob
 Bob -> Alice
 

@@ -52,7 +52,7 @@ SQ_Delay:
     '...' (wait=PT_Wait)? description=SQ_Description '...';
 
 SQ_Autonumber:
-    'autonumber' (start=INT)? (step=INT)?;
+    'autonumber' (start=INT)? (step=INT)? (format=STRING)?;
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
