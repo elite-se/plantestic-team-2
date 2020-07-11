@@ -1,0 +1,11 @@
+SEQUENCE @startuml
+
+Alice -> Bob
+Bob --> Alice
+Alice <-> Bob
+Bob <-> Alice
+Bob ->o Alice
+Alice ->x Alice
+Alice o<->x Bob
+
+@enduml

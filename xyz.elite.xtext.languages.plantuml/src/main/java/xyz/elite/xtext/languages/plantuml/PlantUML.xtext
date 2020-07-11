@@ -24,7 +24,7 @@ SQ_SequenceElement:
     NEWLINE;
 
 SQ_Message:
-    sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant (':' (payload=PT_RequestResponse)? description=SQ_Description)?;
+    sender=SQ_Participant arrow=ARROW receiver=SQ_Participant (':' (payload=PT_RequestResponse)? description=SQ_Description)?;
 
 SQ_ParticipantDefiniton:
     ('actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant') participant=SQ_Participant 
@@ -38,9 +38,6 @@ SQ_Delay:
 SQ_Participant:
     (name=ID|name=STRING);
         
-SQ_Arrow:
-    '-'? '->' | '<-' '-'?;
-
 SQ_Description:
     (ID | STRING | INT | CONTROL_CHARACTER | ANY_OTHER)*;
 
@@ -83,6 +80,11 @@ terminal DIAGRAM_END:
 terminal COLOR:
     '#' (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')
         (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9'))?);
+
+terminal ARROW:
+    ('-'? '-' ('>' | '>>' | '\\' | '\\\\' | '/' | '//' | '>x' | '>o'))
+    | (('<' | '<<' | '\\' | '\\\\' | '/' | '//' | 'x<' | 'o<') '-' '-'?)
+    | (('<' | '<<' | '\\' | '\\\\' | '/' | '//' | 'x<' | 'o<') '-' '-'? ('>' | '>>' | '\\' | '\\\\' | '/' | '//' | '>x' | '>o'));
 
 terminal ID:
     ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;

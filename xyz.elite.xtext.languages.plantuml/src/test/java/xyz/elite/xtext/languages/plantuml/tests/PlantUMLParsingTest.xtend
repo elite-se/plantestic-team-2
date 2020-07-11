@@ -29,7 +29,10 @@ class PlantUMLParsingTest {
 	@Test
     def void empty() {
         val result = parseHelper.parse(loadPUML("empty"))
-        Assert.assertNull(result)
+        if (result != null) {
+            val errors = result.eResource.errors
+            Assert.assertFalse('''An empty PUML file should cause errors!''', errors.isEmpty);
+        }
     }
 
     @Test
@@ -53,6 +56,14 @@ class PlantUMLParsingTest {
         Assert.assertNotNull(result)
 		val errors = result.eResource.errors
         Assert.assertFalse('''Errors: «errors.join(", ")»''', errors.isEmpty);
+    }
+
+    @Test
+    def void arrows() {
+        val result = parseHelper.parse(loadPUML("arrows"))
+        Assert.assertNotNull(result)
+        val errors = result.eResource.errors
+        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
     }
 
 	@Test
