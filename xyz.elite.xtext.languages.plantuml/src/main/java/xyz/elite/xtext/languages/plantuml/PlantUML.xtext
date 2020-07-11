@@ -28,21 +28,18 @@ SQ_Message:
 
 SQ_Description:
     (
-        ID | STRING | INT | HEXCOLOR | CONTROL_CHARACTER | ARROW | ANY_OTHER | 
+        ID | STRING | INT | COLOR | CONTROL_CHARACTER | ARROW | ANY_OTHER | 
         PT_TimeUnit | ',' | '(' | ')' | '#' | '|' | '-' | 'as' | 'order'
     )*;
 
 SQ_ParticipantDefiniton:
     ('actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant') participant=SQ_Participant 
     ('as' alias=ID)? 
-    (color=SQ_Color)?
+    (color=COLOR)?
     ('order' priority=INT)?;
 
 SQ_Participant:
     (name=ID|name=STRING);
-
-SQ_Color:
-    hexcode=HEXCOLOR | ('#' name=ID);
         
 SQ_Delay:
     {SQ_Delay}
@@ -78,9 +75,12 @@ PT_TimeUnit:
 // ----------------------------
 //      LEXER/PARSER ATOMS
 // ----------------------------
-terminal HEXCOLOR:
-    '#' (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')
-        (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9'))?);
+terminal COLOR:
+    '#' 
+    (
+         ('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')
+        (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9'))?
+    );
 
 terminal ARROW:
     ('-'? '-' ('>' | '>>' | '\\' | '\\\\' | '/' | '//' | '>x' | '>o'))
