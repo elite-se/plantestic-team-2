@@ -102,6 +102,9 @@ terminal NEWLINE:
 terminal CONTROL_CHARACTER:
     '\\' ( 'b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\');
 
+// ----------------------
+//    HIDDEN TERMINALS
+// ----------------------
 terminal ML_COMMENT:
     "/'" -> "'/";
 
@@ -111,5 +114,9 @@ terminal SL_COMMENT:
 terminal WS:
     (' '|'\t')+;
 
+// ----------------------
+//   CONSUME REMAINDER
+// ----------------------
 terminal ANY_OTHER:
+    // this rule consumes any remaining tokens
     .;
