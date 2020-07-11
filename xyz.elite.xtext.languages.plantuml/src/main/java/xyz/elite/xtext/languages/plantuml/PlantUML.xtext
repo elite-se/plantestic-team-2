@@ -97,7 +97,7 @@ terminal NEWLINE:
 
 @Override
 terminal SL_COMMENT:
-    "'" !('\n'|'\r')* NEWLINE?;
+    "'" !('\n'|'\r')*;
 
 @Override
 terminal ML_COMMENT:
