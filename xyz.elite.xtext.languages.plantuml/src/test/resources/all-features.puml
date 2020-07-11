@@ -1,4 +1,4 @@
-SEQUENCE @startuml
+@startuml
 
 participant "I have a really long\nlong name" as L #00aa00
 participant "Alice" #aF7
