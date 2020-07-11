@@ -1,0 +1,13 @@
+@startuml
+
+Alice -> Bob
+autonumber
+Bob -> Alice
+
+autonumber 15 8
+Alice -> Peter
+Peter -> Bob
+Bob -> Bob
+Bob -> Alice
+
+@enduml

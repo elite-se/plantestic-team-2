@@ -20,6 +20,7 @@ SQ_SequenceElement:
         SQ_Message
         | SQ_ParticipantDefiniton
         | SQ_Delay
+        | SQ_Autonumber
     )
     NEWLINE;
 
@@ -49,6 +50,9 @@ SQ_Participant:
 SQ_Delay:
     {SQ_Delay}
     '...' (wait=PT_Wait)? description=SQ_Description '...';
+
+SQ_Autonumber:
+    'autonumber' (start=INT)? (step=INT)?;
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
