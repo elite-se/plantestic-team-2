@@ -28,7 +28,7 @@ SQ_Message:
 SQ_ParticipantDefiniton:
     ('actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant') participant=SQ_Participant 
     ('as' alias=ID)? (color=SQ_Color)?
-    ('order' priority=INT);
+    ('order' priority=INT)?;
 
 SQ_Delay:
     {SQ_Delay}
