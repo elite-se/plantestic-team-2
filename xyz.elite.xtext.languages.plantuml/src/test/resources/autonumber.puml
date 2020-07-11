@@ -12,4 +12,11 @@ autonumber 10 "Message template ##"
 Bob -> Bob
 Bob -> Alice
 
+autonumber stop
+Alice -> Peter
+Peter -> Alice
+
+autonumber resume
+Alice -> Hans
+
 @enduml

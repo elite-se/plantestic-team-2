@@ -35,7 +35,8 @@ SQ_Arrow:
 SQ_Description:
     (
         ID | STRING | INT | COLOR | CONTROL_CHARACTER | ANY_OTHER | PT_TimeUnit | 
-        ',' | '(' | ')' | '[' | ']' | '#' | '|' | '-' | '<' | '>' | 'as' | 'order'
+        ',' | '(' | ')' | '[' | ']' | '#' | '|' | '-' | '<' | '>' | 'as' | 'order' |
+        'stop' | 'resume'
     )*;
 
 SQ_ParticipantDefiniton:
@@ -52,7 +53,7 @@ SQ_Delay:
     '...' (wait=PT_Wait)? description=SQ_Description '...';
 
 SQ_Autonumber:
-    'autonumber' (start=INT)? (step=INT)? (format=STRING)?;
+    'autonumber' ('stop' | 'resume')? (start=INT)? (step=INT)? (format=STRING)?;
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
