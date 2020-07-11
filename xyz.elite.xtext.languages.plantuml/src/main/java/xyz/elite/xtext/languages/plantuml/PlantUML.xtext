@@ -42,7 +42,7 @@ SQ_Arrow:
     '-'? '->' | '<-' '-'?;
 
 SQ_Description:
-    (ID | STRING | INT | ANY_OTHER)*;
+    (ID | STRING | INT | CONTROL_CHARACTER | ANY_OTHER)*;
 
 SQ_Color:
     hexcode=COLOR | ('#' name=ID);
@@ -96,6 +96,9 @@ terminal STRING:
 // NEWLINE has to be a visible terminal in this grammar since it has a semantic meaning (end of sequence element)
 terminal NEWLINE:
     '\r'? '\n';
+
+terminal CONTROL_CHARACTER:
+    '\\' ( 'b' | 't' | 'n' | 'f' | 'r' | 'u' | '"' | "'" | '\\');
 
 terminal ML_COMMENT:
     "/'" -> "'/";
