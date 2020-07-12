@@ -31,9 +31,27 @@ SQ_Message:
     sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant (':' payload=(PT_RequestResponse)? description=SQ_Description)?;
 
 SQ_Arrow:
-    ((('-' ('[' color=COLOR ']')?) | ('-' ('[' color=COLOR ']')? '-')) ('>' '>'? | '\\' '\\'? | '/' '/'? | '>x' | '>o'))
-    | (('<' '<'? | '\\' '\\'? | '/' '/'? | 'x<' | 'o<') ((('[' color=COLOR ']')? '-') | ('-' ('[' color=COLOR ']')? '-')))
-    | (('<' '<'? | '\\' '\\'? | '/' '/'? | 'x<' | 'o<') ('-' | ('-' ('[' color=COLOR ']')? '-')) ('>' '>'? | '\\' '\\'? | '/' '/'? | '>x' | '>o'));
+    (
+        ((line+='-' ('[' color=COLOR ']')?) | (line+='-' ('[' color=COLOR ']')? '-')) 
+        righttip=SQ_ArrowRightTip
+    )
+    | 
+    (
+        lefttip=SQ_ArrowLeftTip 
+        ((('[' color=COLOR ']')? line+='-') | (line+='-' ('[' color=COLOR ']')? '-'))
+    )
+    | 
+    (
+        lefttip=SQ_ArrowLeftTip
+        (line+='-' | (line+='-' ('[' color=COLOR ']')? line+='-')) 
+        righttip=SQ_ArrowRightTip
+    );
+
+SQ_ArrowRightTip:
+    '>' '>'? | '\\' '\\'? | '/' '/'? | '>x' | '>o';
+
+SQ_ArrowLeftTip:
+    '<' '<'? | '\\' '\\'? | '/' '/'? | 'x<' | 'o<';
 
 SQ_Description:
     (
