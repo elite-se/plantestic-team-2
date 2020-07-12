@@ -16,35 +16,39 @@ SQ_Diagram:
 //      SEQUENCE ELEMENTS
 // ---------------------------
 SQ_SequenceElement:
+    NEWLINE 
     (
         SQ_Message
         | SQ_ParticipantDefiniton
         | SQ_Delay
         | SQ_Autonumber
         | SQ_PageMetaInfo
-    )
-    NEWLINE;
+    );
 
 SQ_Message:
-    sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant (':' (payload=PT_RequestResponse)? description=SQ_Description)?;
+    sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant (':' payload=(PT_RequestResponse)? description=SQ_Description)?;
 
 SQ_Arrow:
-    ((('-' ('[' color=COLOR ']')?) | ('-' ('[' color=COLOR ']')? '-')) ('>' | '>>' | '\\' | '\\\\' | '/' | '//' | '>x' | '>o'))
-    | (('<' | '<<' | '\\' | '\\\\' | '/' | '//' | 'x<' | 'o<') ((('[' color=COLOR ']')? '-') | ('-' ('[' color=COLOR ']')? '-')))
-    | (('<' | '<<' | '\\' | '\\\\' | '/' | '//' | 'x<' | 'o<') ('-' | ('-' ('[' color=COLOR ']')? '-')) ('>' | '>>' | '\\' | '\\\\' | '/' | '//' | '>x' | '>o'));
+    ((('-' ('[' color=COLOR ']')?) | ('-' ('[' color=COLOR ']')? '-')) ('>' '>'? | '\\' '\\'? | '/' '/'? | '>x' | '>o'))
+    | (('<' '<'? | '\\' '\\'? | '/' '/'? | 'x<' | 'o<') ((('[' color=COLOR ']')? '-') | ('-' ('[' color=COLOR ']')? '-')))
+    | (('<' '<'? | '\\' '\\'? | '/' '/'? | 'x<' | 'o<') ('-' | ('-' ('[' color=COLOR ']')? '-')) ('>' '>'? | '\\' '\\'? | '/' '/'? | '>x' | '>o'));
 
 SQ_Description:
     (
-        ID | STRING | INT | COLOR | CONTROL_CHARACTER | ANY_OTHER | PT_TimeUnit | 
-        ',' | '(' | ')' | '[' | ']' | '#' | '|' | '-' | '<' | '>' | 'as' | 'order' |
-        'stop' | 'resume'
+        ID | STRING | INT | COLOR | CONTROL_CHARACTER | ANY_OTHER | PT_TimeUnit |
+        'SEQUENCE' | ',' | '(' | ')' | '[' | ']' | '#' | '|' | '-' | '<' | '>' |
+        '>x' | '>o' | 'x<' | 'o<' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
+        'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod
     )*;
 
 SQ_ParticipantDefiniton:
-    ('actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant') participant=SQ_Participant 
+    keyword=SQ_ParticipantKeyword participant=SQ_Participant 
     ('as' alias=ID)? 
     (color=COLOR)?
     ('order' priority=INT)?;
+
+SQ_ParticipantKeyword:
+    'actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant';
 
 SQ_Participant:
     name=ID | name=STRING;
@@ -57,7 +61,10 @@ SQ_Autonumber:
     'autonumber' ('stop' | 'resume')? (start=INT | start=INT step=INT)? format=(STRING)?;
 
 SQ_PageMetaInfo:
-    ('header'|'footer'|'title'|'newpage') content=SQ_Description;
+    keyword=SQ_PageMetaInfoKeyword content=SQ_Description;
+
+SQ_PageMetaInfoKeyword:
+    'header'|'footer'|'title'|'newpage';
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
@@ -70,14 +77,17 @@ PT_RequestResponse:
 
 PT_Request returns PT_RequestResponse:
     {PT_Request}
-    method=PT_RequestMethod url=STRING ('(' param+=PT_Parameter (',' param+=PT_Parameter)* ')')?;
+    'request(' method=PT_RequestMethod ',' url=STRING (',' parametermap=(PT_ParameterMap))? ')';
 
 PT_RequestMethod:
     'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 PT_Response returns PT_RequestResponse:
     {PT_Response}
-    'status(' acceptableCodes+=INT ('|' acceptableCodes+=INT)* ')' ('-' '(' param+=PT_Parameter (',' param+=PT_Parameter)* ')')?;
+    'response(' acceptableCodes+=INT ('|' '|' acceptableCodes+=INT)* (',' parametermap=(PT_ParameterMap))? ')';
+
+PT_ParameterMap:
+    ('[' (param+=PT_Parameter (',' param+=PT_Parameter)*)? ']');
 
 PT_Parameter:
     {PT_Parameter}
