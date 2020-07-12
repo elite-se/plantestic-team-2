@@ -34,7 +34,7 @@ SQ_SequenceElement:
 
 // -------- MESSAGES --------
 SQ_Message:
-    sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant (':' payload=(PT_RequestResponse)? description=SQ_Description)?;
+    sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant (receiverlifetime=SQ_LifetimeHint)? (':' payload=(PT_RequestResponse)? description=SQ_Description)?;
 
 SQ_Arrow:
     (
@@ -66,7 +66,7 @@ SQ_Description:
         '>x' | '>o' | 'x<' | 'o<' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
-        'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off'
+        'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | '!' | '*'
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
@@ -144,6 +144,9 @@ SQ_LifelineKeyword:
 
 SQ_Autolifeline:
     'autoactivate' mode=('on' | 'off');
+
+SQ_LifetimeHint:
+    '*' '*' | '!' '!';
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
