@@ -20,13 +20,13 @@ SQ_SequenceElement:
     (
         SQ_Message
         | SQ_ParticipantDefiniton
-        | SQ_Delay
         | SQ_Autonumber
         | SQ_PageMetaInfo
         | SQ_Group
         | SQ_Note
         | SQ_Divider
         | SQ_Ref
+        | SQ_Delay
     );
 
 // -------- MESSAGES --------
@@ -79,11 +79,6 @@ SQ_ParticipantKeyword:
 SQ_Participant:
     name=ID | name=STRING;
 
-// -------- DELAY --------
-SQ_Delay:
-    {SQ_Delay}
-    '...' (wait=PT_Wait)? description=SQ_Description '...'?;
-
 // -------- AUTONUMBERING --------
 SQ_Autonumber:
     'autonumber' ('stop' | 'resume')? (start=INT | start=INT step=INT)? format=(STRING)?;
@@ -130,6 +125,11 @@ SQ_Divider:
 // -------- REF --------
 SQ_Ref:
     'ref' 'over' anchors+=[SQ_Participant] (',' anchors+=[SQ_Participant])* ':' content=SQ_Description;
+
+// -------- DELAY --------
+SQ_Delay:
+    {SQ_Delay}
+    '...' (wait=PT_Wait)? description=SQ_Description '...'?;
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
