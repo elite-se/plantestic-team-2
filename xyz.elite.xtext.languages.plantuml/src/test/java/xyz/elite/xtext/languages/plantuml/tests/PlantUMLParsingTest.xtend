@@ -104,6 +104,11 @@ class PlantUMLParsingTest {
         parsesWithoutErrors("divider")
     }
 
+    @Test
+    def void ref() {
+        parsesWithoutErrors("ref")
+    }
+
 	@Test
 	def void allFeatures() {
         parsesWithoutErrors("all-features")
