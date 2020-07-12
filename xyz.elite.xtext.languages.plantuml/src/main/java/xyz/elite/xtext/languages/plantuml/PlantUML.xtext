@@ -27,6 +27,7 @@ SQ_SequenceElement:
         | SQ_Note
     );
 
+// -------- MESSAGES --------
 SQ_Message:
     sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant (':' payload=(PT_RequestResponse)? description=SQ_Description)?;
 
@@ -62,6 +63,7 @@ SQ_Description:
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 'of'
     )*;
 
+// -------- DEFINING PARTICIPANTS --------
 SQ_ParticipantDefiniton:
     keyword=SQ_ParticipantKeyword participant=SQ_Participant 
     ('as' alias=ID)? 
@@ -74,19 +76,23 @@ SQ_ParticipantKeyword:
 SQ_Participant:
     name=ID | name=STRING;
 
+// -------- DELAY --------
 SQ_Delay:
     {SQ_Delay}
     '...' (wait=PT_Wait)? description=SQ_Description '...'?;
 
+// -------- AUTONUMBERING --------
 SQ_Autonumber:
     'autonumber' ('stop' | 'resume')? (start=INT | start=INT step=INT)? format=(STRING)?;
 
+// -------- PAGE META/FORMATTING INFORMATION --------
 SQ_PageMetaInfo:
     keyword=SQ_PageMetaInfoKeyword content=SQ_Description;
 
 SQ_PageMetaInfoKeyword:
     'header'|'footer'|'title'|'newpage';
 
+// -------- GROUPS --------
 SQ_Group:
     keyword=SQ_GroupEntryKeyword label=SQ_Description 
         (NEWLINE | elements+=SQ_SequenceElement)* 
@@ -100,6 +106,7 @@ SQ_GroupAlternative:
 SQ_GroupEntryKeyword:
     'alt'|'opt'|'loop'|'par'|'break'|'critical'|'group';
 
+// -------- NOTES --------
 SQ_Note:
     type=SQ_NoteType
     (
