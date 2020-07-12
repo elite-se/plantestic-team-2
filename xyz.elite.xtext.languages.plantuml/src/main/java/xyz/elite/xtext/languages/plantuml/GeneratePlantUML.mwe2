@@ -43,9 +43,6 @@ Workflow {
             webSupport = {
                 framework = "Orion"
             }
-            parserGenerator = {
-                debugGrammar = true
-            }
         }
     }
 
