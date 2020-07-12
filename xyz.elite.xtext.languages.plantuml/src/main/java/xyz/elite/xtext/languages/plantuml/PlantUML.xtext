@@ -31,6 +31,8 @@ SQ_SequenceElement:
         | SQ_LifelineCtrl
         | SQ_Autolifeline
         | SQ_Return
+        | SQ_EncompassBegin
+        | SQ_EncompassEnd
     );
 
 // -------- MESSAGES --------
@@ -81,7 +83,7 @@ SQ_Description:
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
         'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | 'create' |
-        '!' | '*' | '+'
+        '!' | '*' | '+' | 'box'
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
@@ -173,6 +175,13 @@ SQ_LifetimeHint:
 
 SQ_Return:
     'return' (response=PT_Response)? label=SQ_Description;
+
+// -------- ENCOMPASS --------
+SQ_EncompassBegin:
+    'box' title=STRING color=COLOR;
+
+SQ_EncompassEnd:
+    'end' 'box';
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS

@@ -134,6 +134,11 @@ class PlantUMLParsingTest {
         parsesWithoutErrors("stereotypes")
     }
 
+    @Test
+    def void encompass() {
+        parsesWithoutErrors("encompass")
+    }
+
 	@Test
 	def void allFeatures() {
         parsesWithoutErrors("all-features")
