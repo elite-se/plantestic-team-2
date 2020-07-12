@@ -10,8 +10,8 @@ Currently, this grammar has the following limitations:
 - TEOZ PlantUML is not supported as of yet as it is still in alpha
 - Only hexadecimal color specifications are supported, i.e., '#red' is not considered a valid color
 - Descriptions (e.g. annotations on messages) may not contain ':', '...' or '==', unless those characters are escaped using double quotation marks ('"')
-- Multiline note syntax of the form 'note ... end note' and inline HTML in Notes are not support, please use 'note : ...\n...\n' to create multiline notes
-- Multiline ref syntax of the form 'ref ... end ref' is not supported, please use 'ref : ...\n...\n' to create multiline refs
+- inline HTML in notes Notes is not support
+- Multiline ref/title/note syntax of the form 'ref ... end ref' is not supported, please use 'x : ...\n...\n' to create multiline content
 
 # Usage
 
