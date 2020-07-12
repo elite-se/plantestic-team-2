@@ -30,6 +30,7 @@ SQ_SequenceElement:
         | SQ_Space
         | SQ_LifelineCtrl
         | SQ_Autolifeline
+        | SQ_Return
     );
 
 // -------- MESSAGES --------
@@ -66,7 +67,7 @@ SQ_Description:
         '>x' | '>o' | 'x<' | 'o<' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
-        'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | '!' | '*'
+        'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | '!' | '*'
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
@@ -147,6 +148,9 @@ SQ_Autolifeline:
 
 SQ_LifetimeHint:
     '*' '*' | '!' '!';
+
+SQ_Return:
+    'return' (response=PT_Response)? label=SQ_Description;
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
