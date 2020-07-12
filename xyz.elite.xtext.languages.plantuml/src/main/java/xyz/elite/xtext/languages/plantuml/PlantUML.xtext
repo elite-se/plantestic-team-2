@@ -48,10 +48,10 @@ SQ_ParticipantDefiniton:
 
 SQ_Participant:
     name=ID | name=STRING;
-        
+
 SQ_Delay:
     {SQ_Delay}
-    '...' (wait=PT_Wait)? description=SQ_Description '...';
+    '...' (wait=PT_Wait)? description=SQ_Description '...'?;
 
 SQ_Autonumber:
     'autonumber' ('stop' | 'resume')? (start=INT | start=INT step=INT)? format=(STRING)?;
