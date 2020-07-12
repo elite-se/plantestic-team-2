@@ -67,12 +67,12 @@ SQ_Description:
         '>x' | '>o' | 'x<' | 'o<' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
-        'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | '!' | '*'
+        'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | 'create' | '!' | '*'
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
 SQ_ParticipantDefiniton:
-    keyword=SQ_ParticipantKeyword participant=SQ_Participant ('order' priority=INT)?;
+    (('create' keyword=(SQ_ParticipantKeyword)?) | keyword=SQ_ParticipantKeyword) participant=SQ_Participant ('order' priority=INT)?;
 
 SQ_ParticipantKeyword:
     'actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant';
