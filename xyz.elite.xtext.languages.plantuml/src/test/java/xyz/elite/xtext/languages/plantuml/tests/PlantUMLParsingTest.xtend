@@ -129,6 +129,11 @@ class PlantUMLParsingTest {
         parsesWithoutErrors("incoming-outgoing-messages")
     }
 
+    @Test
+    def void stereotypes() {
+        parsesWithoutErrors("stereotypes")
+    }
+
 	@Test
 	def void allFeatures() {
         parsesWithoutErrors("all-features")

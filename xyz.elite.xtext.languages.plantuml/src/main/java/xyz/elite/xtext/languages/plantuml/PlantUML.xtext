@@ -92,7 +92,15 @@ SQ_ParticipantKeyword:
     'actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant';
 
 SQ_Participant:
-    (((longform=ID | longform=STRING) ('as' name=ID)) | (name=ID | name=STRING))  (color=COLOR)?;
+    (((longform=ID | longform=STRING) ('as' name=ID)) | (name=ID | name=STRING)) (color=COLOR)? 
+    (stereotype=SQ_Stereotype)?;
+
+SQ_Stereotype:
+    '<' '<' (
+        (('(' char=ID ',' color=COLOR ')')? name=ID) 
+        | 
+        (('(' char=ID ',' color=COLOR ')'))
+    ) '>' '>';
 
 // -------- AUTONUMBERING --------
 SQ_Autonumber:
