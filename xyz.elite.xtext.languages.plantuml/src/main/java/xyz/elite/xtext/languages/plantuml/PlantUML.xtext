@@ -44,27 +44,25 @@ SQ_Message:
     (':' payload=(PT_RequestResponse)? description=SQ_Description)?;
 
 SQ_Arrow:
+    leftmodifier=(SQ_ArrowEndModifier)?
     (
-        leftmodifier=(SQ_ArrowEndModifier)?
-        lefttip=SQ_ArrowLeftTip 
-        ((('[' color=COLOR ']')? line+='-') | (line+='-' ('[' color=COLOR ']')? '-'))
-        rightmodifier=(SQ_ArrowEndModifier)?
+        (
+            lefttip=SQ_ArrowLeftTip 
+            ((('[' color=COLOR ']')? line+='-') | (line+='-' ('[' color=COLOR ']')? '-'))
+        )
+        |
+        (
+            ((line+='-' ('[' color=COLOR ']')?) | (line+='-' ('[' color=COLOR ']')? '-')) 
+            righttip=SQ_ArrowRightTip
+        )
+        | 
+        (
+            lefttip=SQ_ArrowLeftTip
+            (line+='-' | (line+='-' ('[' color=COLOR ']')? line+='-')) 
+            righttip=SQ_ArrowRightTip
+        )
     )
-    |
-    (
-        leftmodifier=(SQ_ArrowEndModifier)?
-        ((line+='-' ('[' color=COLOR ']')?) | (line+='-' ('[' color=COLOR ']')? '-')) 
-        righttip=SQ_ArrowRightTip
-        rightmodifier=(SQ_ArrowEndModifier)?
-    )
-    | 
-    (
-        leftmodifier=(SQ_ArrowEndModifier)?
-        lefttip=SQ_ArrowLeftTip
-        (line+='-' | (line+='-' ('[' color=COLOR ']')? line+='-')) 
-        righttip=SQ_ArrowRightTip
-        rightmodifier=(SQ_ArrowEndModifier)?
-    );
+    rightmodifier=(SQ_ArrowEndModifier)?;
 
 SQ_ArrowEndModifier:
     'x' | 'o';
