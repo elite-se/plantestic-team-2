@@ -144,6 +144,11 @@ class PlantUMLParsingTest {
         parsesWithoutErrors("hide-footbox")
     }
 
+    @Test
+    def void skinparam() {
+        parsesWithoutErrors("skinparam")
+    }
+
 	@Test
 	def void allFeatures() {
         parsesWithoutErrors("all-features")

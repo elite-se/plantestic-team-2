@@ -34,6 +34,7 @@ SQ_SequenceElement:
         | SQ_EncompassBegin
         | SQ_EncompassEnd
         | SQ_HideFootbox
+        | SQ_Skinparam
     );
 
 // -------- MESSAGES --------
@@ -84,7 +85,7 @@ SQ_Description:
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
         'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | 'create' |
-        '!' | '*' | '+' | 'box' | 'hide' | 'footbox'
+        '!' | '*' | '+' | 'box' | 'hide' | 'footbox' | 'skinparam'
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
@@ -169,7 +170,7 @@ SQ_LifelineCtrl:
     keyword=SQ_LifelineKeyword participant=[SQ_Participant] (color=COLOR)?;
 
 SQ_LifelineKeyword:
-    'activate' | 'deactivate';
+    'activate' | 'deactivate' | 'destroy';
 
 SQ_Autolifeline:
     'autoactivate' mode=('on' | 'off');
@@ -186,6 +187,10 @@ SQ_EncompassBegin:
 
 SQ_EncompassEnd:
     'end' 'box';
+
+// -------- SKINPARAM --------
+SQ_Skinparam:
+    'skinparam' name=ID (colorval=COLOR | numberval=INT | idval=ID | strval=STRING);
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS

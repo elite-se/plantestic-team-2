@@ -13,6 +13,7 @@ Currently, this grammar has the following limitations:
 - Descriptions (e.g. annotations on messages) may not contain ':', '...' or '==', unless those characters are escaped using double quotation marks ('"')
 - inline HTML in notes is not support
 - Multiline ref/title/note syntax of the form 'ref ... end ref' is not supported, please use \n to create multiline content
+- Multiline skinparam using '{}' is not supported, please use multiple individual skinparam lines
 
 # Usage
 
