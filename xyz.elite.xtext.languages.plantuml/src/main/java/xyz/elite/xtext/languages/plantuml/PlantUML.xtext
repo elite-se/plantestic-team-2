@@ -85,7 +85,7 @@ SQ_Description:
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
         'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | 'create' |
-        '!' | '*' | '+' | 'box' | 'hide' | 'footbox' | 'skinparam'
+        '!' | '*' | '+' | 'box' | 'hide' | 'footbox' | 'skinparam' | 'ref'
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
@@ -96,8 +96,9 @@ SQ_ParticipantKeyword:
     'actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant';
 
 SQ_Participant:
-    (((longform=ID | longform=STRING) ('as' name=ID)) | (name=ID | name=STRING)) (color=COLOR)? 
-    (stereotype=SQ_Stereotype)?;
+    (((longform=ID | longform=STRING) ('as' name=ID)) | (name=ID | name=STRING))
+    (stereotype=SQ_Stereotype)?
+    (color=COLOR)?;
 
 SQ_Stereotype:
     '<' '<' (
@@ -167,7 +168,7 @@ SQ_Space:
 
 // -------- LIFELINES --------
 SQ_LifelineCtrl:
-    keyword=SQ_LifelineKeyword participant=[SQ_Participant] (color=COLOR)?;
+    keyword=SQ_LifelineKeyword (participant=[SQ_Participant|ID] | participant=[SQ_Participant|STRING]) (color=COLOR)?;
 
 SQ_LifelineKeyword:
     'activate' | 'deactivate' | 'destroy';
