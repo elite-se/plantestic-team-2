@@ -21,6 +21,7 @@ SQ_SequenceElement:
         | SQ_ParticipantDefiniton
         | SQ_Delay
         | SQ_Autonumber
+        | SQ_PageMetaInfo
     )
     NEWLINE;
 
@@ -54,6 +55,9 @@ SQ_Delay:
 
 SQ_Autonumber:
     'autonumber' ('stop' | 'resume')? (start=INT | start=INT step=INT)? format=(STRING)?;
+
+SQ_PageMetaInfo:
+    ('header'|'footer'|'title'|'newpage') content=SQ_Description;
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
