@@ -109,6 +109,11 @@ class PlantUMLParsingTest {
         parsesWithoutErrors("ref")
     }
 
+    @Test
+    def void space() {
+        parsesWithoutErrors("space")
+    }
+
 	@Test
 	def void allFeatures() {
         parsesWithoutErrors("all-features")

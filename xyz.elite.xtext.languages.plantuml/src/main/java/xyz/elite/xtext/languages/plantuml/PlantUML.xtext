@@ -27,6 +27,7 @@ SQ_SequenceElement:
         | SQ_Divider
         | SQ_Ref
         | SQ_Delay
+        | SQ_Space
     );
 
 // -------- MESSAGES --------
@@ -128,8 +129,12 @@ SQ_Ref:
 
 // -------- DELAY --------
 SQ_Delay:
-    {SQ_Delay}
     '...' (wait=PT_Wait)? description=SQ_Description '...'?;
+
+// -------- SPACE --------
+SQ_Space:
+    '|' '|' ('|' | (height=INT '|' '|'));
+
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
