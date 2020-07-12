@@ -92,7 +92,7 @@ SQ_ParticipantKeyword:
     'actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant';
 
 SQ_Participant:
-    (name=ID | name=STRING) ('as' alias=ID)? (color=COLOR)?;
+    (((longform=ID | longform=STRING) ('as' name=ID)) | (name=ID | name=STRING))  (color=COLOR)?;
 
 // -------- AUTONUMBERING --------
 SQ_Autonumber:
