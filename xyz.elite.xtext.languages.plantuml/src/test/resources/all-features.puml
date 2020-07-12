@@ -10,8 +10,10 @@ FOO <- "BAR()": request(POST, "/lol/xd/${var}", [var : "1"])
 BAR --> FOO : response(200 || 201 || 410, [ res: "42" ])
 participant "CCC-Mock"
 
+break test
 Alice -> Alice: This is a signal to self.\nIt also demonstrates\nmultiline \ntext
 Bob->Alice : <->Diese Nachricht enthält einen arrow!
 Alice<--Alice : Dies ist eine tolle Nachricht
+end
 
 @enduml
