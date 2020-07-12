@@ -29,6 +29,7 @@ SQ_SequenceElement:
         | SQ_Delay
         | SQ_Space
         | SQ_LifelineCtrl
+        | SQ_Autolifeline
     );
 
 // -------- MESSAGES --------
@@ -65,21 +66,18 @@ SQ_Description:
         '>x' | '>o' | 'x<' | 'o<' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
-        'of' | SQ_LifelineKeyword
+        'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off'
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
 SQ_ParticipantDefiniton:
-    keyword=SQ_ParticipantKeyword participant=SQ_Participant 
-    ('as' alias=ID)? 
-    (color=COLOR)?
-    ('order' priority=INT)?;
+    keyword=SQ_ParticipantKeyword participant=SQ_Participant ('order' priority=INT)?;
 
 SQ_ParticipantKeyword:
     'actor'|'boundary'|'control'|'collections'|'entity'|'database'|'participant';
 
 SQ_Participant:
-    name=ID | name=STRING;
+    (name=ID | name=STRING) ('as' alias=ID)? (color=COLOR)?;
 
 // -------- AUTONUMBERING --------
 SQ_Autonumber:
@@ -143,6 +141,9 @@ SQ_LifelineCtrl:
 
 SQ_LifelineKeyword:
     'activate' | 'deactivate';
+
+SQ_Autolifeline:
+    'autoactivate' mode=('on' | 'off');
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
