@@ -139,6 +139,11 @@ class PlantUMLParsingTest {
         parsesWithoutErrors("encompass")
     }
 
+    @Test
+    def void hideFootbox() {
+        parsesWithoutErrors("hide-footbox")
+    }
+
 	@Test
 	def void allFeatures() {
         parsesWithoutErrors("all-features")

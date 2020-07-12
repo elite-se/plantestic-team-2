@@ -33,6 +33,7 @@ SQ_SequenceElement:
         | SQ_Return
         | SQ_EncompassBegin
         | SQ_EncompassEnd
+        | SQ_HideFootbox
     );
 
 // -------- MESSAGES --------
@@ -83,7 +84,7 @@ SQ_Description:
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
         'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | 'create' |
-        '!' | '*' | '+' | 'box'
+        '!' | '*' | '+' | 'box' | 'hide' | 'footbox'
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
@@ -114,6 +115,9 @@ SQ_PageMetaInfo:
 
 SQ_PageMetaInfoKeyword:
     'header'|'footer'|'title'|'newpage';
+
+SQ_HideFootbox:
+    'hide' 'footbox';
 
 // -------- GROUPS --------
 SQ_Group:
