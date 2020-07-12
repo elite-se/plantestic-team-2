@@ -1,17 +1,18 @@
 # Purpose
 
-This project aims to build an extended xtext definition of the PlantUML sequence diagram
-language, which has builtin support for typed http request/response annotations.
+This project aims to build a Xtext definition of the PlantUML sequence diagram
+language with some minor extensions, like builtin support for typed http request/response
+message annotations.
 
 # Limitations
 
 Currently, this grammar has the following limitations:
 
-- TEOZ PlantUML is not supported as of yet as it is still in alpha
+- TEOZ PlantUML is not supported as of yet since it is still in alpha
 - Only hexadecimal color specifications are supported, i.e., '#red' is not considered a valid color
 - Descriptions (e.g. annotations on messages) may not contain ':', '...' or '==', unless those characters are escaped using double quotation marks ('"')
-- inline HTML in notes Notes is not support
-- Multiline ref/title/note syntax of the form 'ref ... end ref' is not supported, please use 'x : ...\n...\n' to create multiline content
+- inline HTML in notes is not support
+- Multiline ref/title/note syntax of the form 'ref ... end ref' is not supported, please use \n to create multiline content
 
 # Usage
 
