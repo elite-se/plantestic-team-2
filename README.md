@@ -1,4 +1,19 @@
-# Setup
+# Purpose
+
+This project aims to build an extended xtext definition of the PlantUML sequence diagram
+language, which has builtin support for typed http request/response annotations.
+
+# Limitations
+
+Currently, this grammar has the following limitations:
+
+- Only hexadecimal color specifications are supported, i.e., '#red' is not considered a valid color
+- Descriptions (e.g. annotations on messages) may not contain ':' or '...', unless those characters are escaped using double quotation marks ('"')
+- Multiline note syntax of the form 'note ... end note' are not support, please use 'note : ...\n...\n' to create multiline notes
+
+# Usage
+
+## Setup
 
 ```
 $ git clone <repo>
@@ -8,13 +23,13 @@ $ ./gradlew jettyRun
 
 Then open to the generated puml web code editor by opening `localhost:8080` in your browser.
 
-# Test
+## Test
 
 ```
 $ ./gradlew test
 ```
 
-# Debug Grammar
+## Debug Grammar
 
 Firstly, you have to generate a debugable ANTLR Grammar file, by adding the `debugGrammer = true`
 flag to `parserGenerator` settings in _GeneratePlantUML.mwe2_:

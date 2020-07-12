@@ -106,6 +106,14 @@ class PlantUMLParsingTest {
         Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
     }
 
+    @Test
+    def void notes() {
+        val result = parseHelper.parse(loadPUML("notes"))
+        Assert.assertNotNull(result)
+        val errors = result.eResource.errors
+        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+    }
+
 	@Test
 	def void allFeatures() {
 		val result = parseHelper.parse(loadPUML("all-features"))

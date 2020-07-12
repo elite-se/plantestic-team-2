@@ -24,6 +24,7 @@ SQ_SequenceElement:
         | SQ_Autonumber
         | SQ_PageMetaInfo
         | SQ_Group
+        | SQ_Note
     );
 
 SQ_Message:
@@ -40,7 +41,7 @@ SQ_Description:
         'SEQUENCE' | ',' | '(' | ')' | '[' | ']' | '#' | '|' | '-' | '<' | '>' |
         '>x' | '>o' | 'x<' | 'o<' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
-        SQ_GroupEntryKeyword | 'else' | 'end'
+        SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 'of'
     )*;
 
 SQ_ParticipantDefiniton:
@@ -80,6 +81,19 @@ SQ_GroupAlternative:
 
 SQ_GroupEntryKeyword:
     'alt'|'opt'|'loop'|'par'|'break'|'critical'|'group';
+
+SQ_Note:
+    type=SQ_NoteType
+    (
+        (('left'|'right') ('of' anchors+=[SQ_Participant])?)
+        | 
+        ('over' anchors+=[SQ_Participant] ("," anchors+=[SQ_Participant])*)
+    )
+    color=(COLOR)?
+    ':' content=SQ_Description;
+
+SQ_NoteType:
+    'note' | 'hnote' | 'rnote';
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
