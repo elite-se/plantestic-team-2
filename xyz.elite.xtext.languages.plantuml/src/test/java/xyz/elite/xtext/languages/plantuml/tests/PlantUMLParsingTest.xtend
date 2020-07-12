@@ -26,6 +26,13 @@ class PlantUMLParsingTest {
         return String.join("\n", Files.readAllLines(Paths.get(uri.toURI()), StandardCharsets.UTF_8))
 	}
 
+    def void parsesWithoutErrors(String pumlName) {
+        val result = parseHelper.parse(loadPUML(pumlName))
+        Assert.assertNotNull(result)
+        val errors = result.eResource.errors
+        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+    }
+
 	@Test
     def void empty() {
         val result = parseHelper.parse(loadPUML("empty"))
@@ -33,12 +40,6 @@ class PlantUMLParsingTest {
             val errors = result.eResource.errors
             Assert.assertFalse('''An empty PUML file should cause errors!''', errors.isEmpty);
         }
-    }
-
-    @Test
-    def void minimal() {
-        val result = parseHelper.parse(loadPUML("minimal"))
-        Assert.assertNotNull(result)
     }
 
     @Test
@@ -59,74 +60,52 @@ class PlantUMLParsingTest {
     }
 
     @Test
+    def void minimal() {
+        parsesWithoutErrors("minimal")
+    }
+
+    @Test
     def void arrows() {
-        val result = parseHelper.parse(loadPUML("arrows"))
-        Assert.assertNotNull(result)
-        val errors = result.eResource.errors
-        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+        parsesWithoutErrors("arrows")
     }
 
     @Test
     def void colorfulArrows() {
-        val result = parseHelper.parse(loadPUML("colorful-arrows"))
-        Assert.assertNotNull(result)
-        val errors = result.eResource.errors
-        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+        parsesWithoutErrors("colorful-arrows")
     }
 
     @Test
     def void autonumber() {
-        val result = parseHelper.parse(loadPUML("autonumber"))
-        Assert.assertNotNull(result)
-        val errors = result.eResource.errors
-        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+        parsesWithoutErrors("autonumber")
     }
 
     @Test
     def void pageMetaInfo() {
-        val result = parseHelper.parse(loadPUML("page-meta-info"))
-        Assert.assertNotNull(result)
-        val errors = result.eResource.errors
-        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+        parsesWithoutErrors("page-meta-info")
     }
 
     @Test
     def void arbitraryDescription() {
-        val result = parseHelper.parse(loadPUML("arbitrary-description"))
-        Assert.assertNotNull(result)
-        val errors = result.eResource.errors
-        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+        parsesWithoutErrors("arbitrary-description")
     }    
 
     @Test
     def void groups() {
-        val result = parseHelper.parse(loadPUML("arbitrary-description"))
-        Assert.assertNotNull(result)
-        val errors = result.eResource.errors
-        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+        parsesWithoutErrors("groups")
     }
 
     @Test
     def void notes() {
-        val result = parseHelper.parse(loadPUML("notes"))
-        Assert.assertNotNull(result)
-        val errors = result.eResource.errors
-        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+        parsesWithoutErrors("notes")
     }
 
     @Test
     def void divider() {
-        val result = parseHelper.parse(loadPUML("divider"))
-        Assert.assertNotNull(result)
-        val errors = result.eResource.errors
-        Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+        parsesWithoutErrors("divider")
     }
 
 	@Test
 	def void allFeatures() {
-		val result = parseHelper.parse(loadPUML("all-features"))
-		Assert.assertNotNull(result)
-		val errors = result.eResource.errors
-		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+        parsesWithoutErrors("all-features")
 	}
 }
