@@ -39,7 +39,8 @@ SQ_Description:
         ID | STRING | INT | COLOR | CONTROL_CHARACTER | ANY_OTHER | PT_TimeUnit |
         'SEQUENCE' | ',' | '(' | ')' | '[' | ']' | '#' | '|' | '-' | '<' | '>' |
         '>x' | '>o' | 'x<' | 'o<' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
-        'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod
+        'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
+        SQ_GroupEntryKeyword | 'else' | 'end'
     )*;
 
 SQ_ParticipantDefiniton:
@@ -71,10 +72,10 @@ SQ_Group:
     keyword=SQ_GroupEntryKeyword label=SQ_Description 
         (NEWLINE | elements+=SQ_SequenceElement)* 
     alternatives+=(SQ_GroupAlternative)*
-    'end';
+    NEWLINE 'end';
 
 SQ_GroupAlternative:
-    'else' label=SQ_Description
+    NEWLINE 'else' label=SQ_Description
         (NEWLINE | elements+=SQ_SequenceElement)*;
 
 SQ_GroupEntryKeyword:
