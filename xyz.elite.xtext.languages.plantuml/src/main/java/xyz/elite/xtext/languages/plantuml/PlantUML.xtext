@@ -45,35 +45,44 @@ SQ_Message:
 
 SQ_Arrow:
     (
-        ((line+='-' ('[' color=COLOR ']')?) | (line+='-' ('[' color=COLOR ']')? '-')) 
-        righttip=SQ_ArrowRightTip
-    )
-    | 
-    (
+        leftmodifier=(SQ_ArrowEndModifier)?
         lefttip=SQ_ArrowLeftTip 
         ((('[' color=COLOR ']')? line+='-') | (line+='-' ('[' color=COLOR ']')? '-'))
+        rightmodifier=(SQ_ArrowEndModifier)?
+    )
+    |
+    (
+        leftmodifier=(SQ_ArrowEndModifier)?
+        ((line+='-' ('[' color=COLOR ']')?) | (line+='-' ('[' color=COLOR ']')? '-')) 
+        righttip=SQ_ArrowRightTip
+        rightmodifier=(SQ_ArrowEndModifier)?
     )
     | 
     (
+        leftmodifier=(SQ_ArrowEndModifier)?
         lefttip=SQ_ArrowLeftTip
         (line+='-' | (line+='-' ('[' color=COLOR ']')? line+='-')) 
         righttip=SQ_ArrowRightTip
+        rightmodifier=(SQ_ArrowEndModifier)?
     );
 
+SQ_ArrowEndModifier:
+    'x' | 'o';
+
 SQ_ArrowRightTip:
-    '>' '>'? | '\\' '\\'? | '/' '/'? | '>x' | '>o';
+    '>' '>'? | '\\' '\\'? | '/' '/'?;
 
 SQ_ArrowLeftTip:
-    '<' '<'? | '\\' '\\'? | '/' '/'? | 'x<' | 'o<';
+    '<' '<'? | '\\' '\\'? | '/' '/'?;
 
 SQ_Description:
     (
         ID | STRING | INT | COLOR | CONTROL_CHARACTER | ANY_OTHER | PT_TimeUnit |
         'SEQUENCE' | ',' | '(' | ')' | '[' | ']' | '#' | '|' | '-' | '<' | '>' |
-        '>x' | '>o' | 'x<' | 'o<' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
+        'x' | 'o' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
-        'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | 'create' | 
+        'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | 'create' |
         '!' | '*' | '+'
     )*;
 
