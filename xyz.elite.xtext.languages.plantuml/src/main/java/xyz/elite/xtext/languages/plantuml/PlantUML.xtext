@@ -35,7 +35,13 @@ SQ_SequenceElement:
 
 // -------- MESSAGES --------
 SQ_Message:
-    sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant (receiverlifetime=SQ_LifetimeHint)? (':' payload=(PT_RequestResponse)? description=SQ_Description)?;
+    (
+        ('[' arrow=SQ_Arrow receiver=SQ_Participant) 
+        | (sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant)
+        | (sender=SQ_Participant arrow=SQ_Arrow ']')
+    )  
+    (receiverlifetime=SQ_LifetimeHint)?
+    (':' payload=(PT_RequestResponse)? description=SQ_Description)?;
 
 SQ_Arrow:
     (

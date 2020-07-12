@@ -124,6 +124,11 @@ class PlantUMLParsingTest {
         parsesWithoutErrors("create")
     }
 
+    @Test
+    def void incomingOutgoingMessages() {
+        parsesWithoutErrors("incoming-outgoing-messages")
+    }
+
 	@Test
 	def void allFeatures() {
         parsesWithoutErrors("all-features")
