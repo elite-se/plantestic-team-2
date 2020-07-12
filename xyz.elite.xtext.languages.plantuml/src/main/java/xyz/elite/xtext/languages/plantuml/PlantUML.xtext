@@ -28,6 +28,7 @@ SQ_SequenceElement:
         | SQ_Ref
         | SQ_Delay
         | SQ_Space
+        | SQ_LifelineCtrl
     );
 
 // -------- MESSAGES --------
@@ -135,6 +136,13 @@ SQ_Delay:
 SQ_Space:
     '|' '|' ('|' | (height=INT '|' '|'));
 
+
+// -------- LIFELINES --------
+SQ_LifelineCtrl:
+    keyword=SQ_LifelineKeyword participant=[SQ_Participant] (color=COLOR)?;
+
+SQ_LifelineKeyword:
+    'activate' | 'deactivate';
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
