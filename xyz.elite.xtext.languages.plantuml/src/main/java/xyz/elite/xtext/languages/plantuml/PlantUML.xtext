@@ -65,7 +65,7 @@ SQ_Description:
         '>x' | '>o' | 'x<' | 'o<' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
-        'of'
+        'of' | SQ_LifelineKeyword
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
