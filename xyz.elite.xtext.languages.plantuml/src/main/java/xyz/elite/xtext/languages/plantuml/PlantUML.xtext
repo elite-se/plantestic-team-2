@@ -31,8 +31,7 @@ SQ_SequenceElement:
         | SQ_LifelineCtrl
         | SQ_Autolifeline
         | SQ_Return
-        | SQ_EncompassBegin
-        | SQ_EncompassEnd
+        | SQ_Encompass
         | SQ_HideFootbox
         | SQ_Skinparam
     );
@@ -186,11 +185,10 @@ SQ_Return:
     'return' (response=PT_Response)? label=SQ_Description;
 
 // -------- ENCOMPASS --------
-SQ_EncompassBegin:
-    'box' title=STRING color=SQ_Color;
-
-SQ_EncompassEnd:
-    'end' 'box';
+SQ_Encompass:
+    'box' title=STRING color=SQ_Color
+        (NEWLINE | elements+=SQ_SequenceElement)*
+    NEWLINE 'end' 'box';
 
 // -------- SKINPARAM --------
 SQ_Skinparam:
