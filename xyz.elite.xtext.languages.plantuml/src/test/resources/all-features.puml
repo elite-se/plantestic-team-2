@@ -29,10 +29,10 @@ Syntax bellow yields a 100 pixel high spacing :)
 
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
-Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", [location : "dingolfing"])
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
 ... wait(10 s) Auf schönes Wetter ;) ...
 end box
-return response(200||201, [ event: "42" ])
+return response(200||201, {event})
 
 "CCC-Mock" -> "CCC-Mock" : bootSkynet()
 

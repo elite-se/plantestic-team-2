@@ -218,11 +218,14 @@ PT_Response returns PT_RequestResponse:
     'response(' acceptableCodes+=INT ('|' '|' acceptableCodes+=INT)* (',' parametermap=(PT_ParameterMap))? ')';
 
 PT_ParameterMap:
-    ('[' (param+=PT_Parameter (',' param+=PT_Parameter)*)? ']');
+    ('{' (param+=PT_Parameter (',' param+=PT_Parameter)*)? '}');
 
 PT_Parameter:
     {PT_Parameter}
-    name=ID ':' value=STRING;
+    name=ID (':' value=PT_ParameterValue)?;
+
+PT_ParameterValue:
+    ID | STRING | INT;
 
 PT_TimeUnit:
     'ns'|'ms'|'s'|'min'|'h'|'d';
