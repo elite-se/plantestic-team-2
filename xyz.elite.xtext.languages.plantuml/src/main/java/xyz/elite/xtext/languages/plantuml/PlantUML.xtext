@@ -52,17 +52,17 @@ SQ_Arrow:
     (
         (
             lefttip=SQ_ArrowLeftTip 
-            ((('[' color=COLOR ']')? line+='-') | (line+='-' ('[' color=COLOR ']')? '-'))
+            ((('[' color=SQ_Color']')? line+='-') | (line+='-' ('[' color=SQ_Color']')? '-'))
         )
         |
         (
-            ((line+='-' ('[' color=COLOR ']')?) | (line+='-' ('[' color=COLOR ']')? '-')) 
+            ((line+='-' ('[' color=SQ_Color ']')?) | (line+='-' ('[' color=SQ_Color ']')? '-')) 
             righttip=SQ_ArrowRightTip
         )
         | 
         (
             lefttip=SQ_ArrowLeftTip
-            (line+='-' | (line+='-' ('[' color=COLOR ']')? line+='-')) 
+            (line+='-' | (line+='-' ('[' color=SQ_Color ']')? line+='-')) 
             righttip=SQ_ArrowRightTip
         )
     )
@@ -79,7 +79,7 @@ SQ_ArrowLeftTip:
 
 SQ_Description:
     (
-        ID | STRING | INT | COLOR | CONTROL_CHARACTER | ANY_OTHER | PT_TimeUnit |
+        ID | STRING | INT | HEXCOLOR | NAMEDCOLOR | CONTROL_CHARACTER | ANY_OTHER | PT_TimeUnit |
         'SEQUENCE' | ',' | '(' | ')' | '[' | ']' | '#' | '|' | '-' | '<' | '>' |
         'x' | 'o' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
@@ -98,14 +98,17 @@ SQ_ParticipantKeyword:
 SQ_Participant:
     (((longform=ID | longform=STRING) ('as' name=ID)) | (name=ID | name=STRING))
     (stereotype=SQ_Stereotype)?
-    (color=COLOR)?;
+    (color=SQ_Color)?;
 
 SQ_Stereotype:
     '<' '<' (
-        (('(' char=ID ',' color=COLOR ')')? name=ID) 
+        (('(' char=ID ',' color=SQ_Color ')')? name=ID) 
         | 
-        (('(' char=ID ',' color=COLOR ')'))
+        (('(' char=ID ',' color=SQ_Color ')'))
     ) '>' '>';
+
+SQ_Color:
+    color=HEXCOLOR | color=NAMEDCOLOR;
 
 // -------- AUTONUMBERING --------
 SQ_Autonumber:
@@ -143,7 +146,7 @@ SQ_Note:
         | 
         ('over' anchors+=[SQ_Participant] (',' anchors+=[SQ_Participant])*)
     )
-    color=(COLOR)?
+    color=(SQ_Color)?
     ':' content=SQ_Description;
 
 SQ_NoteType:
@@ -168,7 +171,7 @@ SQ_Space:
 
 // -------- LIFELINES --------
 SQ_LifelineCtrl:
-    keyword=SQ_LifelineKeyword (participant=[SQ_Participant|ID] | participant=[SQ_Participant|STRING]) (color=COLOR)?;
+    keyword=SQ_LifelineKeyword (participant=[SQ_Participant|ID] | participant=[SQ_Participant|STRING]) (color=SQ_Color)?;
 
 SQ_LifelineKeyword:
     'activate' | 'deactivate' | 'destroy';
@@ -184,14 +187,17 @@ SQ_Return:
 
 // -------- ENCOMPASS --------
 SQ_EncompassBegin:
-    'box' title=STRING color=COLOR;
+    'box' title=STRING color=SQ_Color;
 
 SQ_EncompassEnd:
     'end' 'box';
 
 // -------- SKINPARAM --------
 SQ_Skinparam:
-    'skinparam' name=ID (colorval=COLOR | numberval=INT | idval=ID | strval=STRING);
+    'skinparam' name=ID value=SQ_SkinparamValue;
+
+SQ_SkinparamValue: 
+        SQ_Color | INT | ID | STRING;
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
@@ -226,12 +232,15 @@ PT_TimeUnit:
 // ----------------------------
 //      LEXER/PARSER ATOMS
 // ----------------------------
-terminal COLOR:
+terminal HEXCOLOR:
     '#' 
     (
          ('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')
         (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9'))?
     );
+
+terminal NAMEDCOLOR:
+    '#' ('a'..'z'|'A'..'Z')+;
 
 terminal ID:
     ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
