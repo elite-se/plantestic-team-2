@@ -79,7 +79,7 @@ SQ_ArrowLeftTip:
 SQ_Description:
     (
         ID | STRING | INT | HEXCOLOR | NAMEDCOLOR | CONTROL_CHARACTER | ANY_OTHER | PT_TimeUnit |
-        'SEQUENCE' | ',' | '(' | ')' | '[' | ']' | '#' | '|' | '-' | '<' | '>' |
+        'SEQUENCE' | ',' | '(' | ')' | '[' | ']' | '{' | '}' | '#' | '|' | '-' | '<' | '>' |
         'x' | 'o' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
