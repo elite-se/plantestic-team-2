@@ -12,7 +12,7 @@ Currently, this grammar has the following limitations:
 
 - TEOZ PlantUML is not supported as of yet since it is still in alpha
 - Only hexadecimal color specifications are supported, i.e., '#red' is not considered a valid color
-- Descriptions (e.g. annotations on messages) may not contain ':', '...' or '==', unless those characters are escaped using double quotation marks ('"')
+- Descriptions (e.g. annotations on messages) may not contain ':', unless escaped using double quotation marks ('"')
 - inline HTML in notes is not support
 - Multiline ref/title/note syntax of the form 'ref ... end ref' is not supported, please use \n to create multiline content
 - Multiline skinparam using '{}' is not supported, please use multiple individual skinparam lines

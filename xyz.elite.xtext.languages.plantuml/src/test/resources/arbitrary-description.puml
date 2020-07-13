@@ -1,6 +1,6 @@
 @startuml
 
 Alice -> Bob : test aller desc "features" 200.0 #abc\n\\ .;* d s ns SEQUENCE , ( ) [ ] # | - > -> --> <-> < x< >x o< >o \ / as order actor boundary control collections entity database participant autonumber stop resume header footer title newpage GET POST PUT DELETE PATCH
-Bob -> Alice : Wow that was a lot to take in ":O" "..." alt opt loop par break critical group else end note hnote rnote left right over of activate deactivate autoactivate on off create return ! * + ++ !! ** -- - x o skinparam footbox hide box
+Bob -> Alice : Wow that was a lot to take in ":O" "..." alt opt loop par break critical group else end note hnote rnote left right over of activate deactivate autoactivate on off create return ! * + ++ !! ** -- - x o skinparam footbox hide box ... ==
 
 @enduml

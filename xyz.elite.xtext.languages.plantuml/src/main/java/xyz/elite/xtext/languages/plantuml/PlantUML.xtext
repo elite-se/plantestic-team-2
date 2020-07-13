@@ -85,7 +85,7 @@ SQ_Description:
         'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
         SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
         'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | 'create' |
-        '!' | '*' | '+' | 'box' | 'hide' | 'footbox' | 'skinparam' | 'ref'
+        '!' | '*' | '+' | 'box' | 'hide' | 'footbox' | 'skinparam' | 'ref' | '...' | '=='
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
@@ -151,7 +151,7 @@ SQ_NoteType:
 
 // -------- DIVIDER --------
 SQ_Divider:
-    '==' label=SQ_Description '==';
+    '==' label=SQ_Description;
 
 // -------- REF --------
 SQ_Ref:
@@ -159,7 +159,7 @@ SQ_Ref:
 
 // -------- DELAY --------
 SQ_Delay:
-    '...' (wait=PT_Wait)? description=SQ_Description '...'?;
+    '...' (wait=PT_Wait)? description=SQ_Description;
 
 // -------- SPACE --------
 SQ_Space:
