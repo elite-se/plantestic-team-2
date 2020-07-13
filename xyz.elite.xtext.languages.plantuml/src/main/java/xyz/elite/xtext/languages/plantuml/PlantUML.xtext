@@ -215,7 +215,10 @@ PT_RequestMethod:
 
 PT_Response returns PT_RequestResponse:
     {PT_Response}
-    'response(' acceptableCodes+=INT ('|' '|' acceptableCodes+=INT)* (',' parametermap=(PT_ParameterMap))? ')';
+    'response(' acceptedcodes+=PT_ResponseCode ('|' '|' acceptedcodes+=PT_ResponseCode)* (',' parametermap=(PT_ParameterMap))? ')';
+
+PT_ResponseCode:
+    code=INT description=(ID)?;
 
 PT_ParameterMap:
     ('{' (param+=PT_Parameter (',' param+=PT_Parameter)*)? '}');

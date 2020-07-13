@@ -22,7 +22,7 @@ CCC -> XCS : request(POST, "/xcs/vin/v1/{vin}") \n (<CCCTarget>, ServiceType=BCA
 
 note over XCS : XCS creates a new event from data provided by CCC\nresponse contains new eventid
 autoactivate off
-XCS -> CCC : response(202, {eventId})
+XCS -> CCC : response(202 ACCEPTED, {eventId})
 
 XCS -[#green]> Vehicle : <joynr>:requestXCall(requestId, sequenceId, CoreData)
 autoactivate on
