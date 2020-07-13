@@ -149,6 +149,11 @@ class PlantUMLParsingTest {
         parsesWithoutErrors("skinparam")
     }
 
+    @Test
+    def void async() {
+        parsesWithoutErrors("async")
+    }
+
 	@Test
 	def void allFeatures() {
         parsesWithoutErrors("all-features")

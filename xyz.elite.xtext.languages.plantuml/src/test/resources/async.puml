@@ -1,0 +1,49 @@
+@startuml
+
+participant CCC
+participant XCS
+participant SVDS
+participant ELOS
+actor Vehicle
+
+activate CCC
+
+== XCS Event Creation via Joynr ==
+
+note over XCS : Only mandatory or important parameters are visible in 
+note over XCS: This diagram does not describe error handling, only happy path
+
+note over CCC : Agent is being called in callcenter for breakdown and triggers remote bcall
+
+autonumber
+autoactivate on
+
+CCC -> XCS : request(POST, "/xcs/vin/v1/{vin}") \n (<CCCTarget>, ServiceType=BCALL)
+
+note over XCS : XCS creates a new event from data provided by CCC\nresponse contains new eventid
+autoactivate off
+XCS -> CCC : response(202, {eventId})
+
+XCS -[#green]> Vehicle : <joynr>:requestXCall(requestId, sequenceId, CoreData)
+autoactivate on
+
+XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/{vin}")
+return response(200, {MarketRegion})
+
+autoactivate off
+XCS -> ELOS : <jms elos topic>publish(elos data, CREATED)
+activate Vehicle
+Vehicle -[#green]> XCS : <joynr>:notifyXCall(requestId, sequenceId, CoreData)
+
+XCS -> CCC : request(POST, "<CCCTarget>/xcs/v1/eventUpdated", {eventId, xcsEventData})
+
+autoactivate on
+XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/{vin}")
+return response(200, {MarketRegion})
+
+autoactivate off
+XCS -> ELOS : <jms elos topic>publish(elos data, UPDATED)
+
+note over CCC : Remote Bcall Event is visible in CC and can be handled by Agent
+
+@enduml
