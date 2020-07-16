@@ -1,4 +1,7 @@
 plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.plugin.allopen"
+    id "org.jetbrains.kotlin.plugin.noarg"
     id "application"
     id "jacoco"
     id "idea"
@@ -10,7 +13,7 @@ mainClassName = "de.unia.se.plantestic.Main"
 
 jar {
     manifest {
-        attributes "Main-Class": "de.unia.se.plantestic.MainKt"
+        attributes "Main-Class": "de.unia.se.plantestic.Main"
     }
 }
 

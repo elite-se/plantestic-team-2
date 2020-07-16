@@ -48,7 +48,21 @@ generateXtext.dependsOn(generateXtextLanguage)
 clean.dependsOn(cleanGenerateXtextLanguage)
 eclipse.classpath.plusConfigurations += [configurations.mwe2]
 
+configurations.all {
+    exclude group: 'asm'
+}
 
+jar {
+    from('model') {
+        into('model')
+    }
+    from(sourceSets.main.allSource) {
+        include '**/*.xtext'
+    }
+    manifest {
+        attributes 'Bundle-SymbolicName': project.name
+    }
+}
 
 apply from: "$rootDir/gradle/maven-publish.gradle"
 apply from: "$rootDir/gradle/xtext-source-sets.gradle"
