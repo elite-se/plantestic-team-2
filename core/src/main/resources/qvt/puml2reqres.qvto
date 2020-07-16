@@ -18,10 +18,16 @@ mapping SQ_Diagram::transformUmlDiagram(): Scenario {
     scenarioName := diagramName + "_puml";
     var roundtripId : Integer := 1;
 
-    var umlElements : OrderedSet(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements();
-    var umlElementsSize : Integer := umlElements->size();
-    var umlElementsIndex : Integer := 1;
+    var elements : OrderedSet(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements();
+    var elementsSize : Integer := elements->size();
+    var elementsIndex : Integer := 1;
 
+    while (elements->notEmpty()) {
+        var consumed : OrderedSet(SQ_SequenceElement);
+        var elem: SQ_SequenceElement = elements->at(1);
+
+        elements := elements - consumed;
+    };
 /*
     while (umlElementsIndex <= umlElementsSize) {
         var sequenceElement : SQ_SequenceElement := umlElements->at(umlElementsIndex);
@@ -92,7 +98,7 @@ mapping SQ_Diagram::transformUmlDiagram(): Scenario {
 */
 }
 
-helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements():OrderedSet(SQ_SequenceElement) {
+helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(): OrderedSet(SQ_SequenceElement) {
     var sequenceElements : OrderedSet(SQ_SequenceElement);
     self->forEach(umlElement) {
         if (umlElement.oclIsTypeOf(SQ_Message)) {
