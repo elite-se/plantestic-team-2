@@ -1,9 +1,19 @@
+@startconfig
+vin = "987"
+eventid = "123"
+@endconfig
+
+@startconfig
+vin = "120"
+eventid = "20"
+@endconfig
+
 SEQUENCE @startuml
 
-PARTICIPANT CCCMock
-PARTICIPANT XCS
-PARTICIPANT Tester
-PARTICIPANT SVDS
+participant CCCMock
+participant XCS
+participant Tester
+participant SVDS
 
 CCCMock -> SVDS : GET "svds/vehicle/internal/v2/${vin}"
 activate SVDS

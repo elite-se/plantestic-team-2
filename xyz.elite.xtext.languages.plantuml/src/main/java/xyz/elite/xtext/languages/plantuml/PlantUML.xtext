@@ -6,17 +6,25 @@ import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 generate plantUML "http://www.elite.xyz/xtext/languages/plantuml/PlantUML"
 
 Model:
-    NEWLINE* 'SEQUENCE'? sequence_diagrams+=SQ_Diagram NEWLINE*;
+    (configs+=SQ_Config|NEWLINE)* sequence_diagrams+=SQ_Diagram NEWLINE*;
+
+SQ_Config:
+    {SQ_Config}
+    '@startconfig' (NEWLINE | entries+=SQ_ConfigEntry)* '@endconfig';
+
+SQ_ConfigEntry:
+	NEWLINE name=ID '=' value=STRING;
 
 SQ_Diagram:
     {SQ_Diagram}
-    '@startuml' (NEWLINE | elements+=SQ_SequenceElement)* '@enduml';
+    'SEQUENCE'? '@startuml' (NEWLINE | elements+=SQ_SequenceElement)* '@enduml';
+
 
 // ---------------------------
 //      SEQUENCE ELEMENTS
 // ---------------------------
 SQ_SequenceElement:
-    NEWLINE 
+    NEWLINE
     (
         SQ_Message
         | SQ_ParticipantDefiniton
@@ -42,7 +50,7 @@ SQ_Message:
         ('[' arrow=SQ_Arrow participantRight=SQ_Participant)
         | (participantLeft=SQ_Participant arrow=SQ_Arrow participantRight=SQ_Participant)
         | (participantLeft=SQ_Participant arrow=SQ_Arrow ']')
-    )  
+    )
     (receiverlifetime=SQ_LifetimeHint)?
     (':' payload=(PT_RequestResponse)? description=SQ_Description)?;
 
@@ -50,18 +58,18 @@ SQ_Arrow:
     leftmodifier=(SQ_ArrowEndModifier)?
     (
         (
-            lefttip=SQ_ArrowLeftTip 
+            lefttip=SQ_ArrowLeftTip
             ((('[' color=SQ_Color']')? line+='-') | (line+='-' ('[' color=SQ_Color']')? '-'))
         )
         |
         (
-            ((line+='-' ('[' color=SQ_Color ']')?) | (line+='-' ('[' color=SQ_Color ']')? '-')) 
+            ((line+='-' ('[' color=SQ_Color ']')?) | (line+='-' ('[' color=SQ_Color ']')? '-'))
             righttip=SQ_ArrowRightTip
         )
-        | 
+        |
         (
             lefttip=SQ_ArrowLeftTip
-            (line+='-' | (line+='-' ('[' color=SQ_Color ']')? line+='-')) 
+            (line+='-' | (line+='-' ('[' color=SQ_Color ']')? line+='-'))
             righttip=SQ_ArrowRightTip
         )
     )
@@ -81,10 +89,10 @@ SQ_Description:
         ID | STRING | INT | HEXCOLOR | NAMEDCOLOR | CONTROL_CHARACTER | ANY_OTHER | PT_TimeUnit |
         'SEQUENCE' | ',' | '(' | ')' | '[' | ']' | '{' | '}' | '#' | '|' | '-' | '<' | '>' |
         'x' | 'o' | '\\' | '/' | 'as' | 'order' | SQ_ParticipantKeyword |
-        'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod | 
-        SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' | 
+        'autonumber' | 'stop' | 'resume' | SQ_PageMetaInfoKeyword | PT_RequestMethod |
+        SQ_GroupEntryKeyword | 'else' | 'end' | SQ_NoteType | 'left' | 'right' | 'over' |
         'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | 'create' |
-        '!' | '*' | '+' | 'box' | 'hide' | 'footbox' | 'skinparam' | 'ref' | '...' | '==' | ':'
+        '!' | '*' | '+' | 'box' | 'hide' | 'footbox' | 'skinparam' | 'ref' | '...' | '=' | ':'
     )*;
 
 // -------- DEFINING PARTICIPANTS --------
@@ -101,8 +109,8 @@ SQ_Participant:
 
 SQ_Stereotype:
     '<' '<' (
-        (('(' char=ID ',' color=SQ_Color ')')? name=ID) 
-        | 
+        (('(' char=ID ',' color=SQ_Color ')')? name=ID)
+        |
         (('(' char=ID ',' color=SQ_Color ')'))
     ) '>' '>';
 
@@ -125,8 +133,8 @@ SQ_HideFootbox:
 
 // -------- GROUPS --------
 SQ_Group:
-    keyword=SQ_GroupEntryKeyword label=SQ_Description 
-        (NEWLINE | elements+=SQ_SequenceElement)* 
+    keyword=SQ_GroupEntryKeyword label=SQ_Description
+        (NEWLINE | elements+=SQ_SequenceElement)*
     alternatives+=(SQ_GroupAlternative)*
     NEWLINE 'end';
 
@@ -142,7 +150,7 @@ SQ_Note:
     type=SQ_NoteType
     (
         (('left'|'right') ('of' anchors+=[SQ_Participant])?)
-        | 
+        |
         ('over' anchors+=[SQ_Participant] (',' anchors+=[SQ_Participant])*)
     )
     color=(SQ_Color)?
@@ -153,7 +161,7 @@ SQ_NoteType:
 
 // -------- DIVIDER --------
 SQ_Divider:
-    '==' label=SQ_Description;
+    '=' '=' label=SQ_Description;
 
 // -------- REF --------
 SQ_Ref:
@@ -194,7 +202,7 @@ SQ_Encompass:
 SQ_Skinparam:
     'skinparam' name=ID value=SQ_SkinparamValue;
 
-SQ_SkinparamValue: 
+SQ_SkinparamValue:
         SQ_Color | INT | ID | STRING;
 
 // ----------------------------
@@ -235,7 +243,7 @@ PT_TimeUnit:
 //      LEXER/PARSER ATOMS
 // ----------------------------
 terminal HEXCOLOR:
-    '#' 
+    '#'
     (
          ('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')
         (('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9')('a'..'f'|'A'..'F'|'0'..'9'))?
