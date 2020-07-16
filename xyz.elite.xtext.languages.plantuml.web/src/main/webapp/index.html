@@ -1,48 +1,63 @@
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta http-equiv="Content-Language" content="en-us" />
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="Content-Language" content="en-us"/>
     <title>PlantUML Editor</title>
     <link
-      rel="stylesheet"
-      type="text/css"
-      href="orion/code_edit/built-codeEdit.css"
+            rel="stylesheet"
+            type="text/css"
+            href="orion/code_edit/built-codeEdit.css"
     />
     <link
-      rel="stylesheet"
-      type="text/css"
-      href="xtext/2.16.0/xtext-orion.css"
+            rel="stylesheet"
+            type="text/css"
+            href="xtext/2.16.0/xtext-orion.css"
     />
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="style.css"/>
     <script src="webjars/requirejs/2.3.2/require.min.js"></script>
     <script type="text/javascript">
-      var baseUrl = window.location.pathname;
-      var fileIndex = baseUrl.indexOf("index.html");
-      if (fileIndex > 0) baseUrl = baseUrl.slice(0, fileIndex);
-      require.config({
-        baseUrl: baseUrl,
-        paths: {
-          text: "webjars/requirejs-text/2.0.15/text",
-          jquery: "webjars/jquery/2.2.4/jquery.min",
-          "xtext/xtext-orion": "xtext/2.16.0/xtext-orion",
-        },
-      });
-      require(["orion/code_edit/built-codeEdit-amd"], function () {
-        require(["xtext/xtext-orion"], function (xtext) {
-          xtext.createEditor({
+        var baseUrl = window.location.pathname;
+        var fileIndex = baseUrl.indexOf("index.html");
+        if (fileIndex > 0) baseUrl = baseUrl.slice(0, fileIndex);
+        require.config({
             baseUrl: baseUrl,
-            syntaxDefinition: "puml-syntax",
-          });
+            paths: {
+                text: "webjars/requirejs-text/2.0.15/text",
+                jquery: "webjars/jquery/2.2.4/jquery.min",
+                "xtext/xtext-orion": "xtext/2.16.0/xtext-orion",
+                "plantuml-encoder": "plantuml-encoder",
+            },
         });
-      });
+
+        require(["orion/code_edit/built-codeEdit-amd"], function () {
+            require(["xtext/xtext-orion"], function (xtext) {
+                require(["plantuml-encoder"], function (encoder) {
+                    xtext.createEditor({
+                        baseUrl: baseUrl,
+                        syntaxDefinition: "puml-syntax",
+                    }).then(function (editor) {
+                        setInterval(updatePUML, 2000);
+                        function updatePUML() {
+                            editor.editor.getEditorContext().getText().then(function(text) {
+                                var encoded = encoder.encode(text)
+                                document.getElementById("plantuml-img").src = "http://localhost:8081/png/" + encoded
+                            })
+                        }
+                    });
+                });
+            });
+        });
     </script>
-  </head>
-  <body>
-    <div class="container">
-      <div id="xtext-editor" data-editor-xtext-lang="puml"></div>
-      <div id="plantuml-preview">
-        <img src="http://localhost:8081/png/SoWkIImgAStDuNBAJrBGjLDmpCbCJbMmKiX8pSd9vt98pKi1IW80" style="max-width: 100%"/>
-      </div>
+</head>
+<body>
+<div class="container">
+    <div id="xtext-editor" data-editor-xtext-lang="puml"></div>
+    <div id="plantuml-preview">
+        <img id="plantuml-img"
+             src="http://localhost:8081/png/0m00"
+             style="max-width:100%;max-height:100%"
+        />
     </div>
-  </body>
+</div>
+</body>
 </html>

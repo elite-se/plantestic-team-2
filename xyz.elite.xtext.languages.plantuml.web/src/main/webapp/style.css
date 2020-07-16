@@ -1,45 +1,46 @@
 body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  font: 16px Helvetica, sans-serif;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font: 16px Helvetica, sans-serif;
 }
 
 a {
-  color: #22a;
-  text-decoration: none;
+    color: #22a;
+    text-decoration: none;
 }
 
 a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 .container {
-  display: block;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: 0px;
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0px;
 }
 
 #xtext-editor {
-  display: block;
-  top: 0;
-  left: 0;
-  right: 0;
-  border-bottom: 1px solid #aaa;
-  width: 100%;
-  height: 60%;
+    left: 0;
+    width: 50%;
+    height: 100%;
+
+    border-right: 1px solid black;
 }
 
 #plantuml-preview {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  width:100%;
-  height:40%;
+    display: flex;
+    position: absolute;
+    top: 0;
+    right: 0;
+    justify-content:center;
+    align-items:center;
+    width: calc(50% - 10px);
+    height: 100%;
 
-  overflow: scroll;
+    overflow: scroll;
 }
