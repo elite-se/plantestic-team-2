@@ -7,6 +7,7 @@ import org.gradle.api.internal.provider.ValueSupplier.ValueProducer.task
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.testing.Test
+import java.io.File
 
 
 @Suppress("unused")
@@ -51,12 +52,9 @@ class PlantesticPlugin : Plugin<Project> {
 
         project.tasks.named("test", Test::class.java) {
             it.useJUnitPlatform()
-            it.dependsOn("clean")
+//            it.dependsOn("clean")
             it.dependsOn("generate")
         }
-
-        project.repositories.mavenCentral()
-        project.repositories.mavenLocal()
     }
 
     /**
@@ -64,6 +62,12 @@ class PlantesticPlugin : Plugin<Project> {
      */
     private fun addPlantesticDependencies(plantesticRuntime: Configuration, project: Project) {
 //        project.dependencies.project(mapOf("path" to ":core"))
+
+        project.repositories.mavenCentral()
+        project.repositories.mavenLocal()
+//        project.repositories.mavenLocal() {
+//            it.setUrl(File(project.rootDir, "../core/build/p2asmaven/maven"))
+//        }
 
         project.repositories.maven {
             it.setUrl("https://maven.wso2.org/nexus/content/groups/wso2-public/")
