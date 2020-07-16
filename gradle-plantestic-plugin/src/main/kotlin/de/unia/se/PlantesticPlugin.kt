@@ -22,7 +22,7 @@ class PlantesticPlugin : Plugin<Project> {
             PLANTESTIC_EXTENSION_NAME,
             PlantesticExtension::class.java,
             { extension: PlantesticExtension ->
-                val outputDirectoryName: String = "${project.buildDir}/generated-src/plantestic/"
+                val outputDirectoryName = "${project.buildDir}/generated-src/plantestic/"
 
                 val plantesticTask = project.tasks
                     .create(PLANTESTIC_TASK_NAME, PlantesticTask::class.java, plantesticRuntime,
