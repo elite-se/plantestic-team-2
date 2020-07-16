@@ -14,7 +14,7 @@ object PumlParser {
      * @return Root model object
      */
     fun parse(inputUri: String): Model {
-        require(EPackage.Registry.INSTANCE["http://www.eclipse.plantuml/Puml"] != null) {
+        require(EPackage.Registry.INSTANCE["http://www.elite.xyz/xtext/languages/plantuml/PlantUML"] != null) {
             "Please run MetaModelSetup.doSetup() first!"
         }
 
