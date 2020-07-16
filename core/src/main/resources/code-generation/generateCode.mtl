@@ -15,6 +15,9 @@ import org.hamcrest.collection.IsIn;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.text.StringSubstitutor;
 import com.moandjiezana.toml.Toml;
 import javax.script.ScriptEngine;
@@ -33,7 +36,8 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 			//String osAppropriatePath = IS_WINDOWS ? configFile.substring(1) : configFile;
 			//Path path = Paths.get(osAppropriatePath);
 
-			//paramsMap = unnestTomlMap("", new Toml().read(new String(Files.readAllBytes(path))).toMap());
+			//Map<String, Object>  paramsFromFile = unnestTomlMap("", new Toml().read(new String(Files.readAllBytes(path))).toMap());
+			paramsMap = mergeMaps(paramsFromFile, new HashMap<>(System.getenv()));
 			substitutor = new StringSubstitutor(paramsMap);
 			engine = new ScriptEngineManager().getEngineByName("JavaScript");
 		} catch(Exception exception) {
@@ -44,13 +48,17 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 
     @Test
 	public void test() throws Exception {
+		String tester = paramsMap.get("tester");
+
 	[for (testRoundtrip : TestRoundtrip | testScenario.testroundtrip) separator('\n\n') ]
-		[if (testRoundtrip.precondition->isEmpty())][testRoundtrip.generateTestRoundtrip()/][/if]
-		[if (testRoundtrip.precondition->notEmpty())]
-		if(eval("[testRoundtrip.precondition/]")) {
-			[testRoundtrip.generateTestRoundtrip()/]
+		if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/]")) {
+			[if (testRoundtrip.precondition->isEmpty())][testRoundtrip.generateTestRoundtrip()/][/if]
+			[if (testRoundtrip.precondition->notEmpty())]
+			if(eval("[testRoundtrip.precondition/]")) {
+				[testRoundtrip.generateTestRoundtrip()/]
+			}
+			[/if]
 		}
-		[/if]
 	[/for]
 	}
 
@@ -85,14 +93,22 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
         }
         return resultMap;
 	}
+
+    /// Helper method to merge two maps.
+    /// We use this to combine the params from the config file with the environment variables.
+    /// If keys are in both maps, the ones of the m1 are used.
+    private static Map<String, Object> mergeMaps(Map<String, Object> m1, Map<String, Object> m2) {
+        return Stream.of(m1, m2)
+            .map(Map::entrySet)
+            .flatMap(Set::stream)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a));
+    }
 }
 [/file]
 [/template]
 
 [template private generateTestRoundtrip(testRoundtrip : TestRoundtrip) post(trim())]
-	[if (testRoundtrip.requestspecification.requestdatum->notEmpty())]
-[testRoundtrip.requestspecification.generadeAddRequestParams()/]
-	[/if]
+	[if (testRoundtrip.requestspecification.requestdatum->notEmpty())][testRoundtrip.requestspecification.generadeAddRequestParams()/]	[/if]
 Response [testRoundtrip.testRoundtripName/] = RestAssured.given()
         [testRoundtrip.requestspecification.generateGivenPart()/]
     .when()
@@ -101,7 +117,6 @@ Response [testRoundtrip.testRoundtripName/] = RestAssured.given()
         [testRoundtrip.responsespecification.generateThenPart()/];
 [if (testRoundtrip.responsespecification.responsedatum->notEmpty())]
 [testRoundtrip.generateExtractions()/]
-
 	[/if]
 [/template]
 

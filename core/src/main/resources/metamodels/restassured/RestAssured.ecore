@@ -18,6 +18,8 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="requestdatum" upperBound="-1"
         eType="#//RequestDatum" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sender" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ResponseSpecification" instanceTypeName="ResponseSpecification">
     <eStructuralFeatures xsi:type="ecore:EReference" name="bodymatchergroup" eType="#//BodyMatcherGroup"
