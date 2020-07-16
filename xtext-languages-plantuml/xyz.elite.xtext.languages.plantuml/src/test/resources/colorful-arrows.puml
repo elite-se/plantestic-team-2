@@ -1,0 +1,6 @@
+@startuml
+
+Alice -[#00ff00]> Bob
+Bob -[#red]-> Alice
+
+@enduml

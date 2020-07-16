@@ -1,0 +1,12 @@
+@startuml
+
+box "Internal Service" #8877cc
+participant Bob
+participant Alice
+end box
+participant Other
+
+Bob -> Alice : hello
+Alice -> Other : hello
+
+@enduml
