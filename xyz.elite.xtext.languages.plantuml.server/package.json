@@ -1,0 +1,16 @@
+{
+  "name": "xyz.elite.xtext.languages.plantuml.server",
+  "version": "1.0.0",
+  "description": "simple express webserver capable of generating plantuml diagram files",
+  "main": "index.js",
+  "author": "Dominik Horn",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-plantuml": "^0.9.0"
+  },
+	"scripts": {
+		"serve": "node src/index.js"
+	}
+}

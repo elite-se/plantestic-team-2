@@ -222,3 +222,7 @@ local.properties
 # ANTLR Tooling
 xyz.elite.xtext.languages.plantuml/src/main/gen/
 
+#########################
+# Javascript & Webshite #
+#########################
+node_modules
