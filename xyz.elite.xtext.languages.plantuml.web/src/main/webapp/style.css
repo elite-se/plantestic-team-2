@@ -26,27 +26,20 @@ a:hover {
 
 #xtext-editor {
   display: block;
-  position: absolute;
   top: 0;
-  bottom: 0;
   left: 0;
   right: 0;
-  border: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
   width: 100%;
+  height: 60%;
 }
 
-/************* Examples for custom icons *************/
+#plantuml-preview {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  height:40%;
 
-/* For all elements of type Greeting or its subtypes */
-/*
-	.Greeting-icon {
-		background-image: url('images/Greeting.gif');
-	}
- */
-
-/* Only in hovers */
-/*
-	.xtext-hover .Greeting-icon {
-		background-image: url('images/Greeting.gif');
-	}
- */
+  overflow: scroll;
+}
