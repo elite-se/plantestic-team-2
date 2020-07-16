@@ -1,11 +1,9 @@
 package de.unia.se.plantestic
 
-import com.google.common.io.Resources
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
-import org.eclipse.xtext.resource.ClasspathUriResolutionException
-import plantuml.PumlStandaloneSetup
+import xyz.elite.xtext.languages.plantuml.PlantUMLStandaloneSetup
 import java.io.File
 
 object MetaModelSetup {
@@ -34,7 +32,7 @@ object MetaModelSetup {
     fun doSetup() {
         println(REST_ASSURED_METAMODEL_URI)
         println(REQUEST_RESPONSE_PAIRS_METAMODEL_URI)
-        PumlStandaloneSetup.doSetup()
+        PlantUMLStandaloneSetup.doSetup()
 
         val tempDir = createTempDir()
         val RestAssured = File(tempDir, "RestAssured.ecore")

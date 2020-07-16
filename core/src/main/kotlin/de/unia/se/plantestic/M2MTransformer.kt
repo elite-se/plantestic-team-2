@@ -9,7 +9,7 @@ import org.eclipse.m2m.qvt.oml.BasicModelExtent
 import org.eclipse.m2m.qvt.oml.ExecutionContextImpl
 import org.eclipse.m2m.qvt.oml.TransformationExecutor
 import org.eclipse.m2m.qvt.oml.util.WriterLog
-import plantuml.puml.UmlDiagram
+import xyz.elite.xtext.languages.plantuml.plantUML.Model
 import java.io.OutputStreamWriter
 
 object M2MTransformer {
@@ -26,7 +26,7 @@ object M2MTransformer {
      * @return Request Response Pair
      */
     fun transformPuml2ReqRes(inputModel: EObject): EObject {
-        require(inputModel is UmlDiagram) { "Puml transformation input wasn't a puml object!" }
+        require(inputModel is Model) { "Puml transformation input wasn't a puml object!" }
         return doQvtoTransformation(inputModel, QVT_PUML2REQRES_TRANSFORMATION_URI)
     }
 
