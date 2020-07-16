@@ -15,8 +15,19 @@ main() {
 mapping Scenario::scenario2testScenario(): TestScenario {
     log('Transforming Scenario to TestScenario');
 
+    configs := self.configs.map transformConfigs();
+
     testScenarioName := self.scenarioName;
     testroundtrip := self.roundtrip -> map roundtrip2testRoundtrip();
+}
+
+mapping RequestResponsePairs::Config::transformConfigs(): RestAssured::Config {
+    entries := self.entries.map transformConfigEntries();
+}
+
+mapping RequestResponsePairs::ConfigEntry::transformConfigEntries(): RestAssured::ConfigEntry {
+    key := self.key;
+    value := self.value;
 }
 
  mapping Roundtrip::roundtrip2testRoundtrip(): TestRoundtrip {
@@ -38,6 +49,7 @@ mapping HttpRequest::httprequest2requestSpecification(): RequestSpecification {
      url := self.url;
      requestdatum := self.httprequestdatum -> map httpRequestDatum2requestdatum();
      receiver := self.receiver;
+     sender := self.sender;
 }
 
 mapping HttpRequestDatum::httpRequestDatum2requestdatum(): RequestDatum {

@@ -8,16 +8,6 @@ import java.io.File
 
 object MetaModelSetup {
 
-//    private val REQUEST_RESPONSE_PAIRS_METAMODEL_URI =
-//        URI.createURI(Resources.getResource("metamodels/reqrespairs/RequestResponsePairs.ecore").toExternalForm())
-//    private val REST_ASSURED_METAMODEL_URI =
-//        URI.createURI(Resources.getResource("metamodels/restassured/RestAssured.ecore").toExternalForm())
-//    private val REQUEST_RESPONSE_PAIRS_METAMODEL_URI =
-//        URI.createFileURI("/home/max/projects/uni/plantestic/core/build/resources/main/metamodels/reqrespairs/RequestResponsePairs.ecore")
-//
-//    private val REST_ASSURED_METAMODEL_URI =
-//        URI.createFileURI("/home/max/projects/uni/plantestic/core/build/resources/main/metamodels/restassured/RestAssured.ecore")
-
     private val REQUEST_RESPONSE_PAIRS_METAMODEL_URI =
         URI.createURI(
             javaClass.classLoader.getResource("metamodels/reqrespairs/RequestResponsePairs.ecore").toString(),
@@ -30,20 +20,10 @@ object MetaModelSetup {
         )
 
     fun doSetup() {
-        println(REST_ASSURED_METAMODEL_URI)
-        println(REQUEST_RESPONSE_PAIRS_METAMODEL_URI)
         PlantUMLStandaloneSetup.doSetup()
 
-        val tempDir = createTempDir()
-        val RestAssured = File(tempDir, "RestAssured.ecore")
-        javaClass.classLoader.getResource("metamodels/restassured/RestAssured.ecore").openStream().copyTo(RestAssured.outputStream())
-        val RequestResponsePairs = File(tempDir, "RequestResponsePairs.ecore")
-        javaClass.classLoader.getResource("metamodels/reqrespairs/RequestResponsePairs.ecore").openStream().copyTo(RequestResponsePairs.outputStream())
-
-        registerMetamodelFromEcoreFile(URI.createFileURI(RestAssured.absolutePath))
-        registerMetamodelFromEcoreFile(URI.createFileURI(RequestResponsePairs.absolutePath))
-//        registerMetamodelFromEcoreFile(REQUEST_RESPONSE_PAIRS_METAMODEL_URI)
-//        registerMetamodelFromEcoreFile(REST_ASSURED_METAMODEL_URI)
+        registerMetamodelFromEcoreFile(REST_ASSURED_METAMODEL_URI)
+        registerMetamodelFromEcoreFile(REQUEST_RESPONSE_PAIRS_METAMODEL_URI)
     }
 
     private fun registerMetamodelFromEcoreFile(uri: URI) {
