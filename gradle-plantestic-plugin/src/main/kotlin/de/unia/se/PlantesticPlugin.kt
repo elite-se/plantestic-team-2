@@ -18,7 +18,7 @@ class PlantesticPlugin : Plugin<Project> {
         val plantesticRuntime = project.configurations.create("plantesticRuntime")
         plantesticRuntime.description = "The classpath used to invoke plantestic"
 
-        val extension = project.extensions.create(
+        project.extensions.create(
             PLANTESTIC_EXTENSION_NAME,
             PlantesticExtension::class.java,
             { extension: PlantesticExtension ->

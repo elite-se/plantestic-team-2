@@ -2,13 +2,11 @@ package de.unia.se
 
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.process.ExecOperations
@@ -71,9 +69,9 @@ open class PlantesticTask @Inject constructor(
             spec.setMain("de.unia.se.plantestic.Main")
             print("Classpath: ")
             println(plantesticClasspath!!.plus(projectLayout!!.files("src/dist")).forEach(Consumer { println(it.absoluteFile) }))
-            spec.setClasspath(plantesticClasspath!!.plus(projectLayout!!.files("src/dist")))
+            spec.setClasspath(plantesticClasspath.plus(projectLayout.files("src/dist")))
 //            spec.setWorkingDir("/home/max")
-            spec.setWorkingDir(projectLayout!!.getProjectDirectory())
+            spec.setWorkingDir(projectLayout.getProjectDirectory())
             spec.args("--input", file.absolutePath, "--output", File(outputDirectory).absolutePath)
             if (javaExecSpec != null) {
                 javaExecSpec!!.execute(spec)
@@ -81,21 +79,4 @@ open class PlantesticTask @Inject constructor(
         }
 
     }
-
-//    companion object {
-//        private fun relativizeTo(configuration: Configuration?, dir: File?): Configuration? {
-//            val directoryValue: String = configuration.getGenerator().getTarget().getDirectory()
-//            if (directoryValue != null) {
-//                val file = File(directoryValue)
-//                if (file.isAbsolute) {
-//                    var relativized = dir!!.toURI().relativize(file.toURI()).path
-//                    if (relativized.endsWith(File.separator)) {
-//                        relativized = relativized.substring(0, relativized!!.length - 1)
-//                    }
-//                    configuration.getGenerator().getTarget().setDirectory(relativized)
-//                }
-//            }
-//            return configuration
-//        }
-//    }
 }
