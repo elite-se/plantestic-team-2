@@ -4,6 +4,10 @@ plugins {
     id "org.jetbrains.kotlin.plugin.noarg" version "${kotlin_version}"
 }
 
+repositories {
+    mavenCentral()
+}
+
 subprojects {
     buildscript {
         repositories {

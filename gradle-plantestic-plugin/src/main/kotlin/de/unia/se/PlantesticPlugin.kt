@@ -25,10 +25,8 @@ class PlantesticPlugin : Plugin<Project> {
                 val outputDirectoryName: String = "${project.buildDir}/generated-src/plantestic/"
 
                 val plantesticTask = project.tasks
-                    .create(
-                        PLANTESTIC_TASK_NAME, PlantesticTask::class.java, plantesticRuntime,
-                        outputDirectoryName, extension.sourceSet!!.resources
-                    )
+                    .create(PLANTESTIC_TASK_NAME, PlantesticTask::class.java, plantesticRuntime,
+                        outputDirectoryName, extension.sourceSet!!.resources)
                 plantesticTask.description = "Generates the plantestic testcases"
                 plantesticTask.group = "plantestic"
 
