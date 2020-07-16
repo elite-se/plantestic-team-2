@@ -1,11 +1,36 @@
+plugins {
+    id 'java'
+    id "org.xtext.xtend" version "2.0.8"
+    id "eclipse"
+    id 'maven-publish'
+}
+
+configurations.all {
+    exclude group: 'asm'
+}
+
+sourceSets {
+    main {
+        java.srcDirs = ['src/main/java', 'src/main/xtext-gen']
+        resources.srcDirs = ['src/main/resources', 'src/main/xtext-gen']
+        xtendOutputDir = 'src/main/xtend-gen'
+    }
+    test {
+        java.srcDirs = ['src/test/java', 'src/test/xtext-gen']
+        resources.srcDirs = ['src/test/resources', 'src/test/xtext-gen']
+        xtendOutputDir = 'src/test/xtend-gen'
+    }
+}
+
 dependencies {
     testImplementation "junit:junit:4.13"
     testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${xtextVersion}"
     testCompile "org.eclipse.xtext:org.eclipse.xtext.xbase.testing:${xtextVersion}"
-    
+
     compile "org.eclipse.xtext:org.eclipse.xtext:${xtextVersion}"
     compile "org.eclipse.xtext:org.eclipse.xtext.xbase:${xtextVersion}"
 }
+
 configurations {
     mwe2 {
         extendsFrom compile
@@ -40,3 +65,17 @@ test {
 generateXtext.dependsOn(generateXtextLanguage)
 clean.dependsOn(cleanGenerateXtextLanguage)
 eclipse.classpath.plusConfigurations += [configurations.mwe2]
+
+publishing {
+    publications {
+        "$project.name"(MavenPublication) {
+            groupId project.group
+            artifactId project.name
+            version project.version
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}

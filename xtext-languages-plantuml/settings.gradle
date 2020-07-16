@@ -1,3 +1,0 @@
-include "xyz.elite.xtext.languages.plantuml"
-include "xyz.elite.xtext.languages.plantuml.ide"
-include "xyz.elite.xtext.languages.plantuml.web"

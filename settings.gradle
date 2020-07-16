@@ -1,5 +1,5 @@
 rootProject.name = 'plantestic'
-include 'plantuml'
+//include 'plantuml'
 include 'core'
 include 'gradle-plantestic-plugin'
-
+include 'xyz.elite.xtext.languages.plantuml'
