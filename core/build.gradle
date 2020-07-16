@@ -1,7 +1,4 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.plugin.allopen"
-    id "org.jetbrains.kotlin.plugin.noarg"
     id "application"
     id "jacoco"
     id "idea"
@@ -18,22 +15,13 @@ jar {
 }
 
 repositories {
-
     // Most qvt-related packages are hosted on WSO2:
     maven { url "https://maven.wso2.org/nexus/content/groups/wso2-public/" }
     maven { url "https://repo.eclipse.org/content/groups/releases/" }
 }
 
-configurations {
-    ktlint
-}
-
 test {
     useJUnitPlatform()
-
-    afterTest { desc, result ->
-        logger.quiet "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
-    }
 }
 
 dependencies {
@@ -83,33 +71,6 @@ dependencies {
     testRuntimeOnly "io.rest-assured:rest-assured:3.0.0"
     testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
-
-    ktlint "com.github.shyiko:ktlint:0.29.0"
 }
 
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.0
-            }
-        }
-    }
-}
-
-// To run coverage verification during the build (and fail when appropriate)
-check.dependsOn jacocoTestCoverageVerification
-
-publishing {
-    publications {
-        "$project.name"(MavenPublication) {
-            groupId project.group
-            artifactId project.name
-            version project.version
-            from components.java
-        }
-    }
-    repositories {
-        mavenLocal()
-    }
-}
+apply from: "$rootDir/gradle/maven-publish.gradle"

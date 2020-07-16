@@ -1,7 +1,6 @@
 plugins {
-    id 'java'
-    id "org.xtext.xtend" version "2.0.8"
-    id "eclipse"
+    id 'org.xtext.xtend' version "${xtend_version}"
+    id 'eclipse'
     id 'maven-publish'
 }
 
@@ -49,29 +48,7 @@ generateXtext.dependsOn(generateXtextLanguage)
 clean.dependsOn(cleanGenerateXtextLanguage)
 eclipse.classpath.plusConfigurations += [configurations.mwe2]
 
-publishing {
-    publications {
-        "$project.name"(MavenPublication) {
-            groupId project.group
-            artifactId project.name
-            version project.version
-            from components.java
-        }
-    }
-    repositories {
-        mavenLocal()
-    }
-}
 
-sourceSets {
-    main {
-        java.srcDirs = ['src/main/java', 'src/main/xtext-gen']
-        resources.srcDirs = ['src/main/resources', 'src/main/xtext-gen']
-        xtendOutputDir = 'src/main/xtend-gen'
-    }
-    test {
-        java.srcDirs = ['src/test/java', 'src/test/xtext-gen']
-        resources.srcDirs = ['src/test/resources', 'src/test/xtext-gen']
-        xtendOutputDir = 'src/test/xtend-gen'
-    }
-}
+
+apply from: "$rootDir/gradle/maven-publish.gradle"
+apply from: "$rootDir/gradle/xtext-source-sets.gradle"

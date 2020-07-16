@@ -1,9 +1,10 @@
 plugins {
+    id 'java'
     id "org.xtext.xtend" version "2.0.8"
-    id 'war'
     id 'de.undercouch.download'
     id 'eclipse'
     id 'idea'
+    id 'war'
 }
 import de.undercouch.gradle.tasks.download.Download
 
@@ -40,24 +41,5 @@ task jettyRun(type: JavaExec) {
     description = 'Starts an example Jetty server with your language'
 }
 
+apply from: "$rootDir/gradle/xtext-source-sets.gradle"
 
-sourceSets {
-    main {
-        java.srcDirs = ['src/main/java', 'src/main/xtext-gen']
-        resources.srcDirs = ['src/main/resources', 'src/main/xtext-gen']
-        xtendOutputDir = 'src/main/xtend-gen'
-    }
-    test {
-        java.srcDirs = ['src/test/java', 'src/test/xtext-gen']
-        resources.srcDirs = ['src/test/resources', 'src/test/xtext-gen']
-        xtendOutputDir = 'src/test/xtend-gen'
-    }
-}
-
-plugins.withId('war') {
-    webAppDirName = "src/main/webapp"
-}
-
-//plugins.withId('org.xtext.idea-plugin') {
-//    assembleSandbox.metaInf.from('src/main/resources/META-INF')
-//}
