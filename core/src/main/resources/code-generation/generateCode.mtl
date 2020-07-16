@@ -28,28 +28,14 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 		engine = new ScriptEngineManager().getEngineByName("JavaScript");
 	}
 
+    [if (testScenario.configs->notEmpty())]
     [for (config : Config | testScenario.configs) ]
-    @Test
-	public void test[ testScenario.configs->indexOf(config) /]() {
-	[for (entry : ConfigEntry | config.entries) ]
-        paramsMap.put("[ entry.key /]", "[ entry.value /]");
-    [/for]
-
-		String tester = paramsMap.get("tester");
-
-	[for (testRoundtrip : TestRoundtrip | testScenario.testroundtrip) separator('\n\n') ]
-		if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/]")) {
-			[if (testRoundtrip.precondition->isEmpty())][testRoundtrip.generateTestRoundtrip()/][/if]
-			[if (testRoundtrip.precondition->notEmpty())]
-			if(eval("[testRoundtrip.precondition/]")) {
-				[testRoundtrip.generateTestRoundtrip()/]
-			}
-			[/if]
-		}
-	[/for]
-	}
+    [generateTest(testScenario, config, testScenario.configs->indexOf(config).toString()) /]
 
 	[/for]
+	[else]
+    [generateTest(testScenario, null, '') /]
+	[/if]
 
     /// Helper method to make to templating in string variables above more clean.
 	private String subst(String source) {
@@ -84,6 +70,29 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 	}
 }
 [/file]
+[/template]
+
+[template private generateTest(testScenario : TestScenario, config : Config, nameSuffix : String) post(trim())]
+@Test
+public void test[ nameSuffix /]() {
+[if (not config.entries->oclIsUndefined())]
+[for (entry : ConfigEntry | config.entries) ]
+    paramsMap.put("[ entry.key /]", "[ entry.value /]");
+[/for]
+[/if]
+    String tester = paramsMap.get("tester");
+
+[for (testRoundtrip : TestRoundtrip | testScenario.testroundtrip) separator('\n\n') ]
+    if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/]")) {
+        [if (testRoundtrip.precondition->isEmpty())][testRoundtrip.generateTestRoundtrip()/][/if]
+        [if (testRoundtrip.precondition->notEmpty())]
+        if(eval("[testRoundtrip.precondition/]")) {
+            [testRoundtrip.generateTestRoundtrip()/]
+        }
+        [/if]
+    }
+[/for]
+}
 [/template]
 
 [template private generateTestRoundtrip(testRoundtrip : TestRoundtrip) post(trim())]
