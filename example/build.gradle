@@ -3,14 +3,12 @@ buildscript {
         jcenter()
         mavenCentral()
         google()
-        mavenLocal()
     }
 }
 
 plugins {
     id 'java'
     id 'de.unia.se.gradle-plantestic-plugin' version "0.1"
-    id "eclipse"
 }
 
 sourceSets {
@@ -44,7 +42,6 @@ dependencies {
     testImplementation "io.rest-assured:rest-assured:3.0.0"
     testImplementation "javax.xml.bind:jaxb-api:2.3.1"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.3.1"
-
 }
 
 repositories {

@@ -32,9 +32,6 @@ jar {
 	}
 }
 
-group = "plantuml"
-version = "1.0.0-SNAPSHOT"
-
 ext {
 	xtextVersion = "2.18.0"
 }

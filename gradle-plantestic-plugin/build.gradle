@@ -1,28 +1,9 @@
 plugins {
     id 'java'
-    id 'groovy'
-    id "org.jetbrains.kotlin.jvm"
+    id 'org.jetbrains.kotlin.jvm'
     id 'java-gradle-plugin'
     id 'maven-publish'
 }
-
-dependencies {
-
-}
-
-//
-//plugindev {
-//    pluginImplementationClass 'de.unia.se.JooqPlugin'
-//    pluginDescription '' // TODO
-//    pluginLicenses 'Apache-2.0'
-//    pluginTags 'gradle', 'plugin', 'plantestic'
-//    authorId 'maxammann'
-//    authorName 'Max Ammann'
-//    authorEmail 'maximilian.ammann@student.uni-augsburg.de'
-//    projectUrl 'https://github.com/elite-se/plantestic-team-2/'
-//    projectInceptionYear '2020'
-//    done()
-//}
 
 gradlePlugin {
     plugins {
