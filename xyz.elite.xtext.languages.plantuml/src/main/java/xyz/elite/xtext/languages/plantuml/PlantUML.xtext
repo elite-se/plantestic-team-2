@@ -39,9 +39,9 @@ SQ_SequenceElement:
 // -------- MESSAGES --------
 SQ_Message:
     (
-        ('[' arrow=SQ_Arrow receiver=SQ_Participant) 
-        | (sender=SQ_Participant arrow=SQ_Arrow receiver=SQ_Participant)
-        | (sender=SQ_Participant arrow=SQ_Arrow ']')
+        ('[' arrow=SQ_Arrow participantRight=SQ_Participant)
+        | (participantLeft=SQ_Participant arrow=SQ_Arrow participantRight=SQ_Participant)
+        | (participantLeft=SQ_Participant arrow=SQ_Arrow ']')
     )  
     (receiverlifetime=SQ_LifetimeHint)?
     (':' payload=(PT_RequestResponse)? description=SQ_Description)?;
@@ -206,22 +206,20 @@ PT_Wait:
 PT_RequestResponse:
     PT_Request | PT_Response;
 
-PT_Request returns PT_RequestResponse:
-    {PT_Request}
+PT_Request:
     'request(' method=PT_RequestMethod ',' url=STRING (',' parametermap=(PT_ParameterMap))? ')';
 
 PT_RequestMethod:
     'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-PT_Response returns PT_RequestResponse:
-    {PT_Response}
+PT_Response:
     'response(' acceptedcodes+=PT_ResponseCode ('|' '|' acceptedcodes+=PT_ResponseCode)* (',' parametermap=(PT_ParameterMap))? ')';
 
 PT_ResponseCode:
     code=INT description=(ID)?;
 
 PT_ParameterMap:
-    ('{' (param+=PT_Parameter (',' param+=PT_Parameter)*)? '}');
+    ('{' (params+=PT_Parameter (',' params+=PT_Parameter)*)? '}');
 
 PT_Parameter:
     {PT_Parameter}

@@ -71,8 +71,11 @@ object Main {
         |LEGAL
         |=====
         |
-        |This software is licensed under Apache 2.0 license and was developed by 
-        |Andreas Zimmerer, Stefan Grafberger, Fiona Guerin, Daniela Neupert and Michelle Martin.
+        |This software is licensed under Apache 2.0 license and was originally developed by 
+        |Andreas Zimmerer, Stefan Grafberger, Fiona Guerin, Daniela Neupert, Michelle Martin
+        |
+        |The following people built upon their existing work to create this version
+        |Alexander Zellner, Maximilian Ammann, Elias Keis, Dominik Horn
         """.trimMargin()) {
 
         private val input: String by option(help = "Path to the PlantUML file containing the API specification.")
