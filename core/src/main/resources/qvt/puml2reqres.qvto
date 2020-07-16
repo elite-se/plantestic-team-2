@@ -31,13 +31,15 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): Scenario {
     var roundtripCounter : Integer := 1;
 
     var elements : Sequence(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements()->asList();
+    log("Elements: " + elements->size().toString());
     var messages : Sequence(SQ_Message) := Sequence{};
 
     elements->forEach(elem) {
         if (elem.oclIsTypeOf(SQ_Message)) {
-            messages->append(elem.oclAsType(SQ_Message));
-        }
+            messages += elem.oclAsType(SQ_Message);
+        };
     };
+    log("Messages: " + messages->size().toString());
 
     var msgIndex : Integer := 1;
     while (msgIndex <= messages->size()) {
@@ -51,19 +53,24 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): Scenario {
                 var httpResponse : HttpResponse := responseMsg.payload.response.response2httpResponse();
                 roundtrip += generateRoundtrip(roundtripCounter, httpRequest, httpResponse);
                 roundtripCounter := roundtripCounter + 1;
+            } else {
+                log("Ignoring request " + msgIndex.toString() + " that has no corresponding response");
             };
         };
+
+        msgIndex := msgIndex + 1;
     };
+    log("Roundtrips: " + roundtrip->size().toString());
 }
 
 helper findResponse(request : SQ_Message, followingMsgs : Sequence(SQ_Message)) : SQ_Message {
     followingMsgs->forEach(potentialResponse) {
         if (potentialResponse.isResponse() and
-                potentialResponse.sender() = request.receiver() and
-                potentialResponse.receiver() = request.sender()
+                potentialResponse.sender().name = request.receiver().name and
+                potentialResponse.receiver().name = request.sender().name
            ) {
                 return potentialResponse;
-        }
+        };
     };
 }
 
@@ -74,7 +81,7 @@ helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(): OrderedSet
             var message : SQ_Message := umlElement.oclAsType(SQ_Message);
             if (not message.payload.oclIsUndefined()) {
                 sequenceElements += message;
-            }
+            };
         }
         elif (umlElement.oclIsTypeOf(SQ_Group)) {
             var group : SQ_Group := umlElement.oclAsType(SQ_Group);
