@@ -30,6 +30,7 @@
     <genClasses ecoreClass="RequestResponsePairs.ecore#//Scenario">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RequestResponsePairs.ecore#//Scenario/roundtrip"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//Scenario/scenarioName"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RequestResponsePairs.ecore#//Scenario/configs"/>
     </genClasses>
     <genClasses ecoreClass="RequestResponsePairs.ecore#//HttpResponseDatum">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//HttpResponseDatum/variableName"/>
@@ -38,6 +39,13 @@
     <genClasses ecoreClass="RequestResponsePairs.ecore#//HttpRequestDatum">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//HttpRequestDatum/variableName"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//HttpRequestDatum/value"/>
+    </genClasses>
+    <genClasses ecoreClass="RequestResponsePairs.ecore#//Config">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RequestResponsePairs.ecore#//Config/entries"/>
+    </genClasses>
+    <genClasses ecoreClass="RequestResponsePairs.ecore#//ConfigEntry">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//ConfigEntry/key"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RequestResponsePairs.ecore#//ConfigEntry/value"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

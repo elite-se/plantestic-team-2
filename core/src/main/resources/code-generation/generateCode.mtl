@@ -4,50 +4,37 @@
 [template public generateTestScenario(testScenario : TestScenario) post(trim())]
 [comment @main /]
 [file ('Test'.concat(testScenario.testScenarioName.concat('.java')), false, 'UTF-8')]
-package com.plantestic.test;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import org.hamcrest.collection.IsIn;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.commons.text.StringSubstitutor;
-import com.moandjiezana.toml.Toml;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import org.junit.jupiter.api.Test;
+import java.util.HashMap;
+import java.util.Map;
 
 public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 
-	Map<String, Object> paramsMap = new HashMap();
+	Map<String, String> paramsMap;
 	ScriptEngine engine;
 	StringSubstitutor substitutor;
 
-	public [ 'Test'.concat(testScenario.testScenarioName) /]() throws Exception {
-		try {
-			//String osAppropriatePath = IS_WINDOWS ? configFile.substring(1) : configFile;
-			//Path path = Paths.get(osAppropriatePath);
-
-			//Map<String, Object>  paramsFromFile = unnestTomlMap("", new Toml().read(new String(Files.readAllBytes(path))).toMap());
-			paramsMap = mergeMaps(paramsFromFile, new HashMap<>(System.getenv()));
-			substitutor = new StringSubstitutor(paramsMap);
-			engine = new ScriptEngineManager().getEngineByName("JavaScript");
-		} catch(Exception exception) {
-			System.out.println("An Error occured, possible during reading the TOML config file: " + exception);
-			throw exception;
-		}
+    @BeforeEach
+	public void setup() {
+	    paramsMap = new HashMap<>(System.getenv());
+	    substitutor = new StringSubstitutor(paramsMap);
+		engine = new ScriptEngineManager().getEngineByName("JavaScript");
 	}
 
+    [for (config : Config | testScenario.configs) ]
     @Test
-	public void test() throws Exception {
+	public void test[ testScenario.configs->indexOf(config) /]() {
+	[for (entry : ConfigEntry | config.entries) ]
+        paramsMap.put("[ entry.key /]", "[ entry.value /]");
+    [/for]
+
 		String tester = paramsMap.get("tester");
 
 	[for (testRoundtrip : TestRoundtrip | testScenario.testroundtrip) separator('\n\n') ]
@@ -61,6 +48,8 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
 		}
 	[/for]
 	}
+
+	[/for]
 
     /// Helper method to make to templating in string variables above more clean.
 	private String subst(String source) {
@@ -93,16 +82,6 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
         }
         return resultMap;
 	}
-
-    /// Helper method to merge two maps.
-    /// We use this to combine the params from the config file with the environment variables.
-    /// If keys are in both maps, the ones of the m1 are used.
-    private static Map<String, Object> mergeMaps(Map<String, Object> m1, Map<String, Object> m2) {
-        return Stream.of(m1, m2)
-            .map(Map::entrySet)
-            .flatMap(Set::stream)
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a));
-    }
 }
 [/file]
 [/template]

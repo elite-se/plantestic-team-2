@@ -11,11 +11,23 @@ main() {
     assert fatal ( input.objectsOfType(Model).sequence_diagrams[SQ_Diagram]->size() = 1)
         with log('Input does not contain exactly one SequenceDiagram');
 
-     input.objectsOfType(Model).sequence_diagrams[SQ_Diagram].map transformUmlDiagram();
+    var configs = input.objectsOfType(Model).configs[SQ_Config].map transformConfigs();
+    input.objectsOfType(Model).sequence_diagrams[SQ_Diagram].map transformUmlDiagram(configs);
+    log("Output configs: " + configs->size().toString());
 }
 
-mapping SQ_Diagram::transformUmlDiagram(): Scenario {
+mapping SQ_Config::transformConfigs(): Config {
+    entries := self.entries.map transformConfigEntries();
+}
+
+mapping SQ_ConfigEntry::transformConfigEntries(): ConfigEntry {
+    key := self.name;
+    value := self.value;
+}
+
+mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): Scenario {
     scenarioName := diagramName + "_puml";
+    configs := configs_;
     var roundtripId : Integer := 1;
 
     var umlElements : OrderedSet(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements();
