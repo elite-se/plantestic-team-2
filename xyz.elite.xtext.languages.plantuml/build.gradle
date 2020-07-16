@@ -5,23 +5,6 @@ plugins {
     id 'maven-publish'
 }
 
-configurations.all {
-    exclude group: 'asm'
-}
-
-sourceSets {
-    main {
-        java.srcDirs = ['src/main/java', 'src/main/xtext-gen']
-        resources.srcDirs = ['src/main/resources', 'src/main/xtext-gen']
-        xtendOutputDir = 'src/main/xtend-gen'
-    }
-    test {
-        java.srcDirs = ['src/test/java', 'src/test/xtext-gen']
-        resources.srcDirs = ['src/test/resources', 'src/test/xtext-gen']
-        xtendOutputDir = 'src/test/xtend-gen'
-    }
-}
-
 dependencies {
     testImplementation "junit:junit:4.13"
     testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${xtextVersion}"
@@ -77,5 +60,18 @@ publishing {
     }
     repositories {
         mavenLocal()
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDirs = ['src/main/java', 'src/main/xtext-gen']
+        resources.srcDirs = ['src/main/resources', 'src/main/xtext-gen']
+        xtendOutputDir = 'src/main/xtend-gen'
+    }
+    test {
+        java.srcDirs = ['src/test/java', 'src/test/xtext-gen']
+        resources.srcDirs = ['src/test/resources', 'src/test/xtext-gen']
+        xtendOutputDir = 'src/test/xtend-gen'
     }
 }

@@ -42,6 +42,14 @@ subprojects {
     repositories {
         mavenLocal()
     }
+
+    plugins.withId('war') {
+        webAppDirName = "src/main/webapp"
+    }
+
+    plugins.withId('org.xtext.idea-plugin') {
+        assembleSandbox.metaInf.from('src/main/resources/META-INF')
+    }
 }
 
 configure(subprojects.findAll { it.path.contains(':xyz.elite.xtext.languages.plantuml:') }) {
