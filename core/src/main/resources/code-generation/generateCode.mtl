@@ -55,23 +55,28 @@ public class [ 'Test'.concat(testScenario.testScenarioName) /] {
     @Test
 	public void test() throws Exception {
 	[for (testRoundtrip : TestRoundtrip | testScenario.testroundtrip) separator('\n\n') ]
+		[let reqSpec : RequestSpecification = testRoundtrip.requestspecification];
+		if (!swaggerParamsMap.containsKey("[reqSpec.receiver/]") {
+			try {
+ 				swaggerParamsMap.put("[reqSpec.receiver/]", new OpenApiValidationFilter(subst("${[reqSpec.receiver/].swagger}")));
+			} catch (Exception e) {
+				swaggerParamsMap.put("[reqSpec.receiver/]", new Filter() {
+					@Override
+					public Response filter(FilterableRequestSpecification rS, FilterableResponseSpecification rpS, FilterContext context) {
+						return context.next(rS,rpS);
+					}
+				});
+			}
+ 		}
+		[/let]
+
 		[if (testRoundtrip.precondition->isEmpty())][testRoundtrip.generateTestRoundtrip()/][/if]
 		[if (testRoundtrip.precondition->notEmpty())]
 		if(eval("[testRoundtrip.precondition/]")) {
 			[testRoundtrip.generateTestRoundtrip()/]
 		}
 		[/if]
-		String receiver = testRoundtrip.requestspecification.receiver;
-		[if not (swaggerParamsMap.containsKey(receiver))][putSwagger ([receiver/])][/if]
-		
 	[/for]
-	}
-
-	private void putSwagger(String key) {
-		//Create new Object
-		Object value = new 
-		// Put new key in swaggerKey map
-		swaggerParamsMap.put(
 	}
 
     /// Helper method to make to templating in string variables above more clean.
