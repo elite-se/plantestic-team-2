@@ -11,91 +11,48 @@ main() {
     assert fatal ( input.objectsOfType(Model).sequence_diagrams[SQ_Diagram]->size() = 1)
         with log('Input does not contain exactly one SequenceDiagram');
 
-     input.objectsOfType(Model).sequence_diagrams[SQ_Diagram].map transformUmlDiagram();
+    input.objectsOfType(Model).sequence_diagrams[SQ_Diagram].map transformUmlDiagram();
 }
 
 mapping SQ_Diagram::transformUmlDiagram(): Scenario {
     scenarioName := diagramName + "_puml";
-    var roundtripId : Integer := 1;
+    var roundtripCounter : Integer := 1;
 
-    var elements : OrderedSet(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements();
-    var elementsSize : Integer := elements->size();
-    var elementsIndex : Integer := 1;
+    var elements : Sequence(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements()->asList();
+    var messages : Sequence(SQ_Message) := Sequence{};
 
-    while (elements->notEmpty()) {
-        var consumed : OrderedSet(SQ_SequenceElement);
-        var elem: SQ_SequenceElement = elements->at(1);
-
-        elements := elements - consumed;
-    };
-/*
-    while (umlElementsIndex <= umlElementsSize) {
-        var sequenceElement : SQ_SequenceElement := umlElements->at(umlElementsIndex);
-        if (sequenceElement.oclIsTypeOf(UseLeft)) {
-            var useLeft : UseLeft := sequenceElement.oclAsType(UseLeft);
-            var request : Request := useLeft.useLeft2request();
-            var httpRequestElement : HttpRequest := request.request2httpRequest();
-            httpRequestElement.receiver := useLeft.userTwo.name;
-
-            umlElementsIndex := umlElementsIndex + 1;
-            sequenceElement := umlElements->at(umlElementsIndex);
-
-            if (sequenceElement.oclIsTypeOf(UseLeft)) {
-                useLeft := sequenceElement.oclAsType(UseLeft);
-                var response : Response := useLeft.useLeft2response();
-                var httpResponseElement : HttpResponse := response.response2httpResponse();
-
-                var roundtripElement : Roundtrip := generateRoundtrip(roundtripId, httpRequestElement, httpResponseElement);
-                roundtrip += roundtripElement;
-                roundtripId := roundtripId + 1;
-            }
-            elif (sequenceElement.oclIsTypeOf(Alternative)) {
-                var httpRequestElementCopy : HttpRequest := new HttpRequest();
-                httpRequestElementCopy.httpMethod := httpRequestElement.httpMethod;
-                httpRequestElementCopy.url := httpRequestElement.url;
-                httpRequestElementCopy.httprequestdatum := httpRequestElement.httprequestdatum;
-                httpRequestElementCopy.receiver := httpRequestElement.receiver;
-
-                var alternative : Alternative := sequenceElement.oclAsType(Alternative);
-                useLeft := alternative.umlElements->at(1).oclAsType(UseLeft);
-                var response : Response := useLeft.useLeft2response();
-                var httpResponseElement : HttpResponse := response.response2httpResponse();
-
-                var roundtripElement : Roundtrip := generateRoundtrip(roundtripId, httpRequestElementCopy, httpResponseElement);
-                roundtripElement.precondition := alternative.text;
-                roundtrip += roundtripElement;
-                roundtripId := roundtripId + 1;
-
-                var elseElement : Else := alternative.elseBlocks->at(1).oclAsType(Else);
-                useLeft := elseElement.umlElements->at(1).oclAsType(UseLeft);
-                response := useLeft.useLeft2response();
-                httpResponseElement := response.response2httpResponse();
-
-                roundtripElement := generateRoundtrip(roundtripId, httpRequestElement, httpResponseElement);
-                roundtripElement.precondition := elseElement.text;
-                roundtrip += roundtripElement;
-                roundtripId := roundtripId + 1;
-
-            };
+    elements->forEach(elem) {
+        if (elem.oclIsTypeOf(SQ_Message)) {
+            messages->append(elem.oclAsType(SQ_Message));
         }
-        elif (sequenceElement.oclIsTypeOf(Alternative)) {
-            var alternative : Alternative := sequenceElement.oclAsType(Alternative);
-            var useLeft : UseLeft := alternative.umlElements->at(1).oclAsType(UseLeft);
-            var request : Request := useLeft.useLeft2request();
-            var httpRequestElement : HttpRequest := request.request2httpRequest();
-
-            useLeft := alternative.umlElements->at(2).oclAsType(UseLeft);
-            var response : Response := useLeft.useLeft2response();
-            var httpResponseElement : HttpResponse := response.response2httpResponse();
-
-            var roundtripElement : Roundtrip := generateRoundtrip(roundtripId, httpRequestElement, httpResponseElement);
-            roundtripElement.precondition := alternative.text;
-            roundtrip += roundtripElement;
-            roundtripId := roundtripId + 1;
-        };
-        umlElementsIndex := umlElementsIndex + 1;
     };
-*/
+
+    var msgIndex : Integer := 1;
+    while (msgIndex <= messages->size()) {
+        var msg : SQ_Message := messages->at(msgIndex);
+
+        if (msg.isRequest()) {
+            var followingMsgs : Sequence(SQ_Message) := messages->subSequence(msgIndex + 1, messages->size());
+            var responseMsg : SQ_Message := findResponse(msg, followingMsgs);
+            if (not responseMsg.oclIsUndefined()) {
+                var httpRequest : HttpRequest := msg.payload.request.request2httpRequest();
+                var httpResponse : HttpResponse := responseMsg.payload.response.response2httpResponse();
+                roundtrip += generateRoundtrip(roundtripCounter, httpRequest, httpResponse);
+                roundtripCounter := roundtripCounter + 1;
+            };
+        };
+    };
+}
+
+helper findResponse(request : SQ_Message, followingMsgs : Sequence(SQ_Message)) : SQ_Message {
+    followingMsgs->forEach(potentialResponse) {
+        if (potentialResponse.isResponse() and
+                potentialResponse.sender() = request.receiver() and
+                potentialResponse.receiver() = request.sender()
+           ) {
+                return potentialResponse;
+        }
+    };
 }
 
 helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(): OrderedSet(SQ_SequenceElement) {
@@ -126,18 +83,36 @@ mapping SQ_GroupAlternative::flatten_SQ_GroupAlternative(): SQ_GroupAlternative 
     label := self.label;
 }
 
-helper SQ_Message::message2request(): PT_RequestResponse {
-    var receiver: SQ_Participant;
-    if (not self.arrow.lefttip.oclIsUndefined()) {
-        receiver := self.participantLeft;
-    } else {
-        receiver := self.participantRight;
+helper SQ_Arrow::isR2L(): Boolean {
+    return not self.lefttip.oclIsUndefined() and self.righttip.oclIsUndefined();
+}
+
+helper SQ_Arrow::isL2R(): Boolean {
+    return self.lefttip.oclIsUndefined() and not self.righttip.oclIsUndefined();
+}
+
+helper SQ_Message::receiver(): SQ_Participant {
+    if (self.arrow.isR2L()) {
+        return self.participantLeft;
+    } else if (self.arrow.isL2R()) {
+        return self.participantRight;
     };
+}
 
-    assert fatal (self.payload != null)
-        with log ('Messages without payload are not interesting');
+helper SQ_Message::sender(): SQ_Participant {
+    if (self.arrow.isR2L()) {
+        return self.participantRight;
+    } else if (self.arrow.isL2R()) {
+        return self.participantLeft;
+    };
+}
 
-    return self.payload.oclAsType(PT_RequestResponse);
+helper SQ_Message::isRequest(): Boolean {
+    return not self.payload.request.oclIsUndefined();
+}
+
+helper SQ_Message::isResponse(): Boolean {
+    return not self.payload.response.oclIsUndefined();
 }
 
 helper generateRoundtrip(roundtripId : Integer, httpRequest : HttpRequest, httpResponse : HttpResponse): Roundtrip {
