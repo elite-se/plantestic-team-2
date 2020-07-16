@@ -3,7 +3,6 @@ plugins {
     id "org.jetbrains.kotlin.plugin.allopen"
     id "org.jetbrains.kotlin.plugin.noarg"
     id "application"
-    id "jacoco"
     id "idea"
     id "eclipse"
     id 'maven-publish'

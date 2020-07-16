@@ -68,15 +68,16 @@ open class PlantesticTask @Inject constructor(
         return execOperations!!.javaexec { spec ->
             spec.setMain("de.unia.se.plantestic.Main")
             print("Classpath: ")
-            println(plantesticClasspath!!.plus(projectLayout!!.files("src/dist")).forEach(Consumer { println(it.absoluteFile) }))
+            println(
+                plantesticClasspath!!.plus(projectLayout!!.files("src/dist"))
+                    .forEach(Consumer { println(it.absoluteFile) })
+            )
             spec.setClasspath(plantesticClasspath.plus(projectLayout.files("src/dist")))
-//            spec.setWorkingDir("/home/max")
             spec.setWorkingDir(projectLayout.getProjectDirectory())
             spec.args("--input", file.absolutePath, "--output", File(outputDirectory).absolutePath)
             if (javaExecSpec != null) {
                 javaExecSpec!!.execute(spec)
             }
         }
-
     }
 }

@@ -48,10 +48,6 @@ generateXtext.dependsOn(generateXtextLanguage)
 clean.dependsOn(cleanGenerateXtextLanguage)
 eclipse.classpath.plusConfigurations += [configurations.mwe2]
 
-configurations.all {
-    exclude group: 'asm'
-}
-
 jar {
     from('model') {
         into('model')

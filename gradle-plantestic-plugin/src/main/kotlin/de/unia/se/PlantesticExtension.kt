@@ -14,7 +14,7 @@ open class PlantesticExtension(val whenConfigAdded: (PlantesticExtension) -> Sou
 
     public var sourceSet: SourceSet? = null
 
-    open fun sourceSet(sourceSet : SourceSet) {
+    open fun sourceSet(sourceSet: SourceSet) {
         this.sourceSet = sourceSet
         whenConfigAdded(this)
     }
