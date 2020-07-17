@@ -222,3 +222,6 @@ local.properties
 # ANTLR Tooling
 xyz.elite.xtext.languages.plantuml/src/main/gen/
 
+
+
+./eclipse-repo/

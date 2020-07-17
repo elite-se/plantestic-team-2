@@ -1,28 +1,16 @@
 plugins {
     id 'de.unia.se.gradle-plantestic-plugin' version "0.1"
-//    id "com.diffplug.p2.asmaven" version "3.23.0"
 }
 
 repositories {
     maven {
-        url rootProject.file('../core/build/p2asmaven/maven')
+        url rootProject.file('../eclipse-repo/maven')
         metadataSources {
             mavenPom() // https://github.com/diffplug/goomph/commit/6271361598ef7c1d1fd4a45053fad46645554fb0
             artifact() // https://github.com/diffplug/goomph/issues/106
         }
     }
 }
-
-//p2AsMaven {
-//    group 'eclipse-deps1', {
-//        repo 'http://download.eclipse.org/releases/2020-06'
-//
-//        feature 'org.eclipse.emf.ecore'
-//        feature 'org.eclipse.m2m.qvt.oml.sdk'
-//        feature 'org.eclipse.uml2.sdk'
-//        feature 'org.eclipse.acceleo'
-//    }
-//}
 
 plantestic {
     sourceSet sourceSets.test // Location of the puml files

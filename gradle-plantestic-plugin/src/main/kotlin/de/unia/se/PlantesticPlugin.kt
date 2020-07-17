@@ -52,7 +52,6 @@ class PlantesticPlugin : Plugin<Project> {
 
         project.tasks.named("test", Test::class.java) {
             it.useJUnitPlatform()
-//            it.dependsOn("clean")
             it.dependsOn("generate")
         }
     }
@@ -61,17 +60,8 @@ class PlantesticPlugin : Plugin<Project> {
      * Adds the configuration that holds the classpath to use for invoking plantestic.
      */
     private fun addPlantesticDependencies(plantesticRuntime: Configuration, project: Project) {
-//        project.dependencies.project(mapOf("path" to ":core"))
-
         project.repositories.mavenCentral()
         project.repositories.mavenLocal()
-//        project.repositories.mavenLocal() {
-//            it.setUrl(File(project.rootDir, "../core/build/p2asmaven/maven"))
-//        }
-
-        project.repositories.maven {
-            it.setUrl("https://maven.wso2.org/nexus/content/groups/wso2-public/")
-        }
 
         project.repositories.maven {
             it.setUrl("https://repo.eclipse.org/content/groups/releases/")

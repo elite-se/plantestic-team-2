@@ -2,6 +2,20 @@ plugins {
     id "org.jetbrains.kotlin.jvm" version "${kotlin_version}"
     id "org.jetbrains.kotlin.plugin.allopen" version "${kotlin_version}"
     id "org.jetbrains.kotlin.plugin.noarg" version "${kotlin_version}"
+
+    id "com.diffplug.p2.asmaven" version "3.23.0"
+}
+
+p2AsMaven {
+    destination "eclipse-repo"
+    group 'eclipse-p2', {
+        repo 'http://download.eclipse.org/releases/2020-06'
+
+        feature 'org.eclipse.emf.ecore'
+        feature 'org.eclipse.m2m.qvt.oml.sdk'
+        feature 'org.eclipse.uml2.sdk'
+        feature 'org.eclipse.acceleo'
+    }
 }
 
 repositories {
