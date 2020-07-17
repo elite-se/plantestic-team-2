@@ -27,6 +27,11 @@ XCS -> CCC : response(202 ACCEPTED, {eventId})
 XCS -[#green]> Vehicle : <joynr>:requestXCall(requestId, sequenceId, CoreData)
 autoactivate on
 
+/'
+SVDS -> ELOS : request(GET, "dafdsf")
+return response(200)
+'/
+
 XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/{vin}")
 return response(200, {MarketRegion})
 

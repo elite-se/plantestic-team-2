@@ -1,0 +1,12 @@
+@startuml
+
+Alice -> Bob : request(GET, "name")
+
+alt weather==sunny
+	Bob -> Alice : response(200 ACCEPTED, { name: "Bob" })
+else name=="Hans"
+	Alice -> Alice
+end group
+
+
+@enduml
