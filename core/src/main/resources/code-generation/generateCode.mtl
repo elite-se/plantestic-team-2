@@ -103,9 +103,9 @@ public void test[ nameSuffix /]() {
 [template private generateAlternative(alternative : Alternative) post(trim())]
 if (eval("[alternative.condition/]")) {
 	[generateStructures(alternative.provided)/]
-} else {
+}[if (alternative.otherwise->notEmpty())] else {
 	[generateStructures(alternative.otherwise)/]
-}
+}[/if]
 [/template]
 
 [template private generateTestRoundtripWithTesterCheck(testRoundtrip : TestRoundtrip) post(trim())]
