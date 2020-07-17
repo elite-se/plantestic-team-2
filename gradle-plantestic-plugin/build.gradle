@@ -13,4 +13,8 @@ gradlePlugin {
     }
 }
 
+dependencies {
+    implementation "com.diffplug.gradle:goomph:3.23.0"
+}
+
 apply from: "$rootDir/gradle/maven-publish.gradle"

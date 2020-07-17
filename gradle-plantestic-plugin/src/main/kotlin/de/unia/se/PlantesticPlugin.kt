@@ -1,5 +1,6 @@
 package de.unia.se
 
+import com.diffplug.gradle.p2.AsMavenPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -33,23 +34,40 @@ class PlantesticPlugin : Plugin<Project> {
                 val plantesticTask = project.tasks
                     .create(
                         PLANTESTIC_TASK_NAME, PlantesticTask::class.java, plantesticRuntime,
-                        outputDirectoryName, extension.sourceSet!!.resources
+                        outputDirectoryName, extension.sourceSet
                     )
                 plantesticTask.description = "Generates the plantestic testcases"
                 plantesticTask.group = "plantestic"
             }
         )
 
-
-
         project.plugins.apply("java")
 
+        addEclipseDependencies(project)
+        addOutputToTestSources(project, outputDirectoryName)
+        addPlantesticDependencies(plantesticRuntime, project)
+        addJUnit(project)
+    }
+
+    private fun addEclipseDependencies(project: Project) {
+        project.plugins.apply("com.diffplug.p2.asmaven")
+        val extension = project.plugins.apply(AsMavenPlugin::class.java).extension()
+        extension.group("eclipse-p2") {
+            it.repo("http://download.eclipse.org/releases/2020-06")
+            it.feature("org.eclipse.emf.ecore")
+            it.feature("org.eclipse.m2m.qvt.oml.sdk")
+            it.feature("org.eclipse.uml2.sdk")
+            it.feature("org.eclipse.acceleo")
+        }
+    }
+
+    private fun addOutputToTestSources(project: Project, outputDirectoryName: String) {
         val sourceSets = project.properties["sourceSets"] as SourceSetContainer?
         val sourceSet = sourceSets!!.getByName("test")
         sourceSet.java.srcDir(outputDirectoryName)
+    }
 
-        addPlantesticDependencies(plantesticRuntime, project)
-
+    private fun addJUnit(project: Project) {
         project.tasks.named("test", Test::class.java) {
             it.useJUnitPlatform()
             it.dependsOn("generate")
@@ -62,7 +80,6 @@ class PlantesticPlugin : Plugin<Project> {
     private fun addPlantesticDependencies(plantesticRuntime: Configuration, project: Project) {
         project.repositories.mavenCentral()
         project.repositories.mavenLocal()
-
         project.repositories.maven {
             it.setUrl("https://repo.eclipse.org/content/groups/releases/")
         }

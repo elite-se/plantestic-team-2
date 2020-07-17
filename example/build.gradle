@@ -2,18 +2,8 @@ plugins {
     id 'de.unia.se.gradle-plantestic-plugin' version "0.1"
 }
 
-repositories {
-    maven {
-        url rootProject.file('../eclipse-repo/maven')
-        metadataSources {
-            mavenPom() // https://github.com/diffplug/goomph/commit/6271361598ef7c1d1fd4a45053fad46645554fb0
-            artifact() // https://github.com/diffplug/goomph/issues/106
-        }
-    }
-}
-
 plantestic {
-    sourceSet sourceSets.test // Location of the puml files
+    sourceSet sourceSets.test.resources // Location of the puml files
 }
 
 group = "de.unia.se"

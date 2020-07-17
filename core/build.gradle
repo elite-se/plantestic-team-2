@@ -16,15 +16,14 @@ jar {
 }
 
 repositories {
-    mavenCentral()
-    maven { url "https://repo.eclipse.org/content/groups/releases/" }
     maven {
-        url rootProject.file('../eclipse-repo/maven')
+        url rootProject.file('eclipse-repo/maven')
         metadataSources {
             mavenPom() // https://github.com/diffplug/goomph/commit/6271361598ef7c1d1fd4a45053fad46645554fb0
             artifact() // https://github.com/diffplug/goomph/issues/106
         }
     }
+    mavenCentral()
 }
 
 test {
@@ -34,6 +33,7 @@ test {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "com.github.ajalt:clikt:2.2.0"
 
     implementation project(":xyz.elite.xtext.languages.plantuml")
 
@@ -61,22 +61,21 @@ dependencies {
     implementation "eclipse-p2:org.eclipse.uml2.types:+"
     implementation "eclipse-p2:org.eclipse.uml2.uml:+"
 
-    // very legacy dependency, missing runtime depenencies
-    runtimeOnly group: 'lpg.runtime', name: 'java', version: '2.0.17-v201004271640'
-    runtimeOnly group: 'org.osgi', name: 'org.osgi.service.prefs', version: '1.1.1'
-
-    // Making Acceleo work without Eclipse
+    // acceleo
     implementation "eclipse-p2:org.eclipse.acceleo.engine:+"
     implementation "eclipse-p2:org.eclipse.acceleo.parser:+"
     implementation "eclipse-p2:org.eclipse.acceleo.common:+"
     implementation "eclipse-p2:org.eclipse.acceleo.model:+"
 
+    // runtime
     implementation "eclipse-p2:org.eclipse.core.runtime:+"
     implementation "eclipse-p2:org.eclipse.core.contenttype:+"
     implementation "eclipse-p2:org.eclipse.equinox.common:+" // fixes: https://github.com/eclipse/xtext/issues/1231
     implementation "eclipse-p2:org.eclipse.equinox.registry:+"
 
-    implementation "com.github.ajalt:clikt:2.2.0"
+    // very legacy dependency, missing runtime depenencies
+    runtimeOnly group: 'lpg.runtime', name: 'java', version: '2.0.17-v201004271640'
+    runtimeOnly group: 'org.osgi', name: 'org.osgi.service.prefs', version: '1.1.1'
 
     testImplementation "io.kotlintest:kotlintest-runner-junit5:3.1.7"
     testImplementation "io.mockk:mockk:1.8.9"

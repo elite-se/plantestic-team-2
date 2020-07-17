@@ -65,11 +65,14 @@ open class PlantesticTask @Inject constructor(
     }
 
     private fun executePlantestic(file: File): ExecResult? {
+        val output = File(outputDirectory)
+        output.deleteRecursively()
+
         return execOperations!!.javaexec { spec ->
             spec.setMain("de.unia.se.plantestic.Main")
             spec.setClasspath(plantesticClasspath)
             spec.setWorkingDir(projectLayout!!.getProjectDirectory())
-            spec.args("--input", file.absolutePath, "--output", File(outputDirectory).absolutePath)
+            spec.args("--input", file.absolutePath, "--output", output.absolutePath)
             if (javaExecSpec != null) {
                 javaExecSpec!!.execute(spec)
             }
