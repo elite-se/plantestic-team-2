@@ -1,0 +1,10 @@
+plugins {
+    id 'de.unia.se.gradle-plantestic-plugin' version "0.1"
+}
+
+plantestic {
+    sourceSet sourceSets.test.resources // Location of the puml files
+}
+
+group = "de.unia.se"
+

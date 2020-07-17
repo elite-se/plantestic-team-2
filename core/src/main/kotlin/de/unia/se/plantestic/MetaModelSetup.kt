@@ -1,22 +1,23 @@
 package de.unia.se.plantestic
 
-import com.google.common.io.Resources
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
-import plantuml.PumlStandaloneSetup
+import xyz.elite.xtext.languages.plantuml.PlantUMLStandaloneSetup
+import java.io.File
 
 object MetaModelSetup {
 
-    private val REQUEST_RESPONSE_PAIRS_METAMODEL_URI =
-        URI.createURI(Resources.getResource("metamodels/reqrespairs/RequestResponsePairs.ecore").toExternalForm())
-    private val REST_ASSURED_METAMODEL_URI =
-        URI.createURI(Resources.getResource("metamodels/restassured/RestAssured.ecore").toExternalForm())
+    private val TEST_SCENARIO_METAMODEL_URI =
+        URI.createURI(
+            javaClass.classLoader.getResource("metamodels/testscenario/TestScenario.ecore").toString(),
+            true
+        )
 
     fun doSetup() {
-        PumlStandaloneSetup.doSetup()
-        registerMetamodelFromEcoreFile(REQUEST_RESPONSE_PAIRS_METAMODEL_URI)
-        registerMetamodelFromEcoreFile(REST_ASSURED_METAMODEL_URI)
+        PlantUMLStandaloneSetup.doSetup()
+
+        registerMetamodelFromEcoreFile(TEST_SCENARIO_METAMODEL_URI)
     }
 
     private fun registerMetamodelFromEcoreFile(uri: URI) {

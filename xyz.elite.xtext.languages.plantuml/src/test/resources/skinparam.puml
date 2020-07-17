@@ -1,0 +1,20 @@
+@startuml
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 60
+skinparam sequenceParticipant underline
+
+actor User
+participant "First Class" as A
+participant "Second Class" as B
+participant "Last Class" as C
+
+User -> A: DoWork
+A -> B: Create Request
+B -> C: DoWork
+C --> B: WorkDone
+B --> A: Request Created
+A --> User: Done
+
+@enduml

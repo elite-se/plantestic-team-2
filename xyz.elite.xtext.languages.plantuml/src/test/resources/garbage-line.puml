@@ -1,0 +1,6 @@
+SEQUENCE @startuml
+
+Alice -> Bob : Hi ich bin die Alice
+asdf
+
+@enduml

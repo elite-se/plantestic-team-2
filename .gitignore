@@ -1,3 +1,6 @@
+# Plantestic
+core/plantestic-test
+
 #################
 # Java / Kotlin #
 #################
@@ -192,3 +195,39 @@ local.properties
 .scala_dependencies
 .worksheet
 
+# Xtext / Xtend
+generated/
+src-gen/
+xtend-gen/
+xtext-gen/
+
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+bin/
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+# Gradle
+.gradle/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# ANTLR Tooling
+xyz.elite.xtext.languages.plantuml/src/main/gen/
+
+eclipse-repo
+
+#########################
+# Javascript & Webshite #
+#########################
+node_modules

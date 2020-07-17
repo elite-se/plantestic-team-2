@@ -1,13 +1,13 @@
 SEQUENCE @startuml
 
-PARTICIPANT Tester
 PARTICIPANT CCCMock
 PARTICIPANT XCS
+PARTICIPANT Tester
 PARTICIPANT SVDS
 
-Tester -> SVDS : GET "svds/vehicle/internal/v2/${vin}"
+CCCMock -> SVDS : GET "svds/vehicle/internal/v2/${vin}"
 activate SVDS
-SVDS --> Tester : 200 - (marketRegion : "1")
+SVDS --> CCCMock : 200 - (marketRegion : "1")
 deactivate SVDS
 
 Tester -> XCS : GET "xcs/vin/v1/${vin}"
@@ -20,5 +20,9 @@ activate CCCMock
 CCCMock --> Tester : 200 - (eventData : "1")
 deactivate CCCMock
 
+XCS -> SVDS : GET "test"
+activate XCS
+SVDS --> XCS : 200
+deactivate XCS
 
 @enduml

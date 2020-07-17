@@ -1,0 +1,27 @@
+SEQUENCE @startuml
+
+Alice -> Bob
+Bob --> Alice
+Alice <-> Bob
+Bob <-> Alice
+Bob ->o Alice
+Alice ->x Alice
+Alice o<->x Bob
+
+Alice -> Bob
+Alice o-> Bob
+Alice o->o Bob
+Alice x-> Bob
+
+Alice <- Bob
+Alice x<- Bob
+
+Bob -> Peter
+Bob ->o Peter
+Bob o->o Peter
+Bob ->x Peter
+
+Bob <- Peter
+Bob x<- Peter
+
+@enduml

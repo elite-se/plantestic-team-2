@@ -1,0 +1,28 @@
+@startuml
+
+Alice -> Bob : request(GET, "name")
+
+alt weather==sunny
+	Bob -> Alice : response(200 ACCEPTED, { name: "Bob" })
+	
+	CCC -> ECS
+	alt moon==fullmoon
+		ECS <- CCC
+	end group
+else name=="Hans"
+	Bob -> Alice : response(500 DENIED)
+else
+	Bob -> Alice : response(418 I_AM_A_TEAPOT)
+end group
+
+/'
+ if (weather == sunny) {
+	when().get("name").
+	then().statusCode(200);
+ } else if (name == "Hans") {
+	when().get("name")
+	then().statusCode(500);
+ }
+'/
+
+@enduml

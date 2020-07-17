@@ -1,0 +1,11 @@
+plugins {
+    id "org.xtext.xtend" version "2.0.8"
+}
+
+dependencies {
+    implementation project(':xyz.elite.xtext.languages.plantuml')
+    implementation "org.eclipse.xtext:org.eclipse.xtext.ide:${xtextVersion}"
+    implementation "org.eclipse.xtext:org.eclipse.xtext.xbase.ide:${xtextVersion}"
+}
+
+apply from: "$rootDir/gradle/xtext-source-sets.gradle"

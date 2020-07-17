@@ -4,7 +4,7 @@ import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.util.EcoreUtil
-import plantuml.puml.UmlDiagram
+import xyz.elite.xtext.languages.plantuml.plantUML.Model
 
 object PumlParser {
 
@@ -13,8 +13,8 @@ object PumlParser {
      * @param inputUri URI of resource to be parsed as String
      * @return Root model object
      */
-    fun parse(inputUri: String): UmlDiagram {
-        require(EPackage.Registry.INSTANCE["http://www.eclipse.plantuml/Puml"] != null) {
+    fun parse(inputUri: String): Model {
+        require(EPackage.Registry.INSTANCE["http://www.elite.xyz/xtext/languages/plantuml/PlantUML"] != null) {
             "Please run MetaModelSetup.doSetup() first!"
         }
 
@@ -25,7 +25,7 @@ object PumlParser {
         EcoreUtil.resolveAll(resource)
 
         require(resource.contents.size > 0) { "File should contain something meaningful." }
-        require(resource.contents[0] is UmlDiagram) { "File should contain a diagram." }
-        return resource.contents[0] as UmlDiagram
+        require(resource.contents[0] is Model) { "File should contain a diagram." }
+        return resource.contents[0] as Model
     }
 }

@@ -1,0 +1,20 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+}
+
+gradlePlugin {
+    plugins {
+        create("gradle-plantestic-plugin") {
+            id = "de.unia.se.gradle-plantestic-plugin"
+            implementationClass = "de.unia.se.PlantesticPlugin"
+        }
+    }
+}
+
+dependencies {
+    implementation "com.diffplug.gradle:goomph:3.23.0"
+}
+
+apply from: "$rootDir/gradle/maven-publish.gradle"
