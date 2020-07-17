@@ -1,6 +1,4 @@
 # Plantestic
-![plantestic](https://img.shields.io/badge/🌱-plantestic-green.svg)
-[![Build Status](https://travis-ci.com/FionaGuerin/plantestic.svg?token=qCz9ynu1x7xYBT4zA1MS&branch=master)](https://travis-ci.com/FionaGuerin/plantestic/builds)
 
 ## Description
 The test case generator Plantestic produces test cases from a sequence diagram. 
@@ -45,30 +43,65 @@ If the implementation does not fulfill these test cases, the implementation devi
 With our test case generator, developers can quickly uncover inconsistencies, fix them, and save costs.## Demo
 
 ## Features
-Plantestic is universal in that it can run in any IDE. 
-For this, Plantestic uses Gradle.
+**Plantestic is universal in that it can run in any IDE.**
 
-Plantestic is user-friendly: 
+For this, Plantestic uses Gradle. Original Eclipse dependencies are used! 
+
+**Plantestic is user-friendly.**
+
 You set it up by installing Java and downloading Plantestic.
 You generate a test case by filing a sequence diagram and entering one instruction. 
 
-Plantestic has a powerful condition evaluation: 
+**Plantestic has a powerful condition evaluation.**
+
 A sequence diagram can contain alternative or optional interactions that it invokes under a certain condition. 
 Plantestic will evaluate any condition that conforms to JavaScript. 
 For this, it uses a JavaScript engine.  
 
-You can pass parameters to your sequence diagram if you wish to customize its flows.
+**You can pass parameters to your sequence diagram if you wish to customize its flows.**
+
 For example, you no longer need to reveal security-critical information such as passwords in your sequence diagram. 
 Plantestic evaluates the parameters using templating.
 
 ## Installation
-1. Install Java SE Development Kit 8 or higher. 
+1. Install Java SE Development Kit 8. 
 You can find Java SE Development Kit 8 under the website [https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
 2. Clone the Plantestic repository.
-3. Run `./gradlew build`.
+3. Run `./gradlew publish`. This can take a while because the Eclipse repository is cloned.
 
 ## How to use
-### Input requirements
+
+## Usage as Gradle plugin
+
+A Gradle plugin is available in `./gradle-plantestic-plugin`. This plugin is not published to a remote repository currently.
+Therefore you need to install it and its dependencies to your local Maven repository. You can to this by executing:
+
+```console
+$ ./gradlew publish
+```
+
+After that you can copy the `./example` standalone Gradle project. Firstly include the plugin via:
+
+```groovy
+plugins {
+    id 'de.unia.se.gradle-plantestic-plugin' version "0.1"
+}
+```
+
+Now you can configure it and enable it:
+
+```groovy
+plantestic {
+    sourceSet sourceSets.test.resources // Location of the puml files
+}
+```
+
+You can specify where you put your `.puml` files via the `sourceSet` option.
+To run the tests you simply do `./gradlew test` in the root of your project. The first execution can take some time because the P2 Eclipse repository is cloned by the plugin. Consecutive executions take significantly less time.
+
+### Test Specification
+
+#### Sequence Diagram
 The input is a PlantUML sequence diagram. 
 This sequence diagram contains several participants and interactions between the participants. 
 One participiant is the client who calls the test cases. The other participants are services of the implementation. 
@@ -104,98 +137,50 @@ Example: ```(name1 : "/value/value1", name2 : "/value2")```
 
 ![./core/src/test/resources/rerouting.png](./core/src/test/resources/rerouting.png)
 
-### Execution
+#### Configs
+
+Configs can be prepended to PlantUML files:
+
+```puml
+@startconfig
+vin = "987"
+eventid = "123"
+@endconfig
+
+@startconfig
+vin = "120"
+eventid = "20"
+@endconfig
+
+SEQUENCE @startuml
+
+participant CCCMock
+...
+```
+
+For each config a separate test case is generated.
+
+#### Environment variables
+
+All environment variables are accessible in the sequence diagrams via string substitution.
+This means you can add the text `${SECRET_PASSWORD}` in the sequence diagram and export the variable before running the tests via the Gradle plugin:
+
+```
+export SECRET_PASSWORD=1234656
+./gradlew test
+``` 
+
+### Standalone Execution
 1. Create a PlantUML sequence diagram. Note the input requirements above. 
 2. Save the sequence diagram. 
-3. Call the command `./gradlew run --args="--input=<path/to/sequence/diagram/diagram_name.puml>"`.
+3. Call the command `./gradlew run --args="--input=<path/to/sequence/diagram/diagram_name.puml> --output <output_dir>"`.
 
-### Output expectation
 The generated test cases are in `<path/to/sequence/diagram/generatedCode/<diagramName>.java>`.
 
-## Demo
-Take the following test case generation from a minimal sequence diagram as an example:
+## Integrated PlantUML IDE
 
-1. You can find the sequence diagram `minimal_hello.puml` in the Plantestic project under `./core/src/test/resources/minimal_hello.puml`:
-
-![./core/src/test/resources/minimal_hello.png](./core/src/test/resources/minimal_hello.png)
-
-2. In the Plantestic console, call `./gradlew run --args="--input=./core/src/test/resources/minimal_hello.puml"`.
-This will generate test cases for the provided diagram.
-
-3. You will find the test case in the Plantestic project under `./core/build/resources/main/code-generation/generatedCode/minimal_hello_puml.java`:
-
-```
-package com.plantestic.test;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import org.hamcrest.collection.IsIn;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import org.apache.commons.text.StringSubstitutor;
-import com.moandjiezana.toml.Toml;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
-public class Test {
-
-	Map<String, Object> paramsMap = new HashMap();
-	ScriptEngine engine;
-	StringSubstitutor substitutor;
-	private static final boolean IS_WINDOWS = System.getProperty( "os.name" ).contains( "indow" );
-
-	public Test(String configFile) throws Exception {
-		try {
-			String osAppropriatePath = IS_WINDOWS ? configFile.substring(1) : configFile;
-			Path path = Paths.get(osAppropriatePath);
-			String paramsFileContent = new String(Files.readAllBytes(path));
-			paramsMap = unnestTomlMap(new Toml().read(paramsFileContent).toMap());
-			substitutor = new StringSubstitutor(paramsMap);
-			ScriptEngineManager factory = new ScriptEngineManager();
-			engine = factory.getEngineByName("JavaScript");
-		} catch(Exception exception) {
-			System.out.println("An Error occured, possible during reading the TOML config file: " + exception);
-			throw exception;
-		}
-	}
-
-	public void test() throws Exception {
-		try {
-			Response roundtrip1 = RestAssured.given()
-					.auth().basic(substitutor.replace("${B.username}"), substitutor.replace("${B.password}"))
-				.when()
-					.get(substitutor.replace("${B.path}") + substitutor.replace("/hello"))
-				.then()
-					.assertThat()
-					    .statusCode(IsIn.isIn(Arrays.asList(200)));
-		} catch (Exception exception) {
-			System.out.println("An error occured during evaluating the communication with testReceiver: ");
-			exception.printStackTrace();
-			throw exception;
-		}
-	}
-
-	public static Map<String, Object> unnestTomlMap(Map<String, Object> tomlMap) {
-		Map<String, Object> resultMap = new HashMap<>();
-		for (Map.Entry<String, Object> entry : tomlMap.entrySet()){
-			if(entry.getValue() instanceof Map){
-				Map<String, Object> innerMap = (Map<String, Object>) entry.getValue();
-				for (Map.Entry<String, Object> nestedEntry : innerMap.entrySet()){
-					resultMap.put(entry.getKey() + "." + nestedEntry.getKey(), nestedEntry.getValue());
-				}
-			} else {
-				resultMap.put(entry.getKey(), entry.getValue());
-			}
-		}
-		return resultMap;
-	}
-}
-```
+Launch the integrated using `./gradlew jettyRun`. This launches a web-server on port 8080 and allows you to play with the
+PlantUML grammar and render diagrams. **Note that the diagrams are sent to an external server which we do not control!**
 
 ## Limitations
 - When actor A sends actor B a request, Plantestic expects actor B to send actor A a response. 
@@ -205,12 +190,22 @@ public class Test {
 - We only support authenticated requests with username and password.
 
 ## Credits
-### Contributors 
+### Contributors
+
+2019:
 - [Stefan Grafberger](https://github.com/stefan-grafberger) *
 - [Fiona Guerin](https://github.com/FionaGuerin) *
 - [Michelle Martin](https://github.com/MichelleMar) *
 - [Daniela Neupert](https://github.com/danielaneupert) *
 - [Andreas Zimmerer](https://github.com/Jibbow) *
+
+\* contributed equally
+
+2020
+- Dominik
+- Max
+- Elias
+- Alex
 
 \* contributed equally
 
@@ -231,18 +226,3 @@ From the Wiki article [QVTOML/Examples/InvokeInJava](https://wiki.eclipse.org/QV
 
 #### Grammar-based Program Generation Based on Model Finding
 From the paper [Grammar-based Program Generation Based on Model Finding](http://www.informatik.uni-bremen.de/agra/doc/konf/13_idt_program_generation.pdf) we learned about the Eclipse Modeling Framework.
-   
-## License
-Copyright [2019] [Stefan Grafberger, Fiona Guerin, Michelle Martin, Daniela Neupert, Andreas Zimmerer]
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
