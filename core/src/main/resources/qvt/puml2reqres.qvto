@@ -148,13 +148,13 @@ helper generateRoundtrip(roundtripId : Integer, httpRequest : HttpRequest, httpR
 mapping PT_Request::request2httpRequest():HttpRequest {
     httpMethod := self.method;
     url := self.url;
-    httprequestdatum += self.parametermap.params->map param2httpRequestDatum();
+    httprequestdatum := self.parametermap.params->map param2httpRequestDatum();
 }
 
 mapping PT_Response::response2httpResponse(): HttpResponse {
     // TODO: don't mansch together
     httpStatus := self.acceptedcodes->toString();
-    httpresponsedatum += self.parametermap.params->map param2httpResponseDatum();
+    httpresponsedatum := self.parametermap.params->map param2httpResponseDatum();
 }
 
 mapping PT_Parameter::param2httpRequestDatum(): HttpRequestDatum {
