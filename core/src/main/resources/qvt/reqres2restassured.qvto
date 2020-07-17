@@ -70,9 +70,9 @@ mapping HttpResponse::httpresponse2responseSpecification(): ResponseSpecificatio
          };
      };
 
-     var bodyMatcherGroup : BodyMatcherGroup;
+     var bodyMatcherGroup = object BodyMatcherGroup {};
      self.httpresponsedatum->forEach(httpresponsedatum) {
-        var bodyMatcher : BodyMatcher;
+        var bodyMatcher = object BodyMatcher {};
         bodyMatcher.matcher := object HasXPath {
                                 xPath := httpresponsedatum.xPath;
                               };

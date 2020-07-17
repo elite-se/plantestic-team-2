@@ -138,7 +138,7 @@ helper SQ_Message::isResponse(): Boolean {
 }
 
 helper generateRoundtrip(roundtripId : Integer, httpRequest : HttpRequest, httpResponse : HttpResponse): Roundtrip {
-    var roundtripElement : Roundtrip;
+    var roundtripElement : Roundtrip = object Roundtrip {};
     roundtripElement.roundtripName := "roundtrip" + roundtripId.toString();
     roundtripElement.httprequest := httpRequest;
     roundtripElement.httpresponse := httpResponse;
