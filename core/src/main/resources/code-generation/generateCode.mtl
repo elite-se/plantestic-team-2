@@ -140,6 +140,7 @@ paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value/]");
 
 [template private generateGivenPart(requestSpecification : RequestSpecification) post(trim())]
 .auth().basic(subst("${[requestSpecification.receiver/].username}"), subst("${[requestSpecification.receiver/].password}"))
+.filter(swaggerParamsMap.get("[requestSpecification.receiver/]"))
 	[if (requestSpecification.requestdatum->notEmpty())]
 		[for (requestDatum : RequestDatum | requestSpecification.requestdatum)]
 .param("[requestDatum.variableName/]", subst("${[requestDatum.variableName/]}"))
