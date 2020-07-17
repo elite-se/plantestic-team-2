@@ -179,8 +179,9 @@ The generated test cases are in `<path/to/sequence/diagram/generatedCode/<diagra
 
 ## Integrated PlantUML IDE
 
-Launch the integrated using `./gradlew jettyRun`. This launches a web-server on port 8080 and allows you to play with the
-PlantUML grammar and render diagrams. **Note that the diagrams are sent to an external server which we do not control!**
+First start the local PlantUml renderer: `cd xyz.elite.xtext.languages.plantuml.server && yarn && yarn serve`.
+Now Launch the integrated using `./gradlew jettyRun`. This launches a web-server on port 8080 and allows you to play with the
+PlantUML grammar and render diagrams.
 
 ## Used PlantUML Grammar
 
