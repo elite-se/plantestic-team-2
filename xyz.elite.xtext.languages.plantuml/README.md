@@ -1,5 +1,3 @@
-![Tests](https://github.com/elite-se/elite-se.xtext.languages.plantuml/workflows/test/badge.svg)
-
 # Purpose
 
 This project aims to build a Xtext definition of the PlantUML sequence diagram
@@ -19,8 +17,6 @@ Currently, this grammar has the following limitations:
 ## Setup
 
 ```
-$ git clone <repo>
-$ cd <repo>
 $ ./gradlew jettyRun
 ```
 

@@ -40,7 +40,7 @@ Our test case generator detects deviations at an early stage:
 The test case generator derives test cases directly from the specification. 
 If the implementation fulfills these test cases, then the implementation fulfills the specification. 
 If the implementation does not fulfill these test cases, the implementation deviates from the specification. 
-With our test case generator, developers can quickly uncover inconsistencies, fix them, and save costs.## Demo
+With our test case generator, developers can quickly uncover inconsistencies, fix them, and save costs.
 
 ## Features
 **Plantestic is universal in that it can run in any IDE.**
@@ -181,6 +181,16 @@ The generated test cases are in `<path/to/sequence/diagram/generatedCode/<diagra
 
 Launch the integrated using `./gradlew jettyRun`. This launches a web-server on port 8080 and allows you to play with the
 PlantUML grammar and render diagrams. **Note that the diagrams are sent to an external server which we do not control!**
+
+## Used PlantUML Grammar
+
+We created a new Grammar for PlantUML from scratch. The subproject is split into three parts:
+
+* xyz.elite.xtext.languages.plantuml - Grammar and generators
+* xyz.elite.xtext.languages.plantuml.ide - Currently unused IDE
+* xyz.elite.xtext.languages.plantuml - Web IDE with live preview
+
+The grammer supports all of the official PlantUml syntax.
 
 ## Limitations
 - When actor A sends actor B a request, Plantestic expects actor B to send actor A a response. 
