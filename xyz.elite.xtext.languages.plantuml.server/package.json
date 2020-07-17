@@ -8,9 +8,10 @@
   "private": true,
   "dependencies": {
     "express": "^4.17.1",
-    "node-plantuml": "^0.9.0"
+    "node-plantuml": "^0.9.0",
+    "replacestream": "^4.0.3"
   },
-	"scripts": {
-		"serve": "node src/index.js"
-	}
+  "scripts": {
+    "serve": "node src/index.js"
+  }
 }
