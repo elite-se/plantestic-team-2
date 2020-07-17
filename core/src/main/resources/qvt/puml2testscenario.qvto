@@ -33,75 +33,9 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
     var elements := self.elements->flatten_SQ_SequenceElements()->asList();
     log("Elements: " + elements->size().toString());
     
-    var elemIndex := 0;
-    while (elemIndex <= elements->size()) {
-    	elemIndex := elemIndex + 1;
-    	var elem := elements->at(elemIndex);
-    	
-    	if (elem.oclIsTypeOf(SQ_Message)) {
-    		var msg := elem.oclAsType(SQ_Message);
-    		
-    		if (msg.isResponse()) {
-				// Find matching request for this response
-				var preceeding := elements->subSequence(1, elemIndex);
-				var reqT := findRequest(msg, preceeding);
-				
-				// No match found
-				if (reqT.oclIsUndefined()) {
-					log ("Could not find matching request for response: " + msg.toString());
-					elements->removeAt(elemIndex);
-					elemIndex := elemIndex - 1;
-				} else {
-					var request := reqT.requestMsg.map message2request();
-					var response := msg.map message2response();
-					structure += generateRoundtrip(roundtripCounter, request, response);
-					roundtripCounter := roundtripCounter + 1;
-					
-					// Order is important as remove invalidates indices!
-					elements->removeAt(elemIndex);
-					elements->removeAt(reqT.index);
-				}
-    		}
-    	} elif (elem.oclIsTypeOf(SQ_Group)) {
-//    		if (msg.isResponse()) {
-				// Find request for this response
-				// and move into group scope!
-//    		}
-    	}
-    };
-    
-    
-    var elements : Sequence(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements()->asList();
-    log("Elements: " + elements->size().toString());
-    var messages : Sequence(SQ_Message) := Sequence{};
+	structure := elements->structures(1,0).structure;
 
-    elements->forEach(elem) {
-        if (elem.oclIsTypeOf(SQ_Message)) {
-            messages += elem.oclAsType(SQ_Message);
-        };
-    };
-    log("Messages: " + messages->size().toString());
-
-    var msgIndex : Integer := 1;
-    while (msgIndex <= messages->size()) {
-        var msg : SQ_Message := messages->at(msgIndex);
-
-        if (msg.isRequest()) {
-            var followingMsgs : Sequence(SQ_Message) := messages->subSequence(msgIndex + 1, messages->size());
-            var responseMsg : SQ_Message := findResponse(msg, followingMsgs);
-            if (not responseMsg.oclIsUndefined()) {
-                var request : RequestSpecification := msg.map message2request();
-                var response : ResponseSpecification := responseMsg.map response2response();
-                structure += generateRoundtrip(roundtripCounter, request, response, "");
-                roundtripCounter := roundtripCounter + 1;
-            } else {
-                log("Ignoring request " + msgIndex.toString() + " that has no corresponding response");
-            };
-        };
-
-        msgIndex := msgIndex + 1;
-    };
-    log("Roundtrips: " + structure->size().toString());
+    log("Discovered " + structure->size().toString() + " structures");
 }
 
 helper findRequest(response: SQ_Message, preceedingElements: Sequence(SQ_SequenceElement)) : Tuple(index: Integer, requestMsg: SQ_Message) {
@@ -141,7 +75,7 @@ helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(): OrderedSet
 
 mapping SQ_Group::flatten_SQ_Group(): SQ_Group {
     elements += self.elements->flatten_SQ_SequenceElements();
-    alternatives += self.alternatives->at(1).oclAsType(SQ_GroupAlternative).map flatten_SQ_GroupAlternative();
+    alternatives += self.alternatives->oclAsType(SQ_GroupAlternative).map flatten_SQ_GroupAlternative();
     label := self.label;
 }
 
@@ -234,4 +168,108 @@ mapping PT_Parameter::param2requestDatum(): RequestDatum {
 mapping PT_Parameter::param2responseDatum(): ResponseDatum {
     variableName := self.name;
     xPath := self.value;
+}
+
+helper SQ_Group::toAlternative(roundtripIdStart: Integer, preceeding: List(SQ_SequenceElement)): Tuple(structure: Alternative, roundtripCnt: Integer, newPreceeding: List(SQ_SequenceElement)) {
+	var alternative := object Alternative {};
+	var roundtripCnt := roundtripIdStart;
+	var elems := object List(SQ_SequenceElement) {};
+	preceeding->forEach(e) { elems->add(e); };
+	self.elements->forEach(e) { elems->add(e); };
+	
+	var res := elems->structures(roundtripCnt+1, preceeding->size()+1);
+
+	var newPreceeding := object List(SQ_SequenceElement) {};
+	res.elements->forEach(e) {
+		if (preceeding->includes(e)) {
+			newPreceeding += e;
+		};
+	};
+	roundtripCnt := res.roundtripCnt;
+
+	alternative.condition := self.label;
+	alternative.provided := res.structure->asOrderedSet();
+	
+	if (self.alternatives->size() > 0) {
+		var alt1 := self.alternatives->at(1);
+		var othr := object SQ_Group {
+			keyword := self.keyword;
+			label := alt1.label;
+			alternatives := self.alternatives->subOrderedSet(2, self.alternatives->size());
+			elements := alt1.elements;
+		};
+		
+		var res2 := othr.toAlternative(roundtripCnt, newPreceeding);
+		alternative.otherwise := res2.structure;
+		
+		newPreceeding := object List(SQ_SequenceElement) {};
+		res2.newPreceeding->forEach(e) {
+			if (preceeding->includes(e)) {
+				newPreceeding += e;
+			}
+		};
+		roundtripCnt := res2.roundtripCnt;
+	};
+	
+	return Tuple { structure = alternative, roundtripCnt = roundtripCnt, newPreceeding = newPreceeding };
+}
+
+helper List(SQ_SequenceElement)::structures(roundtripIdStart: Integer, elemStartInd: Integer): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), roundtripCnt: Integer) {
+	var structures := object List(Structure) {};
+	var roundtripCnt := roundtripIdStart;
+	var elements := self;
+	
+	var elemInd := elemStartInd;
+	while (elemInd <= elements->size()) {
+		assert fatal (elemInd >= 0)
+			with log('INTERNAL: logic tried accessing index < 0');
+	
+		elemInd := elemInd + 1;
+		var elem := elements->at(elemInd);
+		var prec := self->subSequence(1, elemInd);
+		
+		if (elem.oclIsTypeOf(SQ_Message)) {
+    		var msg := elem.oclAsType(SQ_Message);
+    		
+    		if (msg.isResponse()) {
+				var reqT := findRequest(msg, prec);
+				
+				// No match found
+				if (reqT.oclIsUndefined()) {
+					log ("Could not find matching request for response: " + msg.toString());
+					elements->removeAt(elemInd);
+					elemInd := elemInd - 1;
+				} else {
+					var request := reqT.requestMsg.map message2request();
+					var response := msg.map message2response();
+					structures += generateRoundtrip(roundtripCnt, request, response);
+					roundtripCnt := roundtripCnt + 1;
+					
+					// Order is important as remove invalidates indices!
+					elements->removeAt(elemInd);
+					elements->removeAt(reqT.index);
+				}
+    		}
+    	} elif (elem.oclIsTypeOf(SQ_Group)) {
+    		var res := elem.oclAsType(SQ_Group).toAlternative(roundtripCnt, prec);
+    		structures += res.structure;
+    		roundtripCnt := res.roundtripCnt + 1;
+    		
+    		var elems := object List(SQ_SequenceElement) {};
+    		res.newPreceeding->forEach(e) {
+    			if (prec->includes(e)) {
+    				elems += e;
+    			}
+    		};
+    		elements->forEach(e) {
+    			if (not prec->includes(e)) {
+    				elems +=e;
+    			}
+    		};
+    		elemInd := elements->size() - elems->size();
+			elements := elems;
+    	}
+	};
+	
+	return null;
 }
