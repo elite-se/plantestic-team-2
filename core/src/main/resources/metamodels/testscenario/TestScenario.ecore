@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="TestScenario" nsURI="http://elite-se.xyz/TestScenario" nsPrefix="TestScenario">
-  <eClassifiers xsi:type="ecore:EClass" name="TestRoundtrip" instanceTypeName="TestRoundtrip">
+  <eClassifiers xsi:type="ecore:EClass" name="TestRoundtrip" instanceTypeName="TestRoundtrip"
+      eSuperTypes="#//Structure">
     <eStructuralFeatures xsi:type="ecore:EReference" name="requestspecification" lowerBound="1"
         eType="#//RequestSpecification" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="responsespecification"
@@ -39,12 +40,12 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TestScenario" instanceClassName="TestScenario">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="testroundtrip" lowerBound="1"
-        upperBound="-1" eType="#//TestRoundtrip" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="testScenarioName" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="configs" upperBound="-1"
         eType="#//Config" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="structure" upperBound="-1"
+        eType="#//Structure" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="HasXPath" eSuperTypes="#//Matcher">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="xPath" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -70,5 +71,12 @@
   <eClassifiers xsi:type="ecore:EClass" name="ConfigEntry" instanceTypeName="ConfigEntry">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Structure" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Alternative" eSuperTypes="#//Structure">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="if" upperBound="-1" eType="#//Structure"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="otherwise" eType="#//Structure"
+        containment="true"/>
   </eClassifiers>
 </ecore:EPackage>

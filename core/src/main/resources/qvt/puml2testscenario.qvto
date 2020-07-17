@@ -29,7 +29,9 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
     testScenarioName := diagramName + "_puml";
     configs := configs_;
     var roundtripCounter : Integer := 1;
-
+    
+//    var elements := self.elements->flatten_SQ_SequenceElements();
+    
     var elements : Sequence(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements()->asList();
     log("Elements: " + elements->size().toString());
     var messages : Sequence(SQ_Message) := Sequence{};
