@@ -30,7 +30,46 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
     configs := configs_;
     var roundtripCounter : Integer := 1;
     
-//    var elements := self.elements->flatten_SQ_SequenceElements();
+    var elements := self.elements->flatten_SQ_SequenceElements()->asList();
+    log("Elements: " + elements->size().toString());
+    
+    var elemIndex := 0;
+    while (elemIndex <= elements->size()) {
+    	elemIndex := elemIndex + 1;
+    	var elem := elements->at(elemIndex);
+    	
+    	if (elem.oclIsTypeOf(SQ_Message)) {
+    		var msg := elem.oclAsType(SQ_Message);
+    		
+    		if (msg.isResponse()) {
+				// Find matching request for this response
+				var preceeding := elements->subSequence(1, elemIndex);
+				var reqT := findRequest(msg, preceeding);
+				
+				// No match found
+				if (reqT.oclIsUndefined()) {
+					log ("Could not find matching request for response: " + msg.toString());
+					elements->removeAt(elemIndex);
+					elemIndex := elemIndex - 1;
+				} else {
+					var request := reqT.requestMsg.map message2request();
+					var response := msg.map message2response();
+					structure += generateRoundtrip(roundtripCounter, request, response);
+					roundtripCounter := roundtripCounter + 1;
+					
+					// Order is important as remove invalidates indices!
+					elements->removeAt(elemIndex);
+					elements->removeAt(reqT.index);
+				}
+    		}
+    	} elif (elem.oclIsTypeOf(SQ_Group)) {
+//    		if (msg.isResponse()) {
+				// Find request for this response
+				// and move into group scope!
+//    		}
+    	}
+    };
+    
     
     var elements : Sequence(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements()->asList();
     log("Elements: " + elements->size().toString());
@@ -52,8 +91,8 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
             var responseMsg : SQ_Message := findResponse(msg, followingMsgs);
             if (not responseMsg.oclIsUndefined()) {
                 var request : RequestSpecification := msg.map message2request();
-                var response : ResponseSpecification := responseMsg.payload.response.map response2response();
-                testroundtrip += generateRoundtrip(roundtripCounter, request, response, "");
+                var response : ResponseSpecification := responseMsg.map response2response();
+                structure += generateRoundtrip(roundtripCounter, request, response, "");
                 roundtripCounter := roundtripCounter + 1;
             } else {
                 log("Ignoring request " + msgIndex.toString() + " that has no corresponding response");
@@ -62,19 +101,25 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
 
         msgIndex := msgIndex + 1;
     };
-    log("Roundtrips: " + testroundtrip->size().toString());
+    log("Roundtrips: " + structure->size().toString());
 }
 
-helper findResponse(request : SQ_Message, followingMsgs : Sequence(SQ_Message)) : SQ_Message {
-    followingMsgs->forEach(potentialResponse) {
-        if (potentialResponse.isResponse() and
-                potentialResponse.sender().name = request.receiver().name and
-                potentialResponse.receiver().name = request.sender().name
-           ) {
-                return potentialResponse;
-        };
-    };
-    return null;
+helper findRequest(response: SQ_Message, preceedingElements: Sequence(SQ_SequenceElement)) : Tuple(index: Integer, requestMsg: SQ_Message) {
+	var potInd := 0;
+	var preceedingRev := preceedingElements->reverse();
+	while (potInd <= preceedingRev->size()) {
+		potInd := potInd + 1;
+		if (preceedingRev->at(potInd).oclIsTypeOf(SQ_Message)) {
+			var msg = preceedingRev->at(potInd).oclAsType(SQ_Message);
+			if (msg.isRequest() 
+				and msg.sender().name = response.receiver().name
+				and msg.receiver().name = response.sender().name) {
+				return Tuple{index = potInd, requestMsg = msg};
+			}
+		}	
+	};
+	
+	return null;
 }
 
 helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(): OrderedSet(SQ_SequenceElement) {
@@ -139,12 +184,11 @@ helper SQ_Message::isResponse(): Boolean {
     return not self.payload.response.oclIsUndefined();
 }
 
-helper generateRoundtrip(roundtripId : Integer, request : RequestSpecification, response : ResponseSpecification, precond : String): TestRoundtrip {
+helper generateRoundtrip(roundtripId : Integer, request : RequestSpecification, response : ResponseSpecification): TestRoundtrip {
 	return object TestRoundtrip {
 		testRoundtripName := "roundtrip" + roundtripId.toString();
 		requestspecification := request;
 		responsespecification := response;
-		precondition := precond;
 	};
 }
 
@@ -159,24 +203,27 @@ mapping SQ_Message::message2request(): RequestSpecification {
 	requestdatum := self.payload.request.parametermap.params->map param2requestDatum();
 }
 
-mapping PT_Response::response2response(): ResponseSpecification {
-	 responsedatum := self.parametermap.params->map param2responseDatum();
+mapping SQ_Message::message2response(): ResponseSpecification {
+	assert fatal (not self.payload.response.oclIsUndefined())
+		with log('Message should have contained a response');
+		
+	responsedatum := self.payload.response.parametermap.params->map param2responseDatum();
 
-     if(self.acceptedcodes->notEmpty()) {
-         statusmatcher := object IsIn {
-            value := self.acceptedcodes.code.toString();
-         };
-     };
+    if(self.payload.response.acceptedcodes->notEmpty()) {
+        statusmatcher := object IsIn {
+           value := self.payload.response.acceptedcodes.code.toString();
+        };
+    };
 
-     var bodyMatcherGroup = object BodyMatcherGroup {};
-     responsedatum->forEach(rd) {
-        var bodyMatcher = object BodyMatcher {};
-        bodyMatcher.matcher := object HasXPath {
+    var bodyMatcherGroup = object BodyMatcherGroup {};
+    responsedatum->forEach(rd) {
+    	var bodyMatcher = object BodyMatcher {};
+       	bodyMatcher.matcher := object HasXPath {
 			xPath := rd.xPath;
-		  };
-        bodyMatcherGroup.bodymatcher += bodyMatcher;
-     };
-     bodymatchergroup := bodyMatcherGroup;
+	  	};
+       	bodyMatcherGroup.bodymatcher += bodyMatcher;
+    };
+    bodymatchergroup := bodyMatcherGroup;
 }
 
 mapping PT_Parameter::param2requestDatum(): RequestDatum {
