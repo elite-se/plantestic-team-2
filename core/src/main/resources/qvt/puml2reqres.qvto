@@ -1,9 +1,9 @@
 modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
 modeltype reqres "strict" uses RequestResponsePairs('http://www.example.org/RequestResponsePairs');
 
-configuration property diagramName : String;
-
 transformation puml2reqres(in input: plantUML, out output: reqres);
+
+configuration property diagramName : String;
 
 main() {
     log('Started transforming PlantUML to RequestResponse pairs');
@@ -49,8 +49,8 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): Scenario {
             var followingMsgs : Sequence(SQ_Message) := messages->subSequence(msgIndex + 1, messages->size());
             var responseMsg : SQ_Message := findResponse(msg, followingMsgs);
             if (not responseMsg.oclIsUndefined()) {
-                var httpRequest : HttpRequest := msg.payload.request.request2httpRequest();
-                var httpResponse : HttpResponse := responseMsg.payload.response.response2httpResponse();
+                var httpRequest : HttpRequest := msg.payload.request.map request2httpRequest();
+                var httpResponse : HttpResponse := responseMsg.payload.response.map response2httpResponse();
                 roundtrip += generateRoundtrip(roundtripCounter, httpRequest, httpResponse);
                 roundtripCounter := roundtripCounter + 1;
             } else {
@@ -72,6 +72,7 @@ helper findResponse(request : SQ_Message, followingMsgs : Sequence(SQ_Message)) 
                 return potentialResponse;
         };
     };
+    return null;
 }
 
 helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(): OrderedSet(SQ_SequenceElement) {
@@ -116,6 +117,7 @@ helper SQ_Message::receiver(): SQ_Participant {
     } else if (self.arrow.isL2R()) {
         return self.participantRight;
     };
+    return null;
 }
 
 helper SQ_Message::sender(): SQ_Participant {
@@ -124,6 +126,7 @@ helper SQ_Message::sender(): SQ_Participant {
     } else if (self.arrow.isL2R()) {
         return self.participantLeft;
     };
+    return null;
 }
 
 helper SQ_Message::isRequest(): Boolean {
@@ -135,7 +138,7 @@ helper SQ_Message::isResponse(): Boolean {
 }
 
 helper generateRoundtrip(roundtripId : Integer, httpRequest : HttpRequest, httpResponse : HttpResponse): Roundtrip {
-    var roundtripElement : Roundtrip := new Roundtrip();
+    var roundtripElement : Roundtrip;
     roundtripElement.roundtripName := "roundtrip" + roundtripId.toString();
     roundtripElement.httprequest := httpRequest;
     roundtripElement.httpresponse := httpResponse;
