@@ -1,54 +1,9 @@
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-        google()
-    }
-}
-
 plugins {
-    id 'java'
     id 'de.unia.se.gradle-plantestic-plugin' version "0.1"
 }
 
-sourceSets {
-    plantestic {
-        resources {
-            srcDirs "src/test/resources"
-        }
-    }
-
-    test {
-        java {
-            srcDirs = ["build/generated-src/plantestic"]  // Note @Peter's comment below
-        }
-    }
-}
-
-test {
-    useJUnitPlatform()
-}
-
 plantestic {
-    sourceSet sourceSets.test
-}
-
-test.dependsOn(generate)
-
-dependencies {
-    testImplementation "io.rest-assured:rest-assured:3.0.0"
-    testImplementation "org.apache.commons:commons-text:1.7"
-    testImplementation "com.moandjiezana.toml:toml4j:0.7.2"
-    testImplementation "io.rest-assured:rest-assured:3.0.0"
-    testImplementation "javax.xml.bind:jaxb-api:2.3.1"
-    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.3.1"
-}
-
-repositories {
-    jcenter()
-    google()
-    mavenCentral()
-    mavenLocal()
+    sourceSet sourceSets.test.resources // Location of the puml files
 }
 
 group = "de.unia.se"

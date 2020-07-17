@@ -7,7 +7,6 @@ plugins {
     id "eclipse"
     id 'maven-publish'
 }
-
 mainClassName = "de.unia.se.plantestic.Main"
 
 jar {
@@ -17,9 +16,14 @@ jar {
 }
 
 repositories {
-    // Most qvt-related packages are hosted on WSO2:
-    maven { url "https://maven.wso2.org/nexus/content/groups/wso2-public/" }
-    maven { url "https://repo.eclipse.org/content/groups/releases/" }
+    maven {
+        url rootProject.file('eclipse-repo/maven')
+        metadataSources {
+            mavenPom() // https://github.com/diffplug/goomph/commit/6271361598ef7c1d1fd4a45053fad46645554fb0
+            artifact() // https://github.com/diffplug/goomph/issues/106
+        }
+    }
+    mavenCentral()
 }
 
 test {
@@ -29,35 +33,47 @@ test {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    implementation "com.google.guava:guava:28.0-jre"
     implementation "com.github.ajalt:clikt:2.2.0"
 
-    // Making qvt work without Eclipse
-    implementation "org.eclipse.emf:org.eclipse.emf.common:2.19.0"
-    implementation "org.eclipse.emf:org.eclipse.emf.ecore:2.22.0"
-    implementation "org.eclipse.emf:org.eclipse.emf.ecore.xmi:2.16.0"
-    implementation "org.eclipse:org.eclipse.m2m.qvt.oml:3.4.1.v20150201-1444"
-    implementation "org.eclipse:org.eclipse.m2m.qvt.oml.common:3.4.0.v20140306-0649"
-    implementation "org.eclipse:org.eclipse.m2m.qvt.oml.cst.parser:3.4.0.v20140429-1120"
-    implementation "org.eclipse:org.eclipse.m2m.qvt.oml.ecore.imperativeocl:3.3.0.v20140317-1132"
-    implementation "org.eclipse:org.eclipse.m2m.qvt.oml.emf.util:3.4.0.v20140306-0718"
-    implementation "org.eclipse.ocl:org.eclipse.ocl:3.4.2.v20140725-2242"
-    implementation "org.eclipse.ocl:org.eclipse.ocl.common:1.2.0.v20140610-0641"
-    implementation "org.eclipse.ocl:org.eclipse.ocl.ecore:3.3.100.v20140610-0641"
-    implementation "org.eclipse.uml2:org.eclipse.uml2.common:2.0.1.v20140910-1354"
-    implementation "org.eclipse.uml2:org.eclipse.uml2.types:2.0.0.v20140910-1354"
-    implementation "org.eclipse.uml2:org.eclipse.uml2.uml:5.0.1.v20140910-1354"
-    implementation "lpg.runtime:lpg.runtime.java:2.0.17.v201004271640"
-
-    // Making Acceleo work without Eclipse
-    implementation "org.eclipse.acceleo:org.eclipse.acceleo.engine:3.5.1.201409021433"
-    implementation "org.eclipse.acceleo:org.eclipse.acceleo.parser:3.5.1.201409021433"
-    implementation "org.eclipse.acceleo:org.eclipse.acceleo.common:3.5.1.201409021433"
-    implementation "org.eclipse.acceleo:org.eclipse.acceleo.model:3.5.1.201409021433"
-    implementation "org.eclipse.platform:org.eclipse.core.runtime:3.15.200"
-    implementation "org.apache.ant:ant:1.8.2"
-
     implementation project(":xyz.elite.xtext.languages.plantuml")
+
+    // emf
+    implementation "eclipse-p2:org.eclipse.emf.common:+"
+    implementation "eclipse-p2:org.eclipse.emf.ecore:+"
+    implementation "eclipse-p2:org.eclipse.emf.ecore.xmi:+"
+
+    // qvt
+    implementation "eclipse-p2:org.eclipse.m2m.qvt.oml:+"
+    implementation "eclipse-p2:org.eclipse.m2m.qvt.oml.common:+"
+    implementation "eclipse-p2:org.eclipse.m2m.qvt.oml.cst.parser:+"
+    implementation "eclipse-p2:org.eclipse.m2m.qvt.oml.ecore.imperativeocl:+"
+    implementation "eclipse-p2:org.eclipse.m2m.qvt.oml.emf.util:+"
+
+    // ocl
+    implementation "eclipse-p2:org.eclipse.ocl:+"
+    implementation "eclipse-p2:org.eclipse.ocl.common:+"
+    implementation "eclipse-p2:org.eclipse.ocl.ecore:+"
+
+    // uml2
+    implementation "eclipse-p2:org.eclipse.uml2.common:+"
+    implementation "eclipse-p2:org.eclipse.uml2.types:+"
+    implementation "eclipse-p2:org.eclipse.uml2.uml:+"
+
+    // acceleo
+    implementation "eclipse-p2:org.eclipse.acceleo.engine:+"
+    implementation "eclipse-p2:org.eclipse.acceleo.parser:+"
+    implementation "eclipse-p2:org.eclipse.acceleo.common:+"
+    implementation "eclipse-p2:org.eclipse.acceleo.model:+"
+
+    // runtime
+    implementation "eclipse-p2:org.eclipse.core.runtime:+"
+    implementation "eclipse-p2:org.eclipse.core.contenttype:+"
+    implementation "eclipse-p2:org.eclipse.equinox.common:+" // fixes: https://github.com/eclipse/xtext/issues/1231
+    implementation "eclipse-p2:org.eclipse.equinox.registry:+"
+
+    // very legacy dependency, missing runtime depenencies
+    runtimeOnly group: 'lpg.runtime', name: 'java', version: '2.0.17-v201004271640'
+    runtimeOnly group: 'org.osgi', name: 'org.osgi.service.prefs', version: '1.1.1'
 
     testImplementation "io.kotlintest:kotlintest-runner-junit5:3.1.7"
     testImplementation "io.mockk:mockk:1.8.9"
@@ -68,7 +84,6 @@ dependencies {
 
     // Needed for running the dynamically compiled test code (runtime dependencies)
     testRuntimeOnly "org.apache.commons:commons-text:1.7"
-    testRuntimeOnly "com.moandjiezana.toml:toml4j:0.7.2"
     testRuntimeOnly "io.rest-assured:rest-assured:3.0.0"
     testRuntimeOnly "javax.xml.bind:jaxb-api:2.3.1"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"

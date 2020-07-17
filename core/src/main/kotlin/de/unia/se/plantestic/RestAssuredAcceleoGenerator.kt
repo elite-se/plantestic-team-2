@@ -1,14 +1,11 @@
-package de.unia.se.plantestic
+package de.unia.se.plantestic;
 
-import com.google.common.io.Resources
 import org.eclipse.acceleo.engine.service.AbstractAcceleoGenerator
-import org.eclipse.acceleo.parser.compiler.AcceleoCompiler
 import org.eclipse.emf.common.util.Monitor
 import org.eclipse.emf.ecore.EObject
 import java.io.File
 import java.io.IOException
 import java.net.URL
-import java.nio.file.Paths
 
 class RestAssuredAcceleoGenerator : AbstractAcceleoGenerator() {
 
@@ -28,7 +25,7 @@ class RestAssuredAcceleoGenerator : AbstractAcceleoGenerator() {
 
         acceleoCompiler.setSourceFolder(tempDir!!.absolutePath)
         acceleoCompiler.setOutputFolder(tempDir!!.absolutePath)  // path where the .emtl file is put
-        acceleoCompiler.setBinaryResource(false)
+        acceleoCompiler.binaryResource = false
         acceleoCompiler.execute()
 
         super.initialize(model, targetFolder, arguments)

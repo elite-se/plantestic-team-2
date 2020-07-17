@@ -1,20 +1,13 @@
 package de.unia.se
 
-import org.gradle.api.Action
+import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSet
 
 open class PlantesticExtension(val whenConfigAdded: (PlantesticExtension) -> SourceSet) {
 
-//    public var sourceSet: SourceSet? = null
-//
-//    open fun sourceSet(action: Action<in SourceSet?>) {
-//        action.execute(sourceSet)
-//        whenConfigAdded(this)
-//    }
+    var sourceSet: SourceDirectorySet? = null
 
-    public var sourceSet: SourceSet? = null
-
-    open fun sourceSet(sourceSet : SourceSet) {
+    open fun sourceSet(sourceSet : SourceDirectorySet) {
         this.sourceSet = sourceSet
         whenConfigAdded(this)
     }
