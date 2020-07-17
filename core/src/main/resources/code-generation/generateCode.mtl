@@ -1,5 +1,5 @@
 [comment encoding = UTF-8 /]
-[module generateCode('http://www.example.org/RestAssured')]
+[module generateCode('http://elite-se.xyz/TestScenario')]
 
 [template public generateTestScenario(testScenario : TestScenario) post(trim())]
 [comment @main /]

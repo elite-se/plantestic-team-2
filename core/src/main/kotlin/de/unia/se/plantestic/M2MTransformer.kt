@@ -15,7 +15,7 @@ import java.io.OutputStreamWriter
 object M2MTransformer {
 
     private val QVT_PUML2TESTSCENARIO_TRANSFORMATION_URI =
-        URI.createURI(Resources.getResource("qvt/puml2reqres.qvto").toExternalForm())
+        URI.createURI(Resources.getResource("qvt/puml2testscenario.qvto").toExternalForm())
 
     /**
      * Transforms a UmlDiagram EObject to a Request Response Pair EObject.

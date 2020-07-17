@@ -10,7 +10,7 @@ object MetaModelSetup {
 
     private val TEST_SCENARIO_METAMODEL_URI =
         URI.createURI(
-            javaClass.classLoader.getResource("metamodels/restassured/RestAssured.ecore").toString(),
+            javaClass.classLoader.getResource("metamodels/testscenario/TestScenario.ecore").toString(),
             true
         )
 

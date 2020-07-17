@@ -1,7 +1,7 @@
 modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
-modeltype restassured "strict" uses RestAssured('http://www.example.org/RestAssured');
+modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
 
-transformation puml2reqres(in input: plantUML, out output: restassured);
+transformation puml2reqres(in input: plantUML, out output: testscenario);
 
 configuration property diagramName : String;
 
