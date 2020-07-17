@@ -101,11 +101,10 @@ object Main {
 
         val pumlDiagramModel = PumlParser.parse(inputFile.absolutePath)
 
-        val requestResponsePairsModel = M2MTransformer.transformPuml2ReqRes(pumlDiagramModel)
-        val restAssuredModel = M2MTransformer.transformReqRes2RestAssured(requestResponsePairsModel)
+		val testScenarioModel = M2MTransformer.transformPuml2TestScenario(pumlDiagramModel)
 
         println("Generating code into $outputFolder")
-        AcceleoCodeGenerator.generateCode(restAssuredModel, outputFolder)
+        AcceleoCodeGenerator.generateCode(testScenarioModel, outputFolder)
     }
 
     @JvmStatic

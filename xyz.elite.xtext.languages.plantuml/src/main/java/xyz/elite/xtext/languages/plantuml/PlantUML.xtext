@@ -119,6 +119,7 @@ SQ_Color:
 
 // -------- AUTONUMBERING --------
 SQ_Autonumber:
+    {SQ_Autonumber} 
     'autonumber' ('stop' | 'resume')? (start=INT | start=INT step=INT)? format=(STRING)?;
 
 // -------- PAGE META/FORMATTING INFORMATION --------
@@ -173,6 +174,7 @@ SQ_Delay:
 
 // -------- SPACE --------
 SQ_Space:
+    {SQ_Space} 
     '|' '|' ('|' | (height=INT '|' '|'));
 
 
@@ -212,7 +214,8 @@ PT_Wait:
     'wait(' time=INT unit=PT_TimeUnit ')';
 
 PT_RequestResponse:
-    PT_Request | PT_Response;
+    ('async[' asyncid=INT ']')?
+    (request=PT_Request | response=PT_Response);
 
 PT_Request:
     'request(' method=PT_RequestMethod ',' url=STRING (',' parametermap=(PT_ParameterMap))? ')';
@@ -227,6 +230,7 @@ PT_ResponseCode:
     code=INT description=(ID)?;
 
 PT_ParameterMap:
+    {PT_ParameterMap} 
     ('{' (params+=PT_Parameter (',' params+=PT_Parameter)*)? '}');
 
 PT_Parameter:

@@ -14,29 +14,17 @@ import java.io.OutputStreamWriter
 
 object M2MTransformer {
 
-    private val QVT_PUML2REQRES_TRANSFORMATION_URI =
-        URI.createURI(Resources.getResource("qvt/puml2reqres.qvto").toExternalForm())
-
-    private val QVT_REQRES2RESTASSURED_TRANSFORMATION_URI =
-        URI.createURI(Resources.getResource("qvt/reqres2restassured.qvto").toExternalForm())
+    private val QVT_PUML2TESTSCENARIO_TRANSFORMATION_URI =
+        URI.createURI(Resources.getResource("qvt/puml2testscenario.qvto").toExternalForm())
 
     /**
      * Transforms a UmlDiagram EObject to a Request Response Pair EObject.
      * @param inputModel The UmlDiagram to transform
      * @return Request Response Pair
      */
-    fun transformPuml2ReqRes(inputModel: EObject): EObject {
+    fun transformPuml2TestScenario(inputModel: EObject): EObject {
         require(inputModel is Model) { "Puml transformation input wasn't a puml object!" }
-        return doQvtoTransformation(inputModel, QVT_PUML2REQRES_TRANSFORMATION_URI)
-    }
-
-    /**
-     * Transforms a Request Response Pair EObject to a Rest Assured EObject.
-     * @param inputModel The Request Response Pair EObject to transform
-     * @returnRest Assured EObject
-     */
-    fun transformReqRes2RestAssured(inputModel: EObject): EObject {
-        return doQvtoTransformation(inputModel, QVT_REQRES2RESTASSURED_TRANSFORMATION_URI)
+        return doQvtoTransformation(inputModel, QVT_PUML2TESTSCENARIO_TRANSFORMATION_URI)
     }
 
     private fun doQvtoTransformation(inputModel: EObject, transformationUri: URI): EObject {

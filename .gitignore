@@ -1,3 +1,6 @@
+# Plantestic
+core/plantestic-test
+
 #################
 # Java / Kotlin #
 #################
@@ -222,6 +225,9 @@ local.properties
 # ANTLR Tooling
 xyz.elite.xtext.languages.plantuml/src/main/gen/
 
-
-
 eclipse-repo
+
+#########################
+# Javascript & Webshite #
+#########################
+node_modules

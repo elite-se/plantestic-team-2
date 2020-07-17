@@ -8,22 +8,16 @@ import java.io.File
 
 object MetaModelSetup {
 
-    private val REQUEST_RESPONSE_PAIRS_METAMODEL_URI =
+    private val TEST_SCENARIO_METAMODEL_URI =
         URI.createURI(
-            javaClass.classLoader.getResource("metamodels/reqrespairs/RequestResponsePairs.ecore").toString(),
-            true
-        )
-    private val REST_ASSURED_METAMODEL_URI =
-        URI.createURI(
-            javaClass.classLoader.getResource("metamodels/restassured/RestAssured.ecore").toString(),
+            javaClass.classLoader.getResource("metamodels/testscenario/TestScenario.ecore").toString(),
             true
         )
 
     fun doSetup() {
         PlantUMLStandaloneSetup.doSetup()
 
-        registerMetamodelFromEcoreFile(REST_ASSURED_METAMODEL_URI)
-        registerMetamodelFromEcoreFile(REQUEST_RESPONSE_PAIRS_METAMODEL_URI)
+        registerMetamodelFromEcoreFile(TEST_SCENARIO_METAMODEL_URI)
     }
 
     private fun registerMetamodelFromEcoreFile(uri: URI) {

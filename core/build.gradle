@@ -37,8 +37,6 @@ dependencies {
 
     implementation project(":xyz.elite.xtext.languages.plantuml")
 
-    // Making qvt work without Eclipse
-
     // emf
     implementation "eclipse-p2:org.eclipse.emf.common:+"
     implementation "eclipse-p2:org.eclipse.emf.ecore:+"

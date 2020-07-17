@@ -1,0 +1,190 @@
+modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
+modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
+
+transformation puml2reqres(in input: plantUML, out output: testscenario);
+
+configuration property diagramName : String;
+
+main() {
+    log('Started transforming PlantUML to RequestResponse pairs');
+
+    assert fatal ( input.objectsOfType(Model).sequence_diagrams[SQ_Diagram]->size() = 1)
+        with log('Input does not contain exactly one SequenceDiagram');
+
+    var configs = input.objectsOfType(Model).configs[SQ_Config].map transformConfigs();
+    input.objectsOfType(Model).sequence_diagrams[SQ_Diagram].map transformUmlDiagram(configs);
+    log("Output configs: " + configs->size().toString());
+}
+
+mapping SQ_Config::transformConfigs(): Config {
+    entries := self.entries.map transformConfigEntries();
+}
+
+mapping SQ_ConfigEntry::transformConfigEntries(): ConfigEntry {
+    key := self.name;
+    value := self.value;
+}
+
+mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
+    testScenarioName := diagramName + "_puml";
+    configs := configs_;
+    var roundtripCounter : Integer := 1;
+    
+//    var elements := self.elements->flatten_SQ_SequenceElements();
+    
+    var elements : Sequence(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements()->asList();
+    log("Elements: " + elements->size().toString());
+    var messages : Sequence(SQ_Message) := Sequence{};
+
+    elements->forEach(elem) {
+        if (elem.oclIsTypeOf(SQ_Message)) {
+            messages += elem.oclAsType(SQ_Message);
+        };
+    };
+    log("Messages: " + messages->size().toString());
+
+    var msgIndex : Integer := 1;
+    while (msgIndex <= messages->size()) {
+        var msg : SQ_Message := messages->at(msgIndex);
+
+        if (msg.isRequest()) {
+            var followingMsgs : Sequence(SQ_Message) := messages->subSequence(msgIndex + 1, messages->size());
+            var responseMsg : SQ_Message := findResponse(msg, followingMsgs);
+            if (not responseMsg.oclIsUndefined()) {
+                var request : RequestSpecification := msg.map message2request();
+                var response : ResponseSpecification := responseMsg.payload.response.map response2response();
+                testroundtrip += generateRoundtrip(roundtripCounter, request, response, "");
+                roundtripCounter := roundtripCounter + 1;
+            } else {
+                log("Ignoring request " + msgIndex.toString() + " that has no corresponding response");
+            };
+        };
+
+        msgIndex := msgIndex + 1;
+    };
+    log("Roundtrips: " + testroundtrip->size().toString());
+}
+
+helper findResponse(request : SQ_Message, followingMsgs : Sequence(SQ_Message)) : SQ_Message {
+    followingMsgs->forEach(potentialResponse) {
+        if (potentialResponse.isResponse() and
+                potentialResponse.sender().name = request.receiver().name and
+                potentialResponse.receiver().name = request.sender().name
+           ) {
+                return potentialResponse;
+        };
+    };
+    return null;
+}
+
+helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(): OrderedSet(SQ_SequenceElement) {
+    var sequenceElements : OrderedSet(SQ_SequenceElement);
+    self->forEach(umlElement) {
+        if (umlElement.oclIsTypeOf(SQ_Message)) {
+            var message : SQ_Message := umlElement.oclAsType(SQ_Message);
+            if (not message.payload.oclIsUndefined()) {
+                sequenceElements += message;
+            };
+        }
+        elif (umlElement.oclIsTypeOf(SQ_Group)) {
+            var group : SQ_Group := umlElement.oclAsType(SQ_Group);
+            sequenceElements += group.map flatten_SQ_Group();
+        };
+    };
+    return sequenceElements;
+}
+
+mapping SQ_Group::flatten_SQ_Group(): SQ_Group {
+    elements += self.elements->flatten_SQ_SequenceElements();
+    alternatives += self.alternatives->at(1).oclAsType(SQ_GroupAlternative).map flatten_SQ_GroupAlternative();
+    label := self.label;
+}
+
+mapping SQ_GroupAlternative::flatten_SQ_GroupAlternative(): SQ_GroupAlternative {
+    elements += self.elements->flatten_SQ_SequenceElements();
+    label := self.label;
+}
+
+helper SQ_Arrow::isR2L(): Boolean {
+    return not self.lefttip.oclIsUndefined() and self.righttip.oclIsUndefined();
+}
+
+helper SQ_Arrow::isL2R(): Boolean {
+    return self.lefttip.oclIsUndefined() and not self.righttip.oclIsUndefined();
+}
+
+helper SQ_Message::receiver(): SQ_Participant {
+    if (self.arrow.isR2L()) {
+        return self.participantLeft;
+    } else if (self.arrow.isL2R()) {
+        return self.participantRight;
+    };
+    return null;
+}
+
+helper SQ_Message::sender(): SQ_Participant {
+    if (self.arrow.isR2L()) {
+        return self.participantRight;
+    } else if (self.arrow.isL2R()) {
+        return self.participantLeft;
+    };
+    return null;
+}
+
+helper SQ_Message::isRequest(): Boolean {
+    return not self.payload.request.oclIsUndefined();
+}
+
+helper SQ_Message::isResponse(): Boolean {
+    return not self.payload.response.oclIsUndefined();
+}
+
+helper generateRoundtrip(roundtripId : Integer, request : RequestSpecification, response : ResponseSpecification, precond : String): TestRoundtrip {
+	return object TestRoundtrip {
+		testRoundtripName := "roundtrip" + roundtripId.toString();
+		requestspecification := request;
+		responsespecification := response;
+		precondition := precond;
+	};
+}
+
+mapping SQ_Message::message2request(): RequestSpecification {
+	assert fatal (not self.payload.request.oclIsUndefined())
+		with log('Message should have contained a request');
+
+	method := self.payload.request.method;
+    url := self.payload.request.url;
+	receiver := self.receiver().name;
+	sender := self.sender().name;
+	requestdatum := self.payload.request.parametermap.params->map param2requestDatum();
+}
+
+mapping PT_Response::response2response(): ResponseSpecification {
+	 responsedatum := self.parametermap.params->map param2responseDatum();
+
+     if(self.acceptedcodes->notEmpty()) {
+         statusmatcher := object IsIn {
+            value := self.acceptedcodes.code.toString();
+         };
+     };
+
+     var bodyMatcherGroup = object BodyMatcherGroup {};
+     responsedatum->forEach(rd) {
+        var bodyMatcher = object BodyMatcher {};
+        bodyMatcher.matcher := object HasXPath {
+			xPath := rd.xPath;
+		  };
+        bodyMatcherGroup.bodymatcher += bodyMatcher;
+     };
+     bodymatchergroup := bodyMatcherGroup;
+}
+
+mapping PT_Parameter::param2requestDatum(): RequestDatum {
+    variableName := self.name;
+    value := self.value;
+}
+
+mapping PT_Parameter::param2responseDatum(): ResponseDatum {
+    variableName := self.name;
+    xPath := self.value;
+}
