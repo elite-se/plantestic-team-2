@@ -82,21 +82,40 @@ public void test[ nameSuffix /]() {
 [/if]
     String tester = paramsMap.get("tester");
 
-[for (testRoundtrip : TestRoundtrip | testScenario.testroundtrip) separator('\n\n') ]
-    if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/]")) {
-        [if (testRoundtrip.precondition->isEmpty())][testRoundtrip.generateTestRoundtrip()/][/if]
-        [if (testRoundtrip.precondition->notEmpty())]
-        if(eval("[testRoundtrip.precondition/]")) {
-            [testRoundtrip.generateTestRoundtrip()/]
-        }
-        [/if]
-    }
+	[generateStructures(testScenario.structure)/]
+}
+[/template]
+
+[template private generateStructures(structures : Collection(Structure)) post(trim())]
+[for (structure : Structure | structures) separator('\n') ]
+	[generateStructure(structure)/]
 [/for]
+[/template]
+
+[template private generateStructure(structure : Structure) post(trim())]
+[if (structure.oclIsTypeOf(TestRoundtrip))]
+	[generateTestRoundtripWithTesterCheck(structure.oclAsType(TestRoundtrip))/]
+[elseif (structure.oclIsTypeOf(Alternative))]
+	[generateAlternative(structure.oclAsType(Alternative))/]
+[/if]
+[/template] 
+
+[template private generateAlternative(alternative : Alternative) post(trim())]
+if (eval("[alternative.condition/]")) {
+	[generateStructures(alternative.provided)/]
+} else {
+	[generateStructures(alternative.otherwise)/]
+}
+[/template]
+
+[template private generateTestRoundtripWithTesterCheck(testRoundtrip : TestRoundtrip) post(trim())]
+if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/]")) {
+    [testRoundtrip.generateTestRoundtrip()/]
 }
 [/template]
 
 [template private generateTestRoundtrip(testRoundtrip : TestRoundtrip) post(trim())]
-	[if (testRoundtrip.requestspecification.requestdatum->notEmpty())][testRoundtrip.requestspecification.generadeAddRequestParams()/]	[/if]
+	[if (testRoundtrip.requestspecification.requestdatum->notEmpty())][testRoundtrip.requestspecification.generateAddRequestParams()/]	[/if]
 Response [testRoundtrip.testRoundtripName/] = RestAssured.given()
         [testRoundtrip.requestspecification.generateGivenPart()/]
     .when()
@@ -108,7 +127,7 @@ Response [testRoundtrip.testRoundtripName/] = RestAssured.given()
 	[/if]
 [/template]
 
-[template private generadeAddRequestParams(requestSpecification : RequestSpecification)]
+[template private generateAddRequestParams(requestSpecification : RequestSpecification)]
 	[if (requestSpecification.requestdatum->notEmpty())]
 		[for (requestDatum : RequestDatum | requestSpecification.requestdatum)]
 paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value/]");
