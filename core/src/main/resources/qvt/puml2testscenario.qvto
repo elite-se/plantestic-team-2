@@ -31,8 +31,11 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
     var roundtripCounter : Integer := 1;
     
 	structure := self.elements->flatten_SQ_SequenceElements("")->asList()->structures("", 1, 1).structure;
-
-    log("Discovered " + structure->size().toString() + " structures");
+	
+	log("\nPARSED:");
+	structure->forEach(struct) {
+    	log(struct.humanReadableString(""));
+	};
 }
 
 helper findRequest(msgPrefix: String, response: SQ_Message, preceedingElements: Sequence(SQ_SequenceElement)) : Tuple(index: Integer, requestMsg: SQ_Message) {
@@ -194,18 +197,18 @@ mapping PT_Parameter::param2responseDatum(): ResponseDatum {
 }
 
 helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, preceeding: List(SQ_SequenceElement)): Tuple(structure: Alternative, roundtripCnt: Integer, newPreceeding: List(SQ_SequenceElement)) {
-	log(msgPrefix + "TO ALTERNATIVE (rdID=" + roundtripIdStart.toString() + ", #prec=" + preceeding->size().toString() + ")");
+	log(msgPrefix + "TO ALTERNATIVE (rdID=" + roundtripIdStart.toString() + ", #prec=" + preceeding->size().toString() + ") " + self.humanReadableString());
 	var alternative := object Alternative {};
 	var roundtripCnt := roundtripIdStart;
 	var elems := object List(SQ_SequenceElement) {};
 	preceeding->forEach(e) { elems->add(e); };
 	self.elements->forEach(e) { elems->add(e); };
 	
-	var res := elems->structures(msgPrefix, roundtripCnt, preceeding->size()+1);
+	var res := elems->structures(msgPrefix + "  ", roundtripCnt, preceeding->size()+1);
 
 	var newPreceeding := object List(SQ_SequenceElement) {};
 	res.elements->forEach(e) {
-		if (preceeding->includes(e)) {
+		if (preceeding->includes(e) and not res.consumedRequests->includes(e)) {
 			newPreceeding += e;
 		};
 	};
@@ -228,24 +231,27 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, pre
 		
 		newPreceeding := object List(SQ_SequenceElement) {};
 		res2.newPreceeding->forEach(e) {
-			if (preceeding->includes(e)) {
+			// Consumed requests by the group or any of its children may only be eliminated here, as other alternatives might consume this
+			if (preceeding->includes(e) and not res.consumedRequests->includes(e)) {
 				newPreceeding += e;
 			}
 		};
 		roundtripCnt := res2.roundtripCnt;
 	};
 	
+	
 	log(msgPrefix + "END ALTERNATIVE");
 	return Tuple { structure = alternative, roundtripCnt = roundtripCnt, newPreceeding = newPreceeding };
 }
 
-helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart: Integer, elemStartInd: Integer): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), roundtripCnt: Integer) {
+helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart: Integer, elemStartInd: Integer): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), consumedRequests: List(SQ_SequenceElement), roundtripCnt: Integer) {
 	log(msgPrefix + "BEGIN STRUCTURES #" + self->size().toString() + " (rtID=" + roundtripIdStart.toString() + ", elemStart=" + elemStartInd.toString() + ")");
 
 	var structures := object List(Structure) {};
 	var roundtripCnt := roundtripIdStart;
 	var elements := self;
-	
+	var consumedRequests := object List(SQ_SequenceElement) {};
+
 	var elemInd := elemStartInd;
 	while (elemInd <= elements->size()) {
 		assert fatal (elemInd >= 0)
@@ -260,21 +266,24 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
     		log(msgPrefix + "  message(" + elemInd.toString() + "): " + msg.humanReadableString());
     		
     		if (msg.isResponse()) {
-				var reqT := findRequest(msgPrefix + "  ", msg, prec);
+				var reqT := findRequest(msgPrefix + "    ", msg, prec);
 				
 				// No match found
 				if (reqT.oclIsUndefined()) {
 					log (msgPrefix + "Could not find matching request for response: " + msg.toString());
-					elements->removeAt(elemInd);
 					elemInd := elemInd - 1;
+					elements->removeAt(elemInd);
 				} else {
 					var request := reqT.requestMsg.map message2request();
 					var response := msg.map message2response();
-					structures += generateRoundtrip(msgPrefix + "  " , roundtripCnt, request, response);
+					structures += generateRoundtrip(msgPrefix + "    " , roundtripCnt, request, response);
 					roundtripCnt := roundtripCnt + 1;
 					
 					// Order is important as remove invalidates indices!
+					elemInd := elemInd - 1;
 					elements->removeAt(elemInd);
+					
+					consumedRequests->add(elements->at(reqT.index));
 				}
     		}
     	} elif (elem.oclIsTypeOf(SQ_Group)) {
@@ -301,7 +310,7 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 	};
 	
 	log(msgPrefix + "END STRUCTURES");
-	return Tuple { structure = structures, elements = elements, roundtripCnt = roundtripCnt };
+	return Tuple { structure = structures, elements = elements, consumedRequests=consumedRequests, roundtripCnt = roundtripCnt };
 }
 
 helper SQ_Message::humanReadableString(): String {
@@ -371,4 +380,36 @@ helper RequestSpecification::humanReadableString(): String {
 
 helper SQ_Group::humanReadableString(): String {
 	return self.keyword.toString() + " " + self.label.toString() + " (#elems=" + self.elements->size().toString() + ", #alternatives=" + self.alternatives->size().toString() + ")";
+}
+
+helper Structure::humanReadableString(prefix: String): String {
+	var str := prefix;
+	
+	if (self.oclIsTypeOf(TestRoundtrip)) {
+		var rt := self.oclAsType(TestRoundtrip);
+		str := str + "Roundtrip(" + rt.testRoundtripName + "): " + rt.requestspecification.humanReadableString(); 
+	} elif (self.oclIsTypeOf(Alternative)) {
+		var alt := self.oclAsType(Alternative);
+		var hasCondition := not alt.condition.oclIsUndefined();
+		
+		if (hasCondition) {
+			str := str + "if (" + alt.condition + ") {\n";
+		};
+		alt.provided->forEach(prov) {
+			if (hasCondition) {
+				str := str + prov.humanReadableString(prefix + "  ") + "\n";
+			} else {
+				str := str + prov.humanReadableString(prefix) + "\n";
+			};
+		};
+		if (hasCondition) {
+			str := str + prefix + "}";
+		};
+		
+		if (not alt.otherwise.oclIsUndefined()) {
+			str := str + " else {\n" + alt.otherwise.humanReadableString(prefix + "  ") + "\n" + prefix + "}";
+		}
+	};
+	
+	return str;
 }

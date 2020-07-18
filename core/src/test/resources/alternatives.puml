@@ -15,14 +15,6 @@ else
 	Bob -> Alice : response(418 I_AM_A_TEAPOT)
 end
 
-/'
- if (weather == sunny) {
-	when().get("name").
-	then().statusCode(200);
- } else if (name == "Hans") {
-	when().get("name")
-	then().statusCode(500);
- }
-'/
+Bob -> Alice : response(404 NOT_FOUND)
 
 @enduml
