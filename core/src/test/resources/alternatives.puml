@@ -1,20 +1,26 @@
 @startuml
 
-Alice -> Bob : request(GET, "name")
+Alice -> Bob : request(GET, "age")
 
 alt weather==sunny
+	Alice -> Bob : request(GET, "name")
 	Bob --> Alice : response(200 ACCEPTED, { name: "Bob" })
 	
+	Alice -> Bob : request(GET, "mainframe_location")
+
 	CCC -> ECS
+	
 	alt moon==fullmoon
 		return 200
-	else
-		Bob --> Alice : response(410 GONE)
 	end
-else name==Hans
+
+	Bob --> Alice : response(410 GONE)
+else weather==Cloudy
+	Alice -> Bob : request(GET, "name")
 	Bob --> Alice : response(500 DENIED)
-'else
-'	Bob --> Alice : response(418 I_AM_A_TEAPOT)
+else
+	Alice -> Bob : request(GET, "type")
+	Bob --> Alice : response(418 I_AM_A_TEAPOT)
 end
 
 Bob -> Alice : response(404 NOT_FOUND)
