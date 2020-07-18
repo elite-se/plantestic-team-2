@@ -104,7 +104,7 @@ public void test[ nameSuffix /]() {
 if (eval("[alternative.condition/]")) {
 	[generateStructures(alternative.provided)/]
 }[if (alternative.otherwise->notEmpty())] else {
-	[generateStructures(alternative.otherwise)/]
+	[generateStructure(alternative.otherwise)/]
 }[/if]
 [/template]
 
