@@ -239,8 +239,9 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, pre
 		
 		newPreceeding := object List(SQ_SequenceElement) {};
 		res2.newPreceeding->forEach(e) {
-			// alt without condition captures all consumed requests
-			if (preceeding->includes(e) and not (alternative.condition.oclIsUndefined() and res.consumedRequests->includes(e))) {
+			// alt without condition captures all consumed requests only if all branches capture the request 
+			// -> check is disabled at the moment since it does not care about other branches
+			if (preceeding->includes(e)) {// and not (alternative.condition.oclIsUndefined() and res.consumedRequests->includes(e))) {
 				newPreceeding += e;
 			};
 		};
