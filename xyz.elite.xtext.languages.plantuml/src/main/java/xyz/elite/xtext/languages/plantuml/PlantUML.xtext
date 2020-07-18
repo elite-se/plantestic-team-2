@@ -135,13 +135,13 @@ SQ_HideFootbox:
 // -------- GROUPS --------
 SQ_Group:
     keyword=SQ_GroupEntryKeyword label=SQ_Description
-        (NEWLINE | elements+=SQ_SequenceElement)*
+        (elements+=SQ_SequenceElement | NEWLINE)*
     alternatives+=(SQ_GroupAlternative)*
     NEWLINE 'end';
 
 SQ_GroupAlternative:
     NEWLINE 'else' label=SQ_Description
-        (NEWLINE | elements+=SQ_SequenceElement)*;
+        (elements+=SQ_SequenceElement | NEWLINE)*;
 
 SQ_GroupEntryKeyword:
     'alt'|'opt'|'loop'|'par'|'break'|'critical'|'group';

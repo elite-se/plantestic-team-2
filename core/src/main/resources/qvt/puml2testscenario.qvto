@@ -30,7 +30,7 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
     configs := configs_;
     var roundtripCounter : Integer := 1;
     
-    var elements := self.elements->flatten_SQ_SequenceElements()->asList();
+    var elements := self.elements->flatten_SQ_SequenceElements("")->asList();
     log("Elements: " + elements->size().toString());
     
 	structure := elements->structures(1,0).structure;
@@ -56,52 +56,108 @@ helper findRequest(response: SQ_Message, preceedingElements: Sequence(SQ_Sequenc
 	return null;
 }
 
-helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(): OrderedSet(SQ_SequenceElement) {
+helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(msgPrefix: String): OrderedSet(SQ_SequenceElement) {
+	log(msgPrefix + "START ELEMENTS");
+
     var sequenceElements : OrderedSet(SQ_SequenceElement);
     self->forEach(umlElement) {
         if (umlElement.oclIsTypeOf(SQ_Message)) {
             var message : SQ_Message := umlElement.oclAsType(SQ_Message);
+            
+            log(msgPrefix + "MESSAGE: " + message.humanReadableString());
+
             if (not message.payload.oclIsUndefined()) {
-								// TODO: tmp
-								if (message.isRequest()) {
-									log("\tDiscovered Request: " + 
-										message.participantLeft.name.toString() + 
-										" " + message.arrow.lefttip.toString() + message.arrow.righttip.toString() +
-										" " + message.participantRight.name.toString()
-									);
-								} elif (message.isResponse()) {
-									log("\tDiscovered Response: " + 
-										message.participantLeft.name.toString() + 
-										" " + message.arrow.lefttip.toString() + message.arrow.righttip.toString() +
-										" " + message.participantRight.name.toString()
-									);
-								};
-
-
                 sequenceElements += message;
             };
         }
         elif (umlElement.oclIsTypeOf(SQ_Group)) {
             var group : SQ_Group := umlElement.oclAsType(SQ_Group);
-
-						// TODO: temp
-						log("\tDiscovered Group: " + group.keyword.toString() + " " + group.label.toString() + " (" + group.elements->size().toString() + ")");
-
-            sequenceElements += group.map flatten_SQ_Group();
+            sequenceElements += group.map flatten_SQ_Group(msgPrefix);
         };
     };
+    
+	log(msgPrefix + "END ELEMENTS");
     return sequenceElements;
 }
 
-mapping SQ_Group::flatten_SQ_Group(): SQ_Group {
-    elements += self.elements->flatten_SQ_SequenceElements();
-    alternatives += self.alternatives->oclAsType(SQ_GroupAlternative).map flatten_SQ_GroupAlternative();
-    label := self.label;
+helper SQ_Message::humanReadableString(): String {
+	var str := "";
+	
+	// Parse left participant (if any)
+	if (not self.participantLeft.oclIsUndefined()) {
+		str := str + self.participantLeft.name + " ";
+	};
+	
+	// Parse arrow
+	if (not self.arrow.leftmodifier.oclIsUndefined()) {
+		str := str + self.arrow.leftmodifier;
+	};
+	if (not self.arrow.lefttip.oclIsUndefined()) {
+		str := str + self.arrow.lefttip.toString();
+	};
+	self.arrow.line->forEach(l) {
+		str := str + l;
+	};
+	if (not self.arrow.righttip.oclIsUndefined()) {
+		str := str + self.arrow.righttip.toString();
+	};
+	if (not self.arrow.rightmodifier.oclIsUndefined()) {
+		str := str + self.arrow.rightmodifier;
+	};
+	
+	// Parse right participant (if any)
+	if (not self.participantRight.oclIsUndefined()) {
+		str := str + " " + self.participantRight.name;
+	};
+	
+	// Parse payload (if any)
+	if (not self.payload.oclIsUndefined()) {
+		if (not self.payload.asyncid.oclIsUndefined() and self.payload.asyncid != 0) {
+			str := str + " : async[" + self.payload.asyncid.toString() + "]";
+		};
+		
+		if (not self.payload.request.oclIsUndefined()) {
+			str := str + " request(" + self.payload.request.method + ", " + self.payload.request.url + ", {...})";
+		} elif (not self.payload.response.oclIsUndefined()) {
+			str := str + " response(";
+			self.payload.response.acceptedcodes->forEach(ac) {
+				str := str + ac.code.toString() + " " + ac.description + ", ";
+			};
+			str := str + ")";
+		};
+		
+		if (not self.description.oclIsUndefined()) {
+			str := str + " " + self.description;
+		};
+	} elif (not self.description.oclIsUndefined()) {
+		str := str + " : " + self.description;
+	};
+	
+	
+	if (not self.payload.oclIsUndefined()) {
+		str := str + " (isRequest=" + self.isRequest().toString() + ")";
+	};
+	
+	return str;
 }
 
-mapping SQ_GroupAlternative::flatten_SQ_GroupAlternative(): SQ_GroupAlternative {
-    elements += self.elements->flatten_SQ_SequenceElements();
+mapping SQ_Group::flatten_SQ_Group(msgPrefix: String): SQ_Group {
+	log(msgPrefix + "START GROUP: " + self.keyword.toString() + " " + self.label.toString() + " (" + self.elements->size().toString() + ", " + self.alternatives->size().toString() + ")");
+
+    elements += self.elements->flatten_SQ_SequenceElements(msgPrefix + "  ");
+    alternatives += self.alternatives->oclAsType(SQ_GroupAlternative).map flatten_SQ_GroupAlternative(msgPrefix);
     label := self.label;
+    
+	log(msgPrefix + "END GROUP");
+}
+
+mapping SQ_GroupAlternative::flatten_SQ_GroupAlternative(msgPrefix: String): SQ_GroupAlternative {
+	log(msgPrefix + "START ALTERNATIVE: else" + " " + self.label.toString() + " (" + self.elements->size().toString() + ")");
+
+    elements += self.elements->flatten_SQ_SequenceElements(msgPrefix + "  ");
+    label := self.label;
+    
+	log(msgPrefix + "END ALTERNATIVE");
 }
 
 helper SQ_Arrow::isR2L(): Boolean {

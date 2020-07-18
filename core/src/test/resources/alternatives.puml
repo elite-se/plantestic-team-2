@@ -8,12 +8,12 @@ alt weather==sunny
 	CCC -> ECS
 	alt moon==fullmoon
 		ECS <- CCC
-	end group
-else name=="Hans"
+	end
+else name==Hans
 	Bob -> Alice : response(500 DENIED)
 else
 	Bob -> Alice : response(418 I_AM_A_TEAPOT)
-end group
+end
 
 /'
  if (weather == sunny) {
