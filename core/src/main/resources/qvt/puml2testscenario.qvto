@@ -206,7 +206,7 @@ mapping PT_Parameter::param2responseDatum(): ResponseDatum {
 }
 
 helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, preceeding: List(SQ_SequenceElement)): Tuple(structure: Alternative, roundtripCnt: Integer, newPreceeding: List(SQ_SequenceElement)) {
-	log(msgPrefix + "TO ALTERNATIVE (rdID=" + roundtripIdStart.toString() + ", #prec=" + preceeding->size().toString() + ") " + self.humanReadableString());
+	log(msgPrefix + "TO ALTERNATIVE (hasCond=" + (not self.label.oclIsUndefined()).toString() + ", rdID=" + roundtripIdStart.toString() + ", #prec=" + preceeding->size().toString() + ") " + self.humanReadableString());
 	var alternative := object Alternative {};
 	var roundtripCnt := roundtripIdStart;
 	var elems := object List(SQ_SequenceElement) {};
@@ -214,18 +214,18 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, pre
 	self.elements->forEach(e) { elems->add(e); };
 	
 	var res := elems->structures(msgPrefix + "  ", roundtripCnt, preceeding->size()+1);
-
+	alternative.condition := self.label;
+	alternative.provided := res.structure->asOrderedSet();
+	
 	var newPreceeding := object List(SQ_SequenceElement) {};
 	res.elements->forEach(e) {
-		if (preceeding->includes(e)) {
+		// alt without condition captures all consumed requests
+		if (preceeding->includes(e) and not (alternative.condition.oclIsUndefined() and res.consumedRequests->includes(e))) {
 			newPreceeding += e;
 		};
 	};
 	roundtripCnt := res.roundtripCnt;
 
-	alternative.condition := self.label;
-	alternative.provided := res.structure->asOrderedSet();
-	
 	if (self.alternatives->size() > 0) {
 		var alt1 := self.alternatives->at(1);
 		var othr := object SQ_Group {
@@ -240,10 +240,10 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, pre
 		
 		newPreceeding := object List(SQ_SequenceElement) {};
 		res2.newPreceeding->forEach(e) {
-			// Consumed requests by the group or any of its children may only be eliminated here, as other alternatives might consume this
-			if (preceeding->includes(e) and not res.consumedRequests->includes(e)) {
+			// alt without condition captures all consumed requests
+			if (preceeding->includes(e) and not (alternative.condition.oclIsUndefined() and res.consumedRequests->includes(e))) {
 				newPreceeding += e;
-			}
+			};
 		};
 		roundtripCnt := res2.roundtripCnt;
 	};
@@ -270,6 +270,7 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 		var elem := elements->at(elemInd);
 		var prec := self->subSequence(1, elemInd-1);
 		elemInd := elemInd + 1;
+		var following := self->subSequence(elemInd, self->size());
 		
 		if (elem.oclIsTypeOf(SQ_Message)) {
     		var msg := elem.oclAsType(SQ_Message);
@@ -302,13 +303,11 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
     				elems += e;
     			}
     		};
-    		elements->forEach(e) {
-    			if (not prec->includes(e)) {
-    				elems +=e;
-    			}
+    		following->forEach(e) {
+				elems +=e;
     		};
+			elemInd := elemInd - (elements->size() - elems->size());
 			elements := elems;
-			elemInd := elemInd - (prec->size() - res.newPreceeding->size());
     	}
 	};
 	
