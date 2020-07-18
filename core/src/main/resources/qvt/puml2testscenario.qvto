@@ -30,9 +30,13 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
     configs := configs_;
     var roundtripCounter : Integer := 1;
     
-	structure := self.elements->flatten_SQ_SequenceElements("")->asList()->structures("", 1, 1).structure;
+    log("\n1. Preprocessing:");
+    var elements := self.elements->flatten_SQ_SequenceElements("")->asList();
+
+    log("\n2. Parsing:");
+	structure := elements->structures("", 1, 1).structure;
 	
-	log("\nPARSED:");
+	log("\n3. Result:");
 	structure->forEach(struct) {
     	log(struct.humanReadableString(""));
 	};
@@ -142,13 +146,13 @@ helper SQ_Message::isResponse(): Boolean {
     return not self.payload.response.oclIsUndefined();
 }
 
-helper generateRoundtrip(msgPrefix: String, roundtripId : Integer, request : RequestSpecification, response : ResponseSpecification): TestRoundtrip {
+helper generateRoundtrip(msgPrefix: String, roundtripId : Integer, request : SQ_Message, response : SQ_Message): TestRoundtrip {
 	log(msgPrefix + "GENERATING Roundtrip: " + roundtripId.toString() + ": " + request.humanReadableString());
 	
 	var rt := object TestRoundtrip {
 		testRoundtripName := "roundtrip" + roundtripId.toString();
-		requestspecification := request;
-		responsespecification := response;
+		requestspecification := request.map message2request();
+		responsespecification := response.map message2response();
 	};
 	
 	log(msgPrefix + "END GENERATING (" + rt.testRoundtripName + ", " + rt.requestspecification.humanReadableString() + ")");
@@ -275,9 +279,7 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 				elements->removeAt(elemInd);
 				
 				if (not reqT.oclIsUndefined()) {
-					var request := reqT.requestMsg.map message2request();
-					var response := msg.map message2response();
-					structures += generateRoundtrip(msgPrefix + "    " , roundtripCnt, request, response);
+					structures += generateRoundtrip(msgPrefix + "    " , roundtripCnt, reqT.requestMsg, msg);
 					roundtripCnt := roundtripCnt + 1;
 					
 					// Mark this request as consumed -> shadowed from children and will be removed from
