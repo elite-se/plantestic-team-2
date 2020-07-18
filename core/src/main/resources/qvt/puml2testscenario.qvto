@@ -228,9 +228,7 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, pre
 		
 		newPreceeding := object List(SQ_SequenceElement) {};
 		res2.newPreceeding->forEach(e) {
-			// alt without condition captures all consumed requests only if all branches capture the request 
-			// -> check is disabled at the moment since it does not care about other branches
-			if (preceeding->includes(e)) {// and not (alternative.condition.oclIsUndefined() and res.consumedRequests->includes(e))) {
+			if (preceeding->includes(e)) {
 				newPreceeding += e;
 			};
 		};
@@ -243,13 +241,12 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, pre
 	return Tuple { structure = alternative, roundtripCnt = roundtripCnt, newPreceeding = newPreceeding };
 }
 
-helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart: Integer, elemStartInd: Integer): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), consumedRequests: List(SQ_SequenceElement), roundtripCnt: Integer) {
+helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart: Integer, elemStartInd: Integer): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), roundtripCnt: Integer) {
 	log(msgPrefix + "BEGIN STRUCTURES #" + self->size().toString() + " (rtID=" + roundtripIdStart.toString() + ", elemStart=" + elemStartInd.toString() + ")");
 
 	var structures := object List(Structure) {};
 	var roundtripCnt := roundtripIdStart;
 	var elements := self;
-	var consumedRequests := object List(SQ_SequenceElement) {};
 
 	var elemInd := elemStartInd;
 	while (elemInd <= elements->size()) {
@@ -269,13 +266,11 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 				var reqT := findRequest(msgPrefix + "    ", msg, prec);
 				elemInd := elemInd - 1;
 				elements->removeAt(elemInd);
+				elements->removeAt(reqT.index);
 				
 				if (not reqT.oclIsUndefined()) {
 					structures += generateRoundtrip(msgPrefix + "    " , roundtripCnt, reqT.requestMsg, msg);
 					roundtripCnt := roundtripCnt + 1;
-					
-					// Mark as consumed -> shadowed from children and removed from parent scope
-					consumedRequests->add(elements->at(reqT.index));
 				}
     		}
     	} elif (elem.oclIsTypeOf(SQ_Group)) {
@@ -301,7 +296,7 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 	};
 	
 	log(msgPrefix + "END STRUCTURES");
-	return Tuple { structure = structures, elements = elements, consumedRequests=consumedRequests, roundtripCnt = roundtripCnt };
+	return Tuple { structure = structures, elements = elements, roundtripCnt = roundtripCnt };
 }
 
 helper SQ_Message::humanReadableString(): String {
