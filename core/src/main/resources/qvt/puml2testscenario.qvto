@@ -266,6 +266,7 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 				var reqT := findRequest(msgPrefix + "    ", msg, prec);
 				elemInd := elemInd - 1;
 				elements->removeAt(elemInd);
+				elemInd := elemInd - 1;
 				elements->removeAt(reqT.index);
 				
 				if (not reqT.oclIsUndefined()) {
