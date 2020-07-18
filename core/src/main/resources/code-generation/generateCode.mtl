@@ -3,7 +3,7 @@
 
 [template public generateTestScenario(testScenario : TestScenario) post(trim())]
 [comment @main /]
-[file ('Test'.concat(testScenario.testScenarioName.concat('.java')), false, 'UTF-8')]
+[file ('Test_'.concat(testScenario.testScenarioName.concat('.java')), false, 'UTF-8')]
 
 import org.apache.commons.text.StringSubstitutor;
 import org.junit.jupiter.api.BeforeEach;
@@ -158,35 +158,25 @@ paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value/]");
 
 [template private generateThenPart(responseSpecification : ResponseSpecification) post(trim())]
 	.assertThat()
-    [responseSpecification.generateExpectStatusCode()/][if (responseSpecification.bodymatchergroup->notEmpty())]
-        [responseSpecification.generateExpectations()/]
-    [/if]
+    [responseSpecification.generateExpectStatusCode()/]
+    [responseSpecification.generateExpectations()/]
 	.and().extract().response()
 [/template]
 
 [template private generateExpectStatusCode(responseSpecification : ResponseSpecification) post(trim())]
-	[if (responseSpecification.statusmatcher->notEmpty())]
-		[if (responseSpecification.statusmatcher.oclIsTypeOf(IsIn))]
-			[let statusCode : IsIn = responseSpecification.statusmatcher.oclAsType(IsIn)]
-.statusCode(IsIn.isIn(Arrays.asList([for (val : String | statusCode.value) separator (', ')][val/][/for])))
-			[/let]
-		[/if]
+	[if (responseSpecification.statuscode->notEmpty())]
+.statusCode(IsIn.isIn(Arrays.asList([for (val : Integer | responseSpecification.statuscode) separator (', ')][val/][/for])))
 	[/if]
 [/template]
 
 [template private generateExpectations(responseSpecification : ResponseSpecification) post(trim())]
-	[for (matcher : BodyMatcher | responseSpecification.bodymatchergroup)]
-		[if (matcher.oclIsTypeOf(HasXPath))]
-			[let bodyXPath : HasXPath = matcher.oclAsType(HasXPath)].body(hasXPath([bodyXPath.xPath/]))[/let]
-		[/if]
-		[if (matcher.oclIsTypeOf(IsIn))]
-			[let bodyIsIn : IsIn = matcher.oclAsType(IsIn)][/let]
-		[/if]
+	[for (datum : ResponseDatum | responseSpecification.responsedatum)]
+.body(hasXPath("[datum.variableName/]"))
 	[/for]
 [/template]
 
 [template private generateExtractions(testRoundtrip : TestRoundtrip) post(trim())]
 	[for (responseDatum : ResponseDatum | testRoundtrip.responsespecification.responsedatum)]
-paramsMap.put("[responseDatum.variableName/]", [testRoundtrip.testRoundtripName/].jsonPath().getString("[responseDatum.xPath/]"));
+paramsMap.put("[responseDatum.variableName/]", [testRoundtrip.testRoundtripName/].jsonPath().getString("[responseDatum.variableName/]"));
 	[/for]
 [/template]

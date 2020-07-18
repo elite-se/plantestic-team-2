@@ -181,22 +181,7 @@ mapping SQ_Message::message2response(): ResponseSpecification {
 		with log('Message should have contained a response');
 		
 	responsedatum := self.payload.response.parametermap.params->map param2responseDatum();
-
-    if(self.payload.response.acceptedcodes->notEmpty()) {
-        statusmatcher := object IsIn {
-           value := self.payload.response.acceptedcodes.code.toString();
-        };
-    };
-
-    var bodyMatcherGroup = object BodyMatcherGroup {};
-    responsedatum->forEach(rd) {
-    	var bodyMatcher = object BodyMatcher {};
-       	bodyMatcher.matcher := object HasXPath {
-			xPath := rd.xPath;
-	  	};
-       	bodyMatcherGroup.bodymatcher += bodyMatcher;
-    };
-    bodymatchergroup := bodyMatcherGroup;
+    statuscode := self.payload.response.acceptedcodes.code;
 }
 
 mapping PT_Parameter::param2requestDatum(): RequestDatum {
@@ -206,7 +191,7 @@ mapping PT_Parameter::param2requestDatum(): RequestDatum {
 
 mapping PT_Parameter::param2responseDatum(): ResponseDatum {
     variableName := self.name;
-    xPath := self.value;
+    value := self.value;
 }
 
 helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, preceeding: List(SQ_SequenceElement)): Tuple(structure: Alternative, roundtripCnt: Integer, newPreceeding: List(SQ_SequenceElement)) {
@@ -390,10 +375,10 @@ helper RequestSpecification::humanReadableString(): String {
 helper ResponseSpecification::humanReadableString(): String {
 	var str := "response(";
 	
-	var codes := self.statusmatcher.oclAsType(IsIn).value;
+	var codes := self.statuscode;
 	var codeInd := 1;
 	while (codeInd <= codes->size()) {
-		str := str + codes->at(codeInd);
+		str := str + codes->at(codeInd).toString();
 		codeInd := codeInd + 1;
 		if (codeInd <= codes->size()) {
 			str := str +  " || ";
