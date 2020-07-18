@@ -34,7 +34,7 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
     var elements := self.elements->flatten_SQ_SequenceElements("")->asList();
 
     log("\n2. Parsing:");
-	structure := elements->structures("", 1, 1).structure;
+	structure := elements->structures("", 1).structure;
 	
 	log("\n3. Result:");
 	structure->forEach(struct) {
@@ -194,25 +194,14 @@ mapping PT_Parameter::param2responseDatum(): ResponseDatum {
     value := self.value;
 }
 
-helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, preceeding: List(SQ_SequenceElement)): Tuple(structure: Alternative, roundtripCnt: Integer, newPreceeding: List(SQ_SequenceElement)) {
-	log(msgPrefix + "TO ALTERNATIVE (hasCond=" + (not self.label.oclIsUndefined()).toString() + ", rdID=" + roundtripIdStart.toString() + ", #prec=" + preceeding->size().toString() + ") " + self.humanReadableString());
+helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer): Tuple(structure: Alternative, roundtripCnt: Integer) {
+	log(msgPrefix + "TO ALTERNATIVE (hasCond=" + (not self.label.oclIsUndefined()).toString() + ", rdID=" + roundtripIdStart.toString() + ") " + self.humanReadableString());
 	var alternative := object Alternative {};
-	var roundtripCnt := roundtripIdStart;
-	var elems := object List(SQ_SequenceElement) {};
-	preceeding->forEach(e) { elems->add(e); };
-	self.elements->forEach(e) { elems->add(e); };
-	
-	var res := elems->structures(msgPrefix + "  ", roundtripCnt, preceeding->size()+1);
+
+	var res := self.elements->asList()->structures(msgPrefix + "  ", roundtripIdStart);
 	alternative.condition := self.label;
 	alternative.provided := res.structure->asOrderedSet();
-	
-	var newPreceeding := object List(SQ_SequenceElement) {};
-	res.elements->forEach(e) {
-		if (preceeding->includes(e)) {
-			newPreceeding += e;
-		};
-	};
-	roundtripCnt := res.roundtripCnt;
+	var roundtripCnt := res.roundtripCnt;
 
 	if (self.alternatives->size() > 0) {
 		var alt1 := self.alternatives->at(1);
@@ -223,32 +212,23 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, pre
 			elements := alt1.elements;
 		};
 		
-		var res2 := othr.toAlternative(msgPrefix + "  ", roundtripCnt, newPreceeding);
+		var res2 := othr.toAlternative(msgPrefix + "  ", roundtripCnt);
 		alternative.otherwise := res2.structure;
-		
-		newPreceeding := object List(SQ_SequenceElement) {};
-		res2.newPreceeding->forEach(e) {
-			if (preceeding->includes(e)) {
-				newPreceeding += e;
-			};
-		};
 		roundtripCnt := res2.roundtripCnt;
 	};
 	
-	
 	log(msgPrefix + "END ALTERNATIVE");
-	
-	return Tuple { structure = alternative, roundtripCnt = roundtripCnt, newPreceeding = newPreceeding };
+	return Tuple { structure = alternative, roundtripCnt = roundtripCnt };
 }
 
-helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart: Integer, elemStartInd: Integer): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), roundtripCnt: Integer) {
-	log(msgPrefix + "BEGIN STRUCTURES #" + self->size().toString() + " (rtID=" + roundtripIdStart.toString() + ", elemStart=" + elemStartInd.toString() + ")");
+helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart: Integer): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), roundtripCnt: Integer) {
+	log(msgPrefix + "BEGIN STRUCTURES #" + self->size().toString() + " (rtID=" + roundtripIdStart.toString() + ")");
 
 	var structures := object List(Structure) {};
 	var roundtripCnt := roundtripIdStart;
 	var elements := self;
 
-	var elemInd := elemStartInd;
+	var elemInd := 1;
 	while (elemInd <= elements->size()) {
 		assert fatal (elemInd >= 0)
 			with log('INTERNAL: logic tried accessing index < 0');
@@ -278,21 +258,9 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
     		var grp = elem.oclAsType(SQ_Group);
     		log(msgPrefix + "  " + grp.humanReadableString());
     		
-    		var res := grp.toAlternative(msgPrefix + "  ", roundtripCnt, prec);
+    		var res := grp.toAlternative(msgPrefix + "  ", roundtripCnt);
     		structures += res.structure;
     		roundtripCnt := res.roundtripCnt;
-    		
-    		var elems := object List(SQ_SequenceElement) {};
-    		res.newPreceeding->forEach(e) {
-    			if (prec->includes(e)) {
-    				elems += e;
-    			}
-    		};
-    		following->forEach(e) {
-				elems +=e;
-    		};
-			elemInd := elemInd - (elements->size() - elems->size());
-			elements := elems;
     	}
 	};
 	
