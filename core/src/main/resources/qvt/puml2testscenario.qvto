@@ -145,11 +145,15 @@ helper SQ_Message::isResponse(): Boolean {
 helper generateRoundtrip(msgPrefix: String, roundtripId : Integer, request : RequestSpecification, response : ResponseSpecification): TestRoundtrip {
 	log(msgPrefix + "GENERATING Roundtrip: " + roundtripId.toString() + ": " + request.humanReadableString());
 	
-	return object TestRoundtrip {
+	var rt := object TestRoundtrip {
 		testRoundtripName := "roundtrip" + roundtripId.toString();
 		requestspecification := request;
 		responsespecification := response;
 	};
+	
+	log(msgPrefix + "END GENERATING (" + rt.testRoundtripName + ", " + rt.requestspecification.humanReadableString() + ")");
+	
+	return rt;
 }
 
 mapping SQ_Message::message2request(): RequestSpecification {
@@ -208,7 +212,7 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, pre
 
 	var newPreceeding := object List(SQ_SequenceElement) {};
 	res.elements->forEach(e) {
-		if (preceeding->includes(e) and not res.consumedRequests->includes(e)) {
+		if (preceeding->includes(e)) {
 			newPreceeding += e;
 		};
 	};
@@ -267,22 +271,17 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
     		
     		if (msg.isResponse()) {
 				var reqT := findRequest(msgPrefix + "    ", msg, prec);
+				elemInd := elemInd - 1;
+				elements->removeAt(elemInd);
 				
-				// No match found
-				if (reqT.oclIsUndefined()) {
-					log (msgPrefix + "Could not find matching request for response: " + msg.toString());
-					elemInd := elemInd - 1;
-					elements->removeAt(elemInd);
-				} else {
+				if (not reqT.oclIsUndefined()) {
 					var request := reqT.requestMsg.map message2request();
 					var response := msg.map message2response();
 					structures += generateRoundtrip(msgPrefix + "    " , roundtripCnt, request, response);
 					roundtripCnt := roundtripCnt + 1;
 					
-					// Order is important as remove invalidates indices!
-					elemInd := elemInd - 1;
-					elements->removeAt(elemInd);
-					
+					// Mark this request as consumed -> shadowed from children and will be removed from
+					// above scope
 					consumedRequests->add(elements->at(reqT.index));
 				}
     		}
@@ -292,7 +291,7 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
     		
     		var res := grp.toAlternative(msgPrefix + "  ", roundtripCnt, prec);
     		structures += res.structure;
-    		roundtripCnt := res.roundtripCnt + 1;
+    		roundtripCnt := res.roundtripCnt;
     		
     		var elems := object List(SQ_SequenceElement) {};
     		res.newPreceeding->forEach(e) {
@@ -384,22 +383,34 @@ helper SQ_Group::humanReadableString(): String {
 
 helper Structure::humanReadableString(prefix: String): String {
 	var str := prefix;
+	var add := "";
 	
 	if (self.oclIsTypeOf(TestRoundtrip)) {
 		var rt := self.oclAsType(TestRoundtrip);
-		str := str + "Roundtrip(" + rt.testRoundtripName + "): " + rt.requestspecification.humanReadableString(); 
+		str := str + "Roundtrip(" + rt.testRoundtripName + "): "; 
+		add := rt.requestspecification.humanReadableString() + "\n";
+		if (not add.oclIsUndefined()) {
+			str := str + add;
+		} else {
+			str := str + "UNDEFINED(rs.method=" 
+				+ rt.requestspecification.method.oclIsUndefined().toString() 
+				+ ", rs.url=" + rt.requestspecification.url.oclIsUndefined().toString() 
+				+ ", rs.sender=" + rt.requestspecification.sender.oclIsUndefined().toString() 
+				+ ", rs.receiver=" + rt.requestspecification.receiver.oclIsUndefined().toString() 
+				+")\n";
+		};
 	} elif (self.oclIsTypeOf(Alternative)) {
 		var alt := self.oclAsType(Alternative);
-		var hasCondition := not alt.condition.oclIsUndefined();
 		
+		var hasCondition := not alt.condition.oclIsUndefined();
 		if (hasCondition) {
 			str := str + "if (" + alt.condition + ") {\n";
 		};
 		alt.provided->forEach(prov) {
 			if (hasCondition) {
-				str := str + prov.humanReadableString(prefix + "  ") + "\n";
+				str := str + prov.humanReadableString(prefix + "  ");
 			} else {
-				str := str + prov.humanReadableString(prefix) + "\n";
+				str := str + prov.humanReadableString(prefix);
 			};
 		};
 		if (hasCondition) {
@@ -407,8 +418,9 @@ helper Structure::humanReadableString(prefix: String): String {
 		};
 		
 		if (not alt.otherwise.oclIsUndefined()) {
-			str := str + " else {\n" + alt.otherwise.humanReadableString(prefix + "  ") + "\n" + prefix + "}";
-		}
+			str := str + " else {\n" + alt.otherwise.humanReadableString(prefix + "  ") + prefix + "}";
+		};
+		str := str + "\n";
 	};
 	
 	return str;
