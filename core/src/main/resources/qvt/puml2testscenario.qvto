@@ -147,16 +147,17 @@ helper SQ_Message::isResponse(): Boolean {
 }
 
 helper generateRoundtrip(msgPrefix: String, roundtripId : Integer, request : SQ_Message, response : SQ_Message): TestRoundtrip {
-	log(msgPrefix + "GENERATING Roundtrip: " + roundtripId.toString() + ": " + request.humanReadableString());
+	log(msgPrefix + "GENERATING Roundtrip: " + roundtripId.toString() + ":");
 	
 	var rt := object TestRoundtrip {
 		testRoundtripName := "roundtrip" + roundtripId.toString();
-		requestspecification := request.map message2request();
-		responsespecification := response.map message2response();
+		requestspecification := request.deepclone().map message2request();
+		responsespecification := response.deepclone().map message2response();
 	};
 	
-	log(msgPrefix + "END GENERATING (" + rt.testRoundtripName + ", " + rt.requestspecification.humanReadableString() + ")");
+	log(msgPrefix + "  "  + rt.requestspecification.humanReadableString() + " => " + rt.responsespecification.humanReadableString());
 	
+	log(msgPrefix + "END GENERATING");
 	return rt;
 }
 
@@ -282,8 +283,7 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 					structures += generateRoundtrip(msgPrefix + "    " , roundtripCnt, reqT.requestMsg, msg);
 					roundtripCnt := roundtripCnt + 1;
 					
-					// Mark this request as consumed -> shadowed from children and will be removed from
-					// above scope
+					// Mark as consumed -> shadowed from children and removed from parent scope
 					consumedRequests->add(elements->at(reqT.index));
 				}
     		}
@@ -379,6 +379,22 @@ helper RequestSpecification::humanReadableString(): String {
 	return "request(method=" + self.method + ", url=\"" + self.url + "\", sender=" + self.sender + ", receiver=" + self.receiver + ")";
 }
 
+helper ResponseSpecification::humanReadableString(): String {
+	var str := "response(";
+	
+	var codes := self.statusmatcher.oclAsType(IsIn).value;
+	var codeInd := 1;
+	while (codeInd <= codes->size()) {
+		str := str + codes->at(codeInd);
+		codeInd := codeInd + 1;
+		if (codeInd <= codes->size()) {
+			str := str +  " || ";
+	 	}
+	};
+	str := str + ")";
+	return str;
+}
+
 helper SQ_Group::humanReadableString(): String {
 	return self.keyword.toString() + " " + self.label.toString() + " (#elems=" + self.elements->size().toString() + ", #alternatives=" + self.alternatives->size().toString() + ")";
 }
@@ -390,7 +406,7 @@ helper Structure::humanReadableString(prefix: String): String {
 	if (self.oclIsTypeOf(TestRoundtrip)) {
 		var rt := self.oclAsType(TestRoundtrip);
 		str := str + "Roundtrip(" + rt.testRoundtripName + "): "; 
-		add := rt.requestspecification.humanReadableString() + "\n";
+		add := rt.requestspecification.humanReadableString() + " => " + rt.responsespecification.humanReadableString() + "\n";
 		if (not add.oclIsUndefined()) {
 			str := str + add;
 		} else {
