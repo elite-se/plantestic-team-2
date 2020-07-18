@@ -62,11 +62,31 @@ helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(): OrderedSet
         if (umlElement.oclIsTypeOf(SQ_Message)) {
             var message : SQ_Message := umlElement.oclAsType(SQ_Message);
             if (not message.payload.oclIsUndefined()) {
+								// TODO: tmp
+								if (message.isRequest()) {
+									log("\tDiscovered Request: " + 
+										message.participantLeft.name.toString() + 
+										" " + message.arrow.lefttip.toString() + message.arrow.righttip.toString() +
+										" " + message.participantRight.name.toString()
+									);
+								} elif (message.isResponse()) {
+									log("\tDiscovered Response: " + 
+										message.participantLeft.name.toString() + 
+										" " + message.arrow.lefttip.toString() + message.arrow.righttip.toString() +
+										" " + message.participantRight.name.toString()
+									);
+								};
+
+
                 sequenceElements += message;
             };
         }
         elif (umlElement.oclIsTypeOf(SQ_Group)) {
             var group : SQ_Group := umlElement.oclAsType(SQ_Group);
+
+						// TODO: temp
+						log("\tDiscovered Group: " + group.keyword.toString() + " " + group.label.toString() + " (" + group.elements->size().toString() + ")");
+
             sequenceElements += group.map flatten_SQ_Group();
         };
     };
