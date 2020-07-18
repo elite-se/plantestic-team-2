@@ -3,16 +3,16 @@
 Alice -> Bob : request(GET, "name")
 
 alt weather==sunny
-	Bob -> Alice : response(200 ACCEPTED, { name: "Bob" })
+	Bob --> Alice : response(200 ACCEPTED, { name: "Bob" })
 	
 	CCC -> ECS
 	alt moon==fullmoon
-		ECS <- CCC
+		return 200
 	end
 else name==Hans
-	Bob -> Alice : response(500 DENIED)
+	Bob --> Alice : response(500 DENIED)
 else
-	Bob -> Alice : response(418 I_AM_A_TEAPOT)
+	Bob --> Alice : response(418 I_AM_A_TEAPOT)
 end
 
 Bob -> Alice : response(404 NOT_FOUND)

@@ -250,6 +250,7 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, pre
 	
 	
 	log(msgPrefix + "END ALTERNATIVE");
+	
 	return Tuple { structure = alternative, roundtripCnt = roundtripCnt, newPreceeding = newPreceeding };
 }
 
@@ -307,6 +308,7 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
     			}
     		};
 			elements := elems;
+			elemInd := elemInd - (prec->size() - res.newPreceeding->size());
     	}
 	};
 	
@@ -392,6 +394,19 @@ helper ResponseSpecification::humanReadableString(): String {
 	 	}
 	};
 	str := str + ")";
+	return str;
+}
+
+helper List(SQ_SequenceElement)::humanReadableString(prefix: String): String {
+	var str := "";
+	self->forEach(e) {
+		if (e.oclIsKindOf(SQ_Message)) {
+			str := str + prefix + e.oclAsType(SQ_Message).humanReadableString() + "\n"; 
+		} elif (e.oclIsKindOf(SQ_Group)) {
+			str := str + prefix + e.oclAsType(SQ_Group).humanReadableString() + "\n";
+		};
+	};
+	
 	return str;
 }
 
