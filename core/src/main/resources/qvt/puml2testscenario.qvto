@@ -219,8 +219,7 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, pre
 	
 	var newPreceeding := object List(SQ_SequenceElement) {};
 	res.elements->forEach(e) {
-		// alt without condition captures all consumed requests
-		if (preceeding->includes(e) and not (alternative.condition.oclIsUndefined() and res.consumedRequests->includes(e))) {
+		if (preceeding->includes(e)) {
 			newPreceeding += e;
 		};
 	};

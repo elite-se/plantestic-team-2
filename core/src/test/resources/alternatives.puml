@@ -8,11 +8,13 @@ alt weather==sunny
 	CCC -> ECS
 	alt moon==fullmoon
 		return 200
+	else
+		Bob --> Alice : response(410 GONE)
 	end
 else name==Hans
 	Bob --> Alice : response(500 DENIED)
-else
-	Bob --> Alice : response(418 I_AM_A_TEAPOT)
+'else
+'	Bob --> Alice : response(418 I_AM_A_TEAPOT)
 end
 
 Bob -> Alice : response(404 NOT_FOUND)
