@@ -74,17 +74,21 @@ helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(msgPrefix: St
     var sequenceElements : OrderedSet(SQ_SequenceElement);
     self->forEach(umlElement) {
         if (umlElement.oclIsTypeOf(SQ_Message)) {
-            var message : SQ_Message := umlElement.oclAsType(SQ_Message);
-            
+            var message := umlElement.oclAsType(SQ_Message);
             log(msgPrefix + "MESSAGE: " + message.humanReadableString());
-
             if (not message.payload.oclIsUndefined()) {
                 sequenceElements += message;
             };
         }
         elif (umlElement.oclIsTypeOf(SQ_Group)) {
-            var group : SQ_Group := umlElement.oclAsType(SQ_Group);
-            sequenceElements += group.map flatten_SQ_Group(msgPrefix);
+            sequenceElements += umlElement.oclAsType(SQ_Group).map flatten_SQ_Group(msgPrefix);
+        }
+        elif (umlElement.oclIsTypeOf(SQ_Return)) {
+			var ret := umlElement.oclAsType(SQ_Return);
+			log(msgPrefix + "RETURN: " + ret.humanReadableString());
+			if (not ret.response.oclIsUndefined()) {
+        		sequenceElements += ret;
+        	}
         };
     };
     
@@ -356,7 +360,10 @@ helper SQ_Message::humanReadableString(): String {
 		} elif (not self.payload.response.oclIsUndefined()) {
 			str := str + " response(";
 			self.payload.response.acceptedcodes->forEach(ac) {
-				str := str + ac.code.toString() + " " + ac.description + ", ";
+				str := str + ac.code.toString();
+				if (not ac.description.oclIsUndefined()) {
+					str := str + " " + ac.description;
+				}
 			};
 			str := str + ")";
 		};
@@ -455,5 +462,25 @@ helper Structure::humanReadableString(prefix: String): String {
 		str := str + "\n";
 	};
 	
+	return str;
+}
+
+helper SQ_Return::humanReadableString(): String {
+	return "return " + self.response.humanReadableString();
+}
+
+helper PT_Response::humanReadableString(): String {
+	var str := "response(";
+	
+	var codes := self.acceptedcodes.code->asList();
+	var codeInd := 1;
+	while (codeInd <= codes->size()) {
+		str := str + codes->at(codeInd).toString();
+		codeInd := codeInd + 1;
+		if (codeInd <= codes->size()) {
+			str := str +  " || ";
+	 	}
+	};
+	str := str + ")";
 	return str;
 }
