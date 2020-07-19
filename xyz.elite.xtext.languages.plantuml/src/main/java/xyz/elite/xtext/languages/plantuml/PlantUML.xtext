@@ -241,7 +241,7 @@ PT_ParameterValue:
     ID | STRING | INT;
 
 PT_TimeUnit:
-    'ns'|'ms'|'s'|'min'|'h'|'d';
+    'ns'|'us'|'ms'|'s'|'min'|'h'|'d';
 
 // ----------------------------
 //      LEXER/PARSER ATOMS

@@ -62,4 +62,18 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="condition" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Delay" eSuperTypes="#//Structure">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="unit" lowerBound="1" eType="#//TimeUnit"
+        defaultValueLiteral="MILLISECONDS"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TimeUnit">
+    <eLiterals name="DAYS"/>
+    <eLiterals name="HOURS" value="1"/>
+    <eLiterals name="MICROSECONDS" value="2"/>
+    <eLiterals name="MILLISECONDS" value="3"/>
+    <eLiterals name="MINUTES" value="4"/>
+    <eLiterals name="NANOSECONDS" value="5"/>
+    <eLiterals name="SECONDS" value="6"/>
+  </eClassifiers>
 </ecore:EPackage>

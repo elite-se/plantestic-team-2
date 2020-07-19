@@ -89,6 +89,13 @@ helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(msgPrefix: St
 			if (not ret.response.oclIsUndefined()) {
         		sequenceElements += ret;
         	}
+        }
+        elif (umlElement.oclIsTypeOf(SQ_Delay)) {
+        	var delay := umlElement.oclAsType(SQ_Delay);
+        	if (not delay.wait.oclIsUndefined()) {
+	        	log(msgPrefix + "DALAY: " + delay.humanReadableString());
+	        	sequenceElements += delay;
+        	}
         };
     };
     
@@ -194,6 +201,27 @@ mapping PT_Parameter::param2responseDatum(): ResponseDatum {
     value := self.value;
 }
 
+helper String::string2timeUnit(): TimeUnit {
+	var normalized := self.trim();
+	if (normalized.equalsIgnoreCase("ns")) {
+		return TimeUnit::NANOSECONDS;
+	} else if (normalized.equalsIgnoreCase("us")) {
+		return TimeUnit::MICROSECONDS;
+	} else if (normalized.equalsIgnoreCase("ms")) {
+		return TimeUnit::MILLISECONDS;
+	} else if (normalized.equalsIgnoreCase("s")) {
+		return TimeUnit::SECONDS;
+	} else if (normalized.equalsIgnoreCase("min")) {
+		return TimeUnit::MINUTES;
+	} else if (normalized.equalsIgnoreCase("h")) {
+		return TimeUnit::HOURS;
+	} else if (normalized.equalsIgnoreCase("d")) {
+		return TimeUnit::DAYS;
+	} else {
+		return TimeUnit::MILLISECONDS;
+	}
+}
+
 helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer): Tuple(structure: Alternative, roundtripCnt: Integer) {
 	log(msgPrefix + "TO ALTERNATIVE (hasCond=" + (not self.label.oclIsUndefined()).toString() + ", rdID=" + roundtripIdStart.toString() + ") " + self.humanReadableString());
 	var alternative := object Alternative {};
@@ -261,6 +289,13 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
     		var res := grp.toAlternative(msgPrefix + "  ", roundtripCnt);
     		structures += res.structure;
     		roundtripCnt := res.roundtripCnt;
+    	} elif (elem.oclIsTypeOf(SQ_Delay)) {
+    		var delay = elem.oclAsType(SQ_Delay);
+    		log(msgPrefix + "  " + delay.humanReadableString());
+    		structures += object Delay {
+    			value := delay.wait.time;
+    			unit := delay.wait.unit.string2timeUnit();
+    		};
     	}
 	};
 	
@@ -413,6 +448,15 @@ helper Alternative::humanReadableString(prefix: String): String {
 	str := str + "\n";
 	
 	return str;
+}
+
+helper Delay::humanReadableString(prefix: String): String {
+	return prefix + "Delay: " + self.value.toString() + " " + self.unit.toString();
+}
+
+
+helper SQ_Delay::humanReadableString(): String {
+	return "delay " + self.wait.time.toString() + self.wait.unit.toString();
 }
 
 helper SQ_Return::humanReadableString(): String {
