@@ -369,47 +369,48 @@ helper SQ_Group::humanReadableString(): String {
 	return self.keyword.toString() + " " + self.label.toString() + " (#elems=" + self.elements->size().toString() + ", #alternatives=" + self.alternatives->size().toString() + ")";
 }
 
-helper Structure::humanReadableString(prefix: String): String {
-	var str := prefix;
-	var add := "";
-	
-	if (self.oclIsTypeOf(TestRoundtrip)) {
-		var rt := self.oclAsType(TestRoundtrip);
-		str := str + "Roundtrip(" + rt.testRoundtripName + "): "; 
-		add := rt.requestspecification.humanReadableString() + " => " + rt.responsespecification.humanReadableString() + "\n";
-		if (not add.oclIsUndefined()) {
-			str := str + add;
-		} else {
-			str := str + "UNDEFINED(rs.method=" 
-				+ rt.requestspecification.method.oclIsUndefined().toString() 
-				+ ", rs.url=" + rt.requestspecification.url.oclIsUndefined().toString() 
-				+ ", rs.sender=" + rt.requestspecification.sender.oclIsUndefined().toString() 
-				+ ", rs.receiver=" + rt.requestspecification.receiver.oclIsUndefined().toString() 
-				+")\n";
-		};
-	} elif (self.oclIsTypeOf(Alternative)) {
-		var alt := self.oclAsType(Alternative);
-		
-		var hasCondition := not alt.condition.oclIsUndefined();
-		if (hasCondition) {
-			str := str + "if (" + alt.condition + ") {\n";
-		};
-		alt.provided->forEach(prov) {
-			if (hasCondition) {
-				str := str + prov.humanReadableString(prefix + "  ");
-			} else {
-				str := str + prov.humanReadableString(prefix);
-			};
-		};
-		if (hasCondition) {
-			str := str + prefix + "}";
-		};
-		
-		if (not alt.otherwise.oclIsUndefined()) {
-			str := str + " else {\n" + alt.otherwise.humanReadableString(prefix + "  ") + prefix + "}";
-		};
-		str := str + "\n";
+helper Structure::humanReadableString(prefix: String): String 
+{
+	return prefix + "Structure";
+}
+
+helper TestRoundtrip::humanReadableString(prefix: String): String {
+	var intro := prefix + "Roundtrip(" + self.testRoundtripName + "): "; 
+	var add := self.requestspecification.humanReadableString() + " => " + self.responsespecification.humanReadableString() + "\n";
+	if (not add.oclIsUndefined()) {
+		return intro + add;
+	} else {
+		return intro + "UNDEFINED(rs.method=" 
+			+ self.requestspecification.method.oclIsUndefined().toString() 
+			+ ", rs.url=" + self.requestspecification.url.oclIsUndefined().toString() 
+			+ ", rs.sender=" + self.requestspecification.sender.oclIsUndefined().toString() 
+			+ ", rs.receiver=" + self.requestspecification.receiver.oclIsUndefined().toString() 
+			+")\n";
 	};
+}
+
+helper Alternative::humanReadableString(prefix: String): String {
+	var str := prefix;
+	
+	var hasCondition := not self.condition.oclIsUndefined();
+	if (hasCondition) {
+		str := str + "if (" + self.condition + ") {\n";
+	};
+	self.provided->forEach(prov) {
+		if (hasCondition) {
+			str := str + prov.humanReadableString(prefix + "  ");
+		} else {
+			str := str + prov.humanReadableString(prefix);
+		};
+	};
+	if (hasCondition) {
+		str := str + prefix + "}";
+	};
+	
+	if (not self.otherwise.oclIsUndefined()) {
+		str := str + " else {\n" + self.otherwise.humanReadableString(prefix + "  ") + prefix + "}";
+	};
+	str := str + "\n";
 	
 	return str;
 }
