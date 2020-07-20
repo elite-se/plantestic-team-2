@@ -1,0 +1,15 @@
+@startuml
+
+actor User
+
+' 2 
+User -> A : request(GET, "/var/etc")
+
+' 1
+User -> A : request(GET, "/var/etc/2")
+A --> User : response(201)
+
+' 2
+A --> User : response(202)
+
+@enduml

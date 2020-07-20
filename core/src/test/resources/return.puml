@@ -1,0 +1,14 @@
+@startuml
+
+Frank -> Alice : request(GET, "isalive/{actor}", { actor: Bob })
+Alice -> Bob : request(GET, "name")
+
+alt
+	' This should be Bob --> Alice
+	return response(200, { name: "Bob" })
+	
+	' This should be Alice --> Frank
+	return response(201, { result: true })
+end
+
+@enduml

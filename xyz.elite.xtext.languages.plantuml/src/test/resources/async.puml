@@ -33,7 +33,7 @@ return response(200)
 '/
 
 XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/{vin}")
-return response(200, {MarketRegion})
+SVDS --> XCS : response(200, {MarketRegion})
 
 autoactivate off
 XCS -> ELOS : <jms elos topic>publish(elos data, CREATED)

@@ -3,26 +3,24 @@
 Alice -> Bob : request(GET, "name")
 
 alt weather==sunny
-	Bob -> Alice : response(200 ACCEPTED, { name: "Bob" })
+	Bob --> Alice : response(200 ACCEPTED, { name: "Bob" })
 	
-	CCC -> ECS
-	alt moon==fullmoon
-		ECS <- CCC
-	end group
-else name=="Hans"
-	Bob -> Alice : response(500 DENIED)
-else
-	Bob -> Alice : response(418 I_AM_A_TEAPOT)
-end group
+	Alice -> Bob : request(GET, "social_security_number")
 
-/'
- if (weather == sunny) {
-	when().get("name").
-	then().statusCode(200);
- } else if (name == "Hans") {
-	when().get("name")
-	then().statusCode(500);
- }
-'/
+	CCC -> ECS : request(POST, "/event/create/{id}", { id: 42 })
+	
+	alt moon==fullmoon
+		return response(200 ACCEPTED)
+	end
+
+	Bob --> Alice : response(400 ACCESS_FORBIDDEN)
+else weather==Cloudy
+	Bob --> Alice : response(500 ERROR)
+else
+	Bob --> Alice : response(418 I_AM_A_TEAPOT)
+end
+
+Alice -> Bob : request(GET, "age")
+Bob -> Alice : response(220 NOT_STANDARDIZED)
 
 @enduml

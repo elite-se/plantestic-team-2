@@ -5,6 +5,16 @@ transformation puml2reqres(in input: plantUML, out output: testscenario);
 
 configuration property diagramName : String;
 
+/**
+ * DISCLAIMER:
+ * THIS CODE WAS CREATED UNDER IMMENSE TIME PRESSURE,
+ * NEITHER I NOR ANY OTHER COMMITER FROM GIT BLAME
+ * TAKES ANY RESPONSIBILITY; WE WOULD NEVER WRITE CODE 
+ * LIKE THIS IN ANY PROFESSIONAL ENVIRONMENT
+ *
+ * Have fun with qvt ;)
+ */
+
 main() {
     log('Started transforming PlantUML to RequestResponse pairs');
 
@@ -30,79 +40,129 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
     configs := configs_;
     var roundtripCounter : Integer := 1;
     
-//    var elements := self.elements->flatten_SQ_SequenceElements();
-    
-    var elements : Sequence(SQ_SequenceElement) := self.elements->flatten_SQ_SequenceElements()->asList();
-    log("Elements: " + elements->size().toString());
-    var messages : Sequence(SQ_Message) := Sequence{};
+    log("\n1. Preprocessing:");
+    var elements := self.elements->flatten_SQ_SequenceElements("")->asList();
 
-    elements->forEach(elem) {
-        if (elem.oclIsTypeOf(SQ_Message)) {
-            messages += elem.oclAsType(SQ_Message);
-        };
-    };
-    log("Messages: " + messages->size().toString());
-
-    var msgIndex : Integer := 1;
-    while (msgIndex <= messages->size()) {
-        var msg : SQ_Message := messages->at(msgIndex);
-
-        if (msg.isRequest()) {
-            var followingMsgs : Sequence(SQ_Message) := messages->subSequence(msgIndex + 1, messages->size());
-            var responseMsg : SQ_Message := findResponse(msg, followingMsgs);
-            if (not responseMsg.oclIsUndefined()) {
-                var request : RequestSpecification := msg.map message2request();
-                var response : ResponseSpecification := responseMsg.payload.response.map response2response();
-                testroundtrip += generateRoundtrip(roundtripCounter, request, response, "");
-                roundtripCounter := roundtripCounter + 1;
-            } else {
-                log("Ignoring request " + msgIndex.toString() + " that has no corresponding response");
-            };
-        };
-
-        msgIndex := msgIndex + 1;
-    };
-    log("Roundtrips: " + testroundtrip->size().toString());
+    log("\n2. Parsing:");
+    var prec := object List(SQ_SequenceElement) {};
+	structure := elements->structures("", 1, prec).structure;
+	
+	log("\n3. Result:");
+	structure->forEach(struct) {
+    	log(struct.humanReadableString(""));
+	};
 }
 
-helper findResponse(request : SQ_Message, followingMsgs : Sequence(SQ_Message)) : SQ_Message {
-    followingMsgs->forEach(potentialResponse) {
-        if (potentialResponse.isResponse() and
-                potentialResponse.sender().name = request.receiver().name and
-                potentialResponse.receiver().name = request.sender().name
-           ) {
-                return potentialResponse;
-        };
-    };
-    return null;
+helper findRequest(msgPrefix: String, response: SQ_Message, preceedingElements: Sequence(SQ_SequenceElement)) : Tuple(index: Integer, requestMsg: SQ_Message) {
+	log(msgPrefix + "FIND REQUEST: " + response.humanReadableString());
+	var potInd := 0;
+	var preceedingRev := preceedingElements->reverse();
+	while (potInd <= preceedingRev->size()) {
+		potInd := potInd + 1;
+		var precElem := preceedingRev->at(potInd);
+		if (precElem.oclIsTypeOf(SQ_Message)) {
+			var msg = precElem.oclAsType(SQ_Message);
+			log(msgPrefix + "  * " + msg.humanReadableString());
+			if (msg.isRequest() 
+				and msg.sender().name = response.receiver().name
+				and msg.receiver().name = response.sender().name) {
+				
+				log(msgPrefix + "  FOUND: " + msg.humanReadableString());
+				log(msgPrefix + "END FIND REQUEST");
+				return Tuple{index = potInd, requestMsg = msg};
+			}
+		}	
+	};
+	
+	log(msgPrefix + "  NOTHING FOUND");
+	log(msgPrefix + "END FIND REQUEST");
+	return null;
 }
 
-helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(): OrderedSet(SQ_SequenceElement) {
+helper findReturnedRequest(msgPrefix: String, preceedingElements: Sequence(SQ_SequenceElement)) : Tuple(index: Integer, requestMsg: SQ_Message) {
+	log(msgPrefix + "FIND REQUEST FOR RETURN");
+	var potInd := 0;
+	var returnCnt := 0;
+	var preceedingRev := preceedingElements->reverse();
+	while (potInd <= preceedingRev->size()) {
+		potInd := potInd + 1;
+		var precElem := preceedingRev->at(potInd);
+		if (precElem.oclIsTypeOf(SQ_Return)) {
+			log(msgPrefix + "  x found previous return");
+			returnCnt := returnCnt + 1;	
+		} elif (precElem.oclIsTypeOf(SQ_Message)) {
+			var msg = precElem.oclAsType(SQ_Message);
+			log(msgPrefix + "  * " + msg.humanReadableString());
+			if (msg.isRequest()) {
+				if (returnCnt = 0) {
+					log(msgPrefix + "  FOUND: " + msg.humanReadableString());
+					log(msgPrefix + "END FIND REQUEST FOR RETURN");
+					return Tuple{index = potInd, requestMsg = msg};
+				} else {
+					returnCnt := returnCnt - 1;	
+				};
+			}
+		};
+	};
+	
+	log(msgPrefix + "  NOTHING FOUND");
+	log(msgPrefix + "END FIND REQUEST FOR RETURN");
+	return null;
+}
+
+helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(msgPrefix: String): OrderedSet(SQ_SequenceElement) {
+	log(msgPrefix + "START ELEMENTS");
+
     var sequenceElements : OrderedSet(SQ_SequenceElement);
     self->forEach(umlElement) {
         if (umlElement.oclIsTypeOf(SQ_Message)) {
-            var message : SQ_Message := umlElement.oclAsType(SQ_Message);
+            var message := umlElement.oclAsType(SQ_Message);
+            log(msgPrefix + "MESSAGE: " + message.humanReadableString());
             if (not message.payload.oclIsUndefined()) {
                 sequenceElements += message;
             };
         }
         elif (umlElement.oclIsTypeOf(SQ_Group)) {
-            var group : SQ_Group := umlElement.oclAsType(SQ_Group);
-            sequenceElements += group.map flatten_SQ_Group();
+            sequenceElements += umlElement.oclAsType(SQ_Group).map flatten_SQ_Group(msgPrefix);
+        }
+        elif (umlElement.oclIsTypeOf(SQ_Return)) {
+			var ret := umlElement.oclAsType(SQ_Return);
+			log(msgPrefix + "RETURN: " + ret.humanReadableString());
+			if (not ret.response.oclIsUndefined()) {
+        		sequenceElements += ret;
+        	}
+        }
+        elif (umlElement.oclIsTypeOf(SQ_Delay)) {
+        	var delay := umlElement.oclAsType(SQ_Delay);
+        	if (not delay.wait.oclIsUndefined()) {
+	        	log(msgPrefix + "DELAY: " + delay.humanReadableString());
+	        	sequenceElements += delay;
+        	}
         };
     };
+    
+	log(msgPrefix + "END ELEMENTS");
     return sequenceElements;
 }
 
-mapping SQ_Group::flatten_SQ_Group(): SQ_Group {
-    elements += self.elements->flatten_SQ_SequenceElements();
-    alternatives += self.alternatives->at(1).oclAsType(SQ_GroupAlternative).map flatten_SQ_GroupAlternative();
+mapping SQ_Group::flatten_SQ_Group(msgPrefix: String): SQ_Group {
+	log(msgPrefix + "START GROUP: " + self.humanReadableString());
+
+	keyword := self.keyword;
+    elements += self.elements->flatten_SQ_SequenceElements(msgPrefix + "  ");
+    alternatives += self.alternatives->oclAsType(SQ_GroupAlternative).map flatten_SQ_GroupAlternative(msgPrefix);
     label := self.label;
+    
+	log(msgPrefix + "END GROUP");
 }
 
-mapping SQ_GroupAlternative::flatten_SQ_GroupAlternative(): SQ_GroupAlternative {
-    elements += self.elements->flatten_SQ_SequenceElements();
+mapping SQ_GroupAlternative::flatten_SQ_GroupAlternative(msgPrefix: String): SQ_GroupAlternative {
+	log(msgPrefix + "START ALTERNATIVE: else" + " " + self.label.toString() + " (" + self.elements->size().toString() + ")");
+
+    elements += self.elements->flatten_SQ_SequenceElements(msgPrefix + "  ");
     label := self.label;
+    
+	log(msgPrefix + "END ALTERNATIVE");
 }
 
 helper SQ_Arrow::isR2L(): Boolean {
@@ -139,13 +199,19 @@ helper SQ_Message::isResponse(): Boolean {
     return not self.payload.response.oclIsUndefined();
 }
 
-helper generateRoundtrip(roundtripId : Integer, request : RequestSpecification, response : ResponseSpecification, precond : String): TestRoundtrip {
-	return object TestRoundtrip {
+helper generateRoundtrip(msgPrefix: String, roundtripId: Integer, request: RequestSpecification, response: ResponseSpecification): TestRoundtrip {
+	log(msgPrefix + "GENERATING Roundtrip: " + roundtripId.toString() + ":");
+	
+	var rt := object TestRoundtrip {
 		testRoundtripName := "roundtrip" + roundtripId.toString();
 		requestspecification := request;
 		responsespecification := response;
-		precondition := precond;
 	};
+	
+	log(msgPrefix + "  "  + rt.requestspecification.humanReadableString() + " => " + rt.responsespecification.humanReadableString());
+	
+	log(msgPrefix + "END GENERATING");
+	return rt;
 }
 
 mapping SQ_Message::message2request(): RequestSpecification {
@@ -159,24 +225,9 @@ mapping SQ_Message::message2request(): RequestSpecification {
 	requestdatum := self.payload.request.parametermap.params->map param2requestDatum();
 }
 
-mapping PT_Response::response2response(): ResponseSpecification {
-	 responsedatum := self.parametermap.params->map param2responseDatum();
-
-     if(self.acceptedcodes->notEmpty()) {
-         statusmatcher := object IsIn {
-            value := self.acceptedcodes.code.toString();
-         };
-     };
-
-     var bodyMatcherGroup = object BodyMatcherGroup {};
-     responsedatum->forEach(rd) {
-        var bodyMatcher = object BodyMatcher {};
-        bodyMatcher.matcher := object HasXPath {
-			xPath := rd.xPath;
-		  };
-        bodyMatcherGroup.bodymatcher += bodyMatcher;
-     };
-     bodymatchergroup := bodyMatcherGroup;
+mapping PT_Response::pumlresponse2testscenarioresponse(): ResponseSpecification {
+	responsedatum := self.parametermap.params->map param2responseDatum();
+    statuscode := self.acceptedcodes.code;
 }
 
 mapping PT_Parameter::param2requestDatum(): RequestDatum {
@@ -186,5 +237,316 @@ mapping PT_Parameter::param2requestDatum(): RequestDatum {
 
 mapping PT_Parameter::param2responseDatum(): ResponseDatum {
     variableName := self.name;
-    xPath := self.value;
+    value := self.value;
+}
+
+helper String::string2timeUnit(): TimeUnit {
+	var normalized := self.trim();
+	if (normalized.equalsIgnoreCase("ns")) {
+		return TimeUnit::NANOSECONDS;
+	} else if (normalized.equalsIgnoreCase("us")) {
+		return TimeUnit::MICROSECONDS;
+	} else if (normalized.equalsIgnoreCase("ms")) {
+		return TimeUnit::MILLISECONDS;
+	} else if (normalized.equalsIgnoreCase("s")) {
+		return TimeUnit::SECONDS;
+	} else if (normalized.equalsIgnoreCase("min")) {
+		return TimeUnit::MINUTES;
+	} else if (normalized.equalsIgnoreCase("h")) {
+		return TimeUnit::HOURS;
+	} else if (normalized.equalsIgnoreCase("d")) {
+		return TimeUnit::DAYS;
+	} else {
+		return TimeUnit::MILLISECONDS;
+	}
+}
+
+helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, preceeding: List(SQ_SequenceElement)): Tuple(structure: Alternative, roundtripCnt: Integer) {
+	log(msgPrefix + "TO ALTERNATIVE (hasCond=" + (not self.label.oclIsUndefined()).toString() + ", rdID=" + roundtripIdStart.toString() + ") " + self.humanReadableString());
+	var alternative := object Alternative {};
+
+	var res := self.elements->asList()->structures(msgPrefix + "  ", roundtripIdStart, preceeding);
+	alternative.condition := self.label;
+	alternative.provided := res.structure->asOrderedSet();
+	var roundtripCnt := res.roundtripCnt;
+
+	if (self.alternatives->size() > 0) {
+		var alt1 := self.alternatives->at(1);
+		var othr := object SQ_Group {
+			keyword := self.keyword;
+			label := alt1.label;
+			alternatives := self.alternatives->subOrderedSet(2, self.alternatives->size());
+			elements := alt1.elements;
+		};
+		
+		var res2 := othr.toAlternative(msgPrefix + "  ", roundtripCnt, preceeding);
+		alternative.otherwise := res2.structure;
+		roundtripCnt := res2.roundtripCnt;
+	};
+	
+	log(msgPrefix + "END ALTERNATIVE");
+	return Tuple { structure = alternative, roundtripCnt = roundtripCnt };
+}
+
+helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart: Integer, parentScopePreceeding: List(SQ_SequenceElement)): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), roundtripCnt: Integer) {
+	log(msgPrefix + "BEGIN STRUCTURES #" + self->size().toString() + " (rtID=" + roundtripIdStart.toString() + ")");
+
+	var structures := object List(Structure) {};
+	var roundtripCnt := roundtripIdStart;
+	var elements := self;
+
+	var elemInd := 1;
+	while (elemInd <= elements->size()) {
+		assert fatal (elemInd >= 0)
+			with log('INTERNAL: logic tried accessing index < 0');
+	
+		var elem := elements->at(elemInd);
+		
+		var prec := object List(SQ_SequenceElement) {};
+		parentScopePreceeding->forEach(p) {
+			prec += p;	
+		};
+		self->subSequence(1, elemInd-1)->forEach(p) {
+			prec += p;
+		};
+		
+		// Ordering is important to ensure prec is built correctly
+		elemInd := elemInd + 1;
+	
+		if (elem.oclIsTypeOf(SQ_Message)) {
+    		var msg := elem.oclAsType(SQ_Message);
+    		log(msgPrefix + "  message(" + elemInd.toString() + "): " + msg.humanReadableString());
+    		
+    		if (msg.isResponse()) {
+				var reqT := findRequest(msgPrefix + "    ", msg, prec);
+				
+				if (not reqT.oclIsUndefined()) {
+					structures += generateRoundtrip(
+    					msgPrefix + "    ", 
+    					roundtripCnt, 
+    					reqT.requestMsg.deepclone().map message2request(), 
+    					msg.payload.response.deepclone().map pumlresponse2testscenarioresponse()
+					);
+					roundtripCnt := roundtripCnt + 1;
+				}
+    		}
+    	} elif (elem.oclIsTypeOf(SQ_Return)) {
+    		var ret := elem.oclAsType(SQ_Return);
+    		log(msgPrefix + "  return " + ret.humanReadableString());
+    		
+    		if (not ret.response.oclIsUndefined()) {
+    			var reqT := findReturnedRequest(msgPrefix + "    ", prec);
+    			
+    			if (not reqT.oclIsUndefined()) {
+    				structures += generateRoundtrip(
+    					msgPrefix + "    ", 
+    					roundtripCnt, 
+    					reqT.requestMsg.deepclone().map message2request(), 
+    					ret.response.deepclone().map pumlresponse2testscenarioresponse()
+					);
+					roundtripCnt := roundtripCnt + 1;
+    			}
+    		}
+    	} elif (elem.oclIsTypeOf(SQ_Group)) {
+    		var grp = elem.oclAsType(SQ_Group);
+    		log(msgPrefix + "  " + grp.humanReadableString());
+    		
+    		var res := grp.toAlternative(msgPrefix + "  ", roundtripCnt, prec);
+    		structures += res.structure;
+    		roundtripCnt := res.roundtripCnt;
+    	} elif (elem.oclIsTypeOf(SQ_Delay)) {
+    		var delay = elem.oclAsType(SQ_Delay);
+    		log(msgPrefix + "  " + delay.humanReadableString());
+    		structures += object Delay {
+    			value := delay.wait.time;
+    			unit := delay.wait.unit.string2timeUnit();
+    		};
+    	}
+	};
+	
+	log(msgPrefix + "END STRUCTURES");
+	return Tuple { structure = structures, elements = elements, roundtripCnt = roundtripCnt };
+}
+
+helper SQ_Message::humanReadableString(): String {
+	var str := "";
+	
+	// Parse left participant (if any)
+	if (not self.participantLeft.oclIsUndefined()) {
+		str := str + self.participantLeft.name + " ";
+	};
+	
+	// Parse arrow
+	if (not self.arrow.leftmodifier.oclIsUndefined()) {
+		str := str + self.arrow.leftmodifier;
+	};
+	if (not self.arrow.lefttip.oclIsUndefined()) {
+		str := str + self.arrow.lefttip.toString();
+	};
+	self.arrow.line->forEach(l) {
+		str := str + l;
+	};
+	if (not self.arrow.righttip.oclIsUndefined()) {
+		str := str + self.arrow.righttip.toString();
+	};
+	if (not self.arrow.rightmodifier.oclIsUndefined()) {
+		str := str + self.arrow.rightmodifier;
+	};
+	
+	// Parse right participant (if any)
+	if (not self.participantRight.oclIsUndefined()) {
+		str := str + " " + self.participantRight.name;
+	};
+	
+	// Parse payload (if any)
+	if (not self.payload.oclIsUndefined()) {
+		if (not self.payload.asyncid.oclIsUndefined() and self.payload.asyncid != 0) {
+			str := str + " : async[" + self.payload.asyncid.toString() + "]";
+		};
+		
+		if (not self.payload.request.oclIsUndefined()) {
+			str := str + " request(" + self.payload.request.method + ", " + self.payload.request.url + ", {...})";
+		} elif (not self.payload.response.oclIsUndefined()) {
+			str := str + " response(";
+			self.payload.response.acceptedcodes->forEach(ac) {
+				str := str + ac.code.toString();
+				if (not ac.description.oclIsUndefined()) {
+					str := str + " " + ac.description;
+				}
+			};
+			str := str + ")";
+		};
+		
+		if (not self.description.oclIsUndefined()) {
+			str := str + " " + self.description;
+		};
+	} elif (not self.description.oclIsUndefined()) {
+		str := str + " : " + self.description;
+	};
+	
+	
+	if (not self.payload.oclIsUndefined()) {
+		str := str + " (isRequest=" + self.isRequest().toString() + ")";
+	};
+	
+	return str;
+}
+
+helper RequestSpecification::humanReadableString(): String {
+	return "request(method=" + self.method + ", url=\"" + self.url + "\", sender=" + self.sender + ", receiver=" + self.receiver + ")";
+}
+
+helper ResponseSpecification::humanReadableString(): String {
+	var str := "response(";
+	
+	var codes := self.statuscode;
+	var codeInd := 1;
+	while (codeInd <= codes->size()) {
+		str := str + codes->at(codeInd).toString();
+		codeInd := codeInd + 1;
+		if (codeInd <= codes->size()) {
+			str := str +  " || ";
+	 	}
+	};
+	str := str + ")";
+	return str;
+}
+
+helper List(SQ_SequenceElement)::humanReadableString(prefix: String): String {
+	var str := "";
+	self->forEach(e) {
+		if (e.oclIsKindOf(SQ_Message)) {
+			str := str + prefix + e.oclAsType(SQ_Message).humanReadableString() + "\n"; 
+		} elif (e.oclIsKindOf(SQ_Group)) {
+			str := str + prefix + e.oclAsType(SQ_Group).humanReadableString() + "\n";
+		};
+	};
+	
+	return str;
+}
+
+helper SQ_Group::humanReadableString(): String {
+	return self.keyword.toString() + " " + self.label.toString() + " (#elems=" + self.elements->size().toString() + ", #alternatives=" + self.alternatives->size().toString() + ")";
+}
+
+helper Structure::humanReadableString(prefix: String): String 
+{
+	return prefix + "Structure";
+}
+
+helper TestRoundtrip::humanReadableString(prefix: String): String {
+	var intro := prefix + "Roundtrip(" + self.testRoundtripName + "): "; 
+	var add := self.requestspecification.humanReadableString() + " => " + self.responsespecification.humanReadableString() + "\n";
+	if (not add.oclIsUndefined()) {
+		return intro + add;
+	} else {
+		return intro + "UNDEFINED(rs.method=" 
+			+ self.requestspecification.method.oclIsUndefined().toString() 
+			+ ", rs.url=" + self.requestspecification.url.oclIsUndefined().toString() 
+			+ ", rs.sender=" + self.requestspecification.sender.oclIsUndefined().toString() 
+			+ ", rs.receiver=" + self.requestspecification.receiver.oclIsUndefined().toString() 
+			+")\n";
+	};
+}
+
+helper Alternative::humanReadableString(prefix: String): String {
+	var str := prefix;
+	
+	var hasCondition := not self.condition.oclIsUndefined();
+	if (hasCondition) {
+		str := str + "if (" + self.condition + ") {\n";
+	};
+	self.provided->forEach(prov) {
+		if (hasCondition) {
+			str := str + prov.humanReadableString(prefix + "  ");
+		} else {
+			str := str + prov.humanReadableString(prefix);
+		};
+	};
+	if (hasCondition) {
+		str := str + prefix + "}";
+	};
+	
+	if (not self.otherwise.oclIsUndefined()) {
+		str := str + " else {\n" + self.otherwise.humanReadableString(prefix + "  ") + prefix + "}";
+	};
+	str := str + "\n";
+	
+	return str;
+}
+
+helper Delay::humanReadableString(prefix: String): String {
+	return prefix + "Delay: " + self.value.toString() + " " + self.unit.toString();
+}
+
+
+helper SQ_Delay::humanReadableString(): String {
+	return "delay " + self.wait.time.toString() + self.wait.unit.toString();
+}
+
+helper SQ_Return::humanReadableString(): String {
+	var str := "return";
+	if (not self.response.oclIsUndefined()) {
+		str := str + " " + self.response.humanReadableString();
+	};
+	if (not self.label.oclIsUndefined()) {
+		str := str + " " + self.label;
+	};
+	return str;
+}
+
+helper PT_Response::humanReadableString(): String {
+	var str := "response(";
+	
+	var codes := self.acceptedcodes.code->asList();
+	var codeInd := 1;
+	while (codeInd <= codes->size()) {
+		str := str + codes->at(codeInd).toString();
+		codeInd := codeInd + 1;
+		if (codeInd <= codes->size()) {
+			str := str +  " || ";
+	 	}
+	};
+	str := str + ")";
+	return str;
 }
