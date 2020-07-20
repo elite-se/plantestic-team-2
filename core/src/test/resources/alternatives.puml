@@ -1,28 +1,26 @@
 @startuml
 
-Alice -> Bob : request(GET, "age")
+Alice -> Bob : request(GET, "name")
 
 alt weather==sunny
-	Alice -> Bob : request(GET, "name")
 	Bob --> Alice : response(200 ACCEPTED, { name: "Bob" })
 	
-	Alice -> Bob : request(GET, "mainframe_location")
+	Alice -> Bob : request(GET, "social_security_number")
 
-	CCC -> ECS
+	CCC -> ECS : request(POST, "/event/create/{id}", { id: 42 })
 	
 	alt moon==fullmoon
 		return 200
 	end
 
-	Bob --> Alice : response(410 GONE)
+	Bob --> Alice : response(400 ACCESS_FORBIDDEN)
 else weather==Cloudy
-	Alice -> Bob : request(GET, "name")
-	Bob --> Alice : response(500 DENIED)
+	Bob --> Alice : response(500 ERROR)
 else
-	Alice -> Bob : request(GET, "type")
 	Bob --> Alice : response(418 I_AM_A_TEAPOT)
 end
 
+Alice -> Bob : request(GET, "age")
 Bob -> Alice : response(404 NOT_FOUND)
 
 @enduml

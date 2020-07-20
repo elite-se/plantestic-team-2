@@ -34,7 +34,8 @@ mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
     var elements := self.elements->flatten_SQ_SequenceElements("")->asList();
 
     log("\n2. Parsing:");
-	structure := elements->structures("", 1).structure;
+    var prec := object List(SQ_SequenceElement) {};
+	structure := elements->structures("", 1, prec).structure;
 	
 	log("\n3. Result:");
 	structure->forEach(struct) {
@@ -93,7 +94,7 @@ helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(msgPrefix: St
         elif (umlElement.oclIsTypeOf(SQ_Delay)) {
         	var delay := umlElement.oclAsType(SQ_Delay);
         	if (not delay.wait.oclIsUndefined()) {
-	        	log(msgPrefix + "DALAY: " + delay.humanReadableString());
+	        	log(msgPrefix + "DELAY: " + delay.humanReadableString());
 	        	sequenceElements += delay;
         	}
         };
@@ -222,11 +223,11 @@ helper String::string2timeUnit(): TimeUnit {
 	}
 }
 
-helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer): Tuple(structure: Alternative, roundtripCnt: Integer) {
+helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, preceeding: List(SQ_SequenceElement)): Tuple(structure: Alternative, roundtripCnt: Integer) {
 	log(msgPrefix + "TO ALTERNATIVE (hasCond=" + (not self.label.oclIsUndefined()).toString() + ", rdID=" + roundtripIdStart.toString() + ") " + self.humanReadableString());
 	var alternative := object Alternative {};
 
-	var res := self.elements->asList()->structures(msgPrefix + "  ", roundtripIdStart);
+	var res := self.elements->asList()->structures(msgPrefix + "  ", roundtripIdStart, preceeding);
 	alternative.condition := self.label;
 	alternative.provided := res.structure->asOrderedSet();
 	var roundtripCnt := res.roundtripCnt;
@@ -240,7 +241,7 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer): Tu
 			elements := alt1.elements;
 		};
 		
-		var res2 := othr.toAlternative(msgPrefix + "  ", roundtripCnt);
+		var res2 := othr.toAlternative(msgPrefix + "  ", roundtripCnt, preceeding);
 		alternative.otherwise := res2.structure;
 		roundtripCnt := res2.roundtripCnt;
 	};
@@ -249,7 +250,7 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer): Tu
 	return Tuple { structure = alternative, roundtripCnt = roundtripCnt };
 }
 
-helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart: Integer): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), roundtripCnt: Integer) {
+helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart: Integer, parentScopePreceeding: List(SQ_SequenceElement)): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), roundtripCnt: Integer) {
 	log(msgPrefix + "BEGIN STRUCTURES #" + self->size().toString() + " (rtID=" + roundtripIdStart.toString() + ")");
 
 	var structures := object List(Structure) {};
@@ -262,31 +263,36 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 			with log('INTERNAL: logic tried accessing index < 0');
 	
 		var elem := elements->at(elemInd);
-		var prec := self->subSequence(1, elemInd-1);
 		elemInd := elemInd + 1;
-		var following := self->subSequence(elemInd, self->size());
 		
+		var prec := object List(SQ_SequenceElement) {};
+		parentScopePreceeding->forEach(p) {
+			prec += p;	
+		};
+		self->subSequence(1, elemInd-1)->forEach(p) {
+			prec += p;
+		};
+	
 		if (elem.oclIsTypeOf(SQ_Message)) {
     		var msg := elem.oclAsType(SQ_Message);
     		log(msgPrefix + "  message(" + elemInd.toString() + "): " + msg.humanReadableString());
     		
     		if (msg.isResponse()) {
 				var reqT := findRequest(msgPrefix + "    ", msg, prec);
-				elemInd := elemInd - 1;
-				elements->removeAt(elemInd);
-				elemInd := elemInd - 1;
-				elements->removeAt(reqT.index);
 				
 				if (not reqT.oclIsUndefined()) {
 					structures += generateRoundtrip(msgPrefix + "    " , roundtripCnt, reqT.requestMsg, msg);
 					roundtripCnt := roundtripCnt + 1;
-				}
+				};
+				
+				elemInd := elemInd - 1;
+				elements->removeAt(elemInd);
     		}
     	} elif (elem.oclIsTypeOf(SQ_Group)) {
     		var grp = elem.oclAsType(SQ_Group);
     		log(msgPrefix + "  " + grp.humanReadableString());
     		
-    		var res := grp.toAlternative(msgPrefix + "  ", roundtripCnt);
+    		var res := grp.toAlternative(msgPrefix + "  ", roundtripCnt, prec);
     		structures += res.structure;
     		roundtripCnt := res.roundtripCnt;
     	} elif (elem.oclIsTypeOf(SQ_Delay)) {
