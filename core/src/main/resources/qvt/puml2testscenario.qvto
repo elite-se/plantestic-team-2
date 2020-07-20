@@ -5,6 +5,16 @@ transformation puml2reqres(in input: plantUML, out output: testscenario);
 
 configuration property diagramName : String;
 
+/**
+ * DISCLAIMER:
+ * THIS CODE WAS CREATED UNDER IMMENSE TIME PRESSURE,
+ * NEITHER I NOR ANY OTHER COMMITER FROM GIT BLAME
+ * TAKES ANY RESPONSIBILITY; WE WOULD NEVER WRITE CODE 
+ * LIKE THIS IN ANY PROFESSIONAL ENVIRONMENT
+ *
+ * Have fun with qvt ;)
+ */
+
 main() {
     log('Started transforming PlantUML to RequestResponse pairs');
 
@@ -66,6 +76,37 @@ helper findRequest(msgPrefix: String, response: SQ_Message, preceedingElements: 
 	
 	log(msgPrefix + "  NOTHING FOUND");
 	log(msgPrefix + "END FIND REQUEST");
+	return null;
+}
+
+helper findReturnedRequest(msgPrefix: String, preceedingElements: Sequence(SQ_SequenceElement)) : Tuple(index: Integer, requestMsg: SQ_Message) {
+	log(msgPrefix + "FIND REQUEST FOR RETURN");
+	var potInd := 0;
+	var returnCnt := 0;
+	var preceedingRev := preceedingElements->reverse();
+	while (potInd <= preceedingRev->size()) {
+		potInd := potInd + 1;
+		var precElem := preceedingRev->at(potInd);
+		if (precElem.oclIsTypeOf(SQ_Return)) {
+			log(msgPrefix + "  x found previous return");
+			returnCnt := returnCnt + 1;	
+		} elif (precElem.oclIsTypeOf(SQ_Message)) {
+			var msg = precElem.oclAsType(SQ_Message);
+			log(msgPrefix + "  * " + msg.humanReadableString());
+			if (msg.isRequest()) {
+				if (returnCnt = 0) {
+					log(msgPrefix + "  FOUND: " + msg.humanReadableString());
+					log(msgPrefix + "END FIND REQUEST FOR RETURN");
+					return Tuple{index = potInd, requestMsg = msg};
+				} else {
+					returnCnt := returnCnt - 1;	
+				};
+			}
+		};
+	};
+	
+	log(msgPrefix + "  NOTHING FOUND");
+	log(msgPrefix + "END FIND REQUEST FOR RETURN");
 	return null;
 }
 
@@ -158,13 +199,13 @@ helper SQ_Message::isResponse(): Boolean {
     return not self.payload.response.oclIsUndefined();
 }
 
-helper generateRoundtrip(msgPrefix: String, roundtripId : Integer, request : SQ_Message, response : SQ_Message): TestRoundtrip {
+helper generateRoundtrip(msgPrefix: String, roundtripId: Integer, request: RequestSpecification, response: ResponseSpecification): TestRoundtrip {
 	log(msgPrefix + "GENERATING Roundtrip: " + roundtripId.toString() + ":");
 	
 	var rt := object TestRoundtrip {
 		testRoundtripName := "roundtrip" + roundtripId.toString();
-		requestspecification := request.deepclone().map message2request();
-		responsespecification := response.deepclone().map message2response();
+		requestspecification := request;
+		responsespecification := response;
 	};
 	
 	log(msgPrefix + "  "  + rt.requestspecification.humanReadableString() + " => " + rt.responsespecification.humanReadableString());
@@ -184,12 +225,9 @@ mapping SQ_Message::message2request(): RequestSpecification {
 	requestdatum := self.payload.request.parametermap.params->map param2requestDatum();
 }
 
-mapping SQ_Message::message2response(): ResponseSpecification {
-	assert fatal (not self.payload.response.oclIsUndefined())
-		with log('Message should have contained a response');
-		
-	responsedatum := self.payload.response.parametermap.params->map param2responseDatum();
-    statuscode := self.payload.response.acceptedcodes.code;
+mapping PT_Response::pumlresponse2testscenarioresponse(): ResponseSpecification {
+	responsedatum := self.parametermap.params->map param2responseDatum();
+    statuscode := self.acceptedcodes.code;
 }
 
 mapping PT_Parameter::param2requestDatum(): RequestDatum {
@@ -263,7 +301,6 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 			with log('INTERNAL: logic tried accessing index < 0');
 	
 		var elem := elements->at(elemInd);
-		elemInd := elemInd + 1;
 		
 		var prec := object List(SQ_SequenceElement) {};
 		parentScopePreceeding->forEach(p) {
@@ -272,6 +309,9 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 		self->subSequence(1, elemInd-1)->forEach(p) {
 			prec += p;
 		};
+		
+		// Ordering is important to ensure prec is built correctly
+		elemInd := elemInd + 1;
 	
 		if (elem.oclIsTypeOf(SQ_Message)) {
     		var msg := elem.oclAsType(SQ_Message);
@@ -281,12 +321,31 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 				var reqT := findRequest(msgPrefix + "    ", msg, prec);
 				
 				if (not reqT.oclIsUndefined()) {
-					structures += generateRoundtrip(msgPrefix + "    " , roundtripCnt, reqT.requestMsg, msg);
+					structures += generateRoundtrip(
+    					msgPrefix + "    ", 
+    					roundtripCnt, 
+    					reqT.requestMsg.deepclone().map message2request(), 
+    					msg.payload.response.deepclone().map pumlresponse2testscenarioresponse()
+					);
 					roundtripCnt := roundtripCnt + 1;
-				};
-				
-				elemInd := elemInd - 1;
-				elements->removeAt(elemInd);
+				}
+    		}
+    	} elif (elem.oclIsTypeOf(SQ_Return)) {
+    		var ret := elem.oclAsType(SQ_Return);
+    		log(msgPrefix + "  return " + ret.humanReadableString());
+    		
+    		if (not ret.response.oclIsUndefined()) {
+    			var reqT := findReturnedRequest(msgPrefix + "    ", prec);
+    			
+    			if (not reqT.oclIsUndefined()) {
+    				structures += generateRoundtrip(
+    					msgPrefix + "    ", 
+    					roundtripCnt, 
+    					reqT.requestMsg.deepclone().map message2request(), 
+    					ret.response.deepclone().map pumlresponse2testscenarioresponse()
+					);
+					roundtripCnt := roundtripCnt + 1;
+    			}
     		}
     	} elif (elem.oclIsTypeOf(SQ_Group)) {
     		var grp = elem.oclAsType(SQ_Group);
@@ -466,7 +525,14 @@ helper SQ_Delay::humanReadableString(): String {
 }
 
 helper SQ_Return::humanReadableString(): String {
-	return "return " + self.response.humanReadableString();
+	var str := "return";
+	if (not self.response.oclIsUndefined()) {
+		str := str + " " + self.response.humanReadableString();
+	};
+	if (not self.label.oclIsUndefined()) {
+		str := str + " " + self.label;
+	};
+	return str;
 }
 
 helper PT_Response::humanReadableString(): String {

@@ -10,7 +10,7 @@ alt weather==sunny
 	CCC -> ECS : request(POST, "/event/create/{id}", { id: 42 })
 	
 	alt moon==fullmoon
-		return 200
+		return response(200 ACCEPTED)
 	end
 
 	Bob --> Alice : response(400 ACCESS_FORBIDDEN)
@@ -21,6 +21,6 @@ else
 end
 
 Alice -> Bob : request(GET, "age")
-Bob -> Alice : response(404 NOT_FOUND)
+Bob -> Alice : response(220 NOT_STANDARDIZED)
 
 @enduml
