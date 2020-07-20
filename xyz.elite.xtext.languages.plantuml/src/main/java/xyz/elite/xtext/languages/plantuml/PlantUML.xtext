@@ -205,7 +205,7 @@ SQ_Skinparam:
     'skinparam' name=ID value=SQ_SkinparamValue;
 
 SQ_SkinparamValue:
-        SQ_Color | INT | ID | STRING;
+        SQ_Color | {SQ_SkinparamValue} INT | {SQ_SkinparamValue} ID | {SQ_SkinparamValue} STRING;
 
 // ----------------------------
 //   PLANTESTIC MODIFICATIONS
