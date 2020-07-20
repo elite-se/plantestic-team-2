@@ -18,7 +18,7 @@ note over CCC : Agent is being called in callcenter for breakdown and triggers r
 autonumber
 autoactivate on
 
-CCC -> XCS : async[1] request(POST, "/xcs/vin/v1/{vin}") \n (<CCCTarget>, ServiceType=BCALL)
+CCC -> XCS : async[1, 5s] request(POST, "/xcs/vin/v1/{vin}") \n (<CCCTarget>, ServiceType=BCALL)
 
 note over XCS : XCS creates a new event from data provided by CCC\nresponse contains new eventid
 autoactivate off

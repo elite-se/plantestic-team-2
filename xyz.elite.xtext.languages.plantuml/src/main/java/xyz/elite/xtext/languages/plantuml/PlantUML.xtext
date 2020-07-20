@@ -214,8 +214,9 @@ PT_Wait:
     'wait(' time=INT unit=PT_TimeUnit ')';
 
 PT_RequestResponse:
-    ('async[' asyncid=INT ']')?
-    (request=PT_Request | response=PT_Response);
+    (('async[' asyncid=INT (',' timeout=INT unit=PT_TimeUnit)? ']')? request=PT_Request) 
+    | 
+    (('async[' asyncid=INT ']')? response=PT_Response);
 
 PT_Request:
     'request(' method=PT_RequestMethod ',' url=STRING (',' parametermap=(PT_ParameterMap))? ')';
