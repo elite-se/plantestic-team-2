@@ -1,0 +1,118 @@
+library PUMLHumanReadable;
+
+import PUMLMessages;
+
+modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
+
+helper SQ_Delay::humanReadableString(): String {
+	return "delay " + self.wait.time.toString() + self.wait.unit.toString();
+}
+
+helper SQ_Return::humanReadableString(): String {
+	var str := "return";
+	if (not self.response.oclIsUndefined()) {
+		str := str + " " + self.response.humanReadableString();
+	};
+	if (not self.label.oclIsUndefined()) {
+		str := str + " " + self.label;
+	};
+	return str;
+}
+
+helper SQ_Message::humanReadableString(): String {
+	var str := "";
+	
+	// Parse left participant (if any)
+	if (not self.participantLeft.oclIsUndefined()) {
+		str := str + self.participantLeft.name + " ";
+	};
+	
+	// Parse arrow
+	if (not self.arrow.leftmodifier.oclIsUndefined()) {
+		str := str + self.arrow.leftmodifier;
+	};
+	if (not self.arrow.lefttip.oclIsUndefined()) {
+		str := str + self.arrow.lefttip.toString();
+	};
+	self.arrow.line->forEach(l) {
+		str := str + l;
+	};
+	if (not self.arrow.righttip.oclIsUndefined()) {
+		str := str + self.arrow.righttip.toString();
+	};
+	if (not self.arrow.rightmodifier.oclIsUndefined()) {
+		str := str + self.arrow.rightmodifier;
+	};
+	
+	// Parse right participant (if any)
+	if (not self.participantRight.oclIsUndefined()) {
+		str := str + " " + self.participantRight.name;
+	};
+	
+	// Parse payload (if any)
+	if (not self.payload.oclIsUndefined()) {
+		if (not self.payload.asyncid.oclIsUndefined() and self.payload.asyncid != 0) {
+			str := str + " : async[" + self.payload.asyncid.toString() + "]";
+		};
+		
+		if (not self.payload.request.oclIsUndefined()) {
+			str := str + " request(" + self.payload.request.method + ", " + self.payload.request.url + ", {...})";
+		} elif (not self.payload.response.oclIsUndefined()) {
+			str := str + " response(";
+			self.payload.response.acceptedcodes->forEach(ac) {
+				str := str + ac.code.toString();
+				if (not ac.description.oclIsUndefined()) {
+					str := str + " " + ac.description;
+				}
+			};
+			str := str + ")";
+		};
+		
+		if (not self.description.oclIsUndefined()) {
+			str := str + " " + self.description;
+		};
+	} elif (not self.description.oclIsUndefined()) {
+		str := str + " : " + self.description;
+	};
+	
+	
+	if (not self.payload.oclIsUndefined()) {
+		str := str + " (isRequest=" + self.isRequest().toString() + ")";
+	};
+	
+	return str;
+}
+
+helper List(SQ_SequenceElement)::humanReadableString(prefix: String): String {
+	var str := "";
+	self->forEach(e) {
+		if (e.oclIsKindOf(SQ_Message)) {
+			str := str + prefix + e.oclAsType(SQ_Message).humanReadableString() + "\n"; 
+		} elif (e.oclIsKindOf(SQ_Group)) {
+			str := str + prefix + e.oclAsType(SQ_Group).humanReadableString() + "\n";
+		};
+	};
+	
+	return str;
+}
+
+helper SQ_Group::humanReadableString(): String {
+	return self.keyword.toString() + " " + self.label.toString() + " (#elems=" + self.elements->size().toString() + ", #alternatives=" + self.alternatives->size().toString() + ")";
+}
+
+
+helper PT_Response::humanReadableString(): String {
+	var str := "response(";
+	
+	var codes := self.acceptedcodes.code->asList();
+	var codeInd := 1;
+	while (codeInd <= codes->size()) {
+		str := str + codes->at(codeInd).toString();
+		codeInd := codeInd + 1;
+		if (codeInd <= codes->size()) {
+			str := str +  " || ";
+	 	}
+	};
+	str := str + ")";
+	return str;
+}

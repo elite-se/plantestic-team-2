@@ -1,0 +1,73 @@
+library TSHumanReadable;
+
+modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
+
+helper RequestSpecification::humanReadableString(): String {
+	return "request(method=" + self.method + ", url=\"" + self.url + "\", sender=" + self.sender + ", receiver=" + self.receiver + ")";
+}
+
+helper ResponseSpecification::humanReadableString(): String {
+	var str := "response(";
+	
+	var codes := self.statuscode;
+	var codeInd := 1;
+	while (codeInd <= codes->size()) {
+		str := str + codes->at(codeInd).toString();
+		codeInd := codeInd + 1;
+		if (codeInd <= codes->size()) {
+			str := str +  " || ";
+	 	}
+	};
+	str := str + ")";
+	return str;
+}
+
+helper Structure::humanReadableString(prefix: String): String 
+{
+	return prefix + "Structure";
+}
+
+helper TestRoundtrip::humanReadableString(prefix: String): String {
+	var intro := prefix + "Roundtrip(" + self.testRoundtripName + "): "; 
+	var add := self.requestspecification.humanReadableString() + " => " + self.responsespecification.humanReadableString() + "\n";
+	if (not add.oclIsUndefined()) {
+		return intro + add;
+	} else {
+		return intro + "UNDEFINED(rs.method=" 
+			+ self.requestspecification.method.oclIsUndefined().toString() 
+			+ ", rs.url=" + self.requestspecification.url.oclIsUndefined().toString() 
+			+ ", rs.sender=" + self.requestspecification.sender.oclIsUndefined().toString() 
+			+ ", rs.receiver=" + self.requestspecification.receiver.oclIsUndefined().toString() 
+			+")\n";
+	};
+}
+
+helper Alternative::humanReadableString(prefix: String): String {
+	var str := prefix;
+	
+	var hasCondition := not self.condition.oclIsUndefined();
+	if (hasCondition) {
+		str := str + "if (" + self.condition + ") {\n";
+	};
+	self.provided->forEach(prov) {
+		if (hasCondition) {
+			str := str + prov.humanReadableString(prefix + "  ");
+		} else {
+			str := str + prov.humanReadableString(prefix);
+		};
+	};
+	if (hasCondition) {
+		str := str + prefix + "}";
+	};
+	
+	if (not self.otherwise.oclIsUndefined()) {
+		str := str + " else {\n" + self.otherwise.humanReadableString(prefix + "  ") + prefix + "}";
+	};
+	str := str + "\n";
+	
+	return str;
+}
+
+helper Delay::humanReadableString(prefix: String): String {
+	return prefix + "Delay: " + self.value.toString() + " " + self.unit.toString();
+}

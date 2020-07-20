@@ -16,14 +16,14 @@ object M2MTransformer {
 
     private val QVT_PUML2TESTSCENARIO_TRANSFORMATION_URI =
         URI.createURI(Resources.getResource("qvt/puml2testscenario.qvto").toExternalForm())
-
+	
     /**
      * Transforms a UmlDiagram EObject to a Request Response Pair EObject.
      * @param inputModel The UmlDiagram to transform
      * @return Request Response Pair
      */
     fun transformPuml2TestScenario(inputModel: EObject): EObject {
-        require(inputModel is Model) { "Puml transformation input wasn't a puml object!" }
+        require(inputModel is Model) { "Puml transformation input wasn't a puml object" }
         return doQvtoTransformation(inputModel, QVT_PUML2TESTSCENARIO_TRANSFORMATION_URI)
     }
 
@@ -44,8 +44,9 @@ object M2MTransformer {
         val context = ExecutionContextImpl()
         context.setConfigProperty("keepModeling", true)
         context.setConfigProperty("diagramName", EcoreUtil.getURI(inputModel).trimFileExtension().lastSegment())
+        context.setConfigProperty("verbose", true) // TODO: make configurable via command line
 
-        require(System.out != null) { "System.out was null!" }
+        require(System.out != null) { "System.out was null" }
         val outStream = OutputStreamWriter(System.out!!)
         val log = WriterLog(outStream)
         context.log = log
@@ -53,7 +54,7 @@ object M2MTransformer {
         val result = executor.execute(context, input, output)
 
         if (result.severity == Diagnostic.OK) {
-            require(!output.contents.isNullOrEmpty()) { "No transformation result!" }
+            require(!output.contents.isNullOrEmpty()) { "No transformation result" }
             return output.contents[0]
         } else {
             throw IllegalArgumentException(result.toString())

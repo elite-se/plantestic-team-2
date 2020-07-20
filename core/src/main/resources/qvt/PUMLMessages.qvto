@@ -1,0 +1,37 @@
+library PUMLMessages;
+
+modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
+
+helper SQ_Arrow::isR2L(): Boolean {
+    return not self.lefttip.oclIsUndefined() and self.righttip.oclIsUndefined();
+}
+
+helper SQ_Arrow::isL2R(): Boolean {
+    return self.lefttip.oclIsUndefined() and not self.righttip.oclIsUndefined();
+}
+
+helper SQ_Message::receiver(): SQ_Participant {
+    if (self.arrow.isR2L()) {
+        return self.participantLeft;
+    } else if (self.arrow.isL2R()) {
+        return self.participantRight;
+    };
+    return null;
+}
+
+helper SQ_Message::sender(): SQ_Participant {
+    if (self.arrow.isR2L()) {
+        return self.participantRight;
+    } else if (self.arrow.isL2R()) {
+        return self.participantLeft;
+    };
+    return null;
+}
+
+helper SQ_Message::isRequest(): Boolean {
+    return not self.payload.request.oclIsUndefined();
+}
+
+helper SQ_Message::isResponse(): Boolean {
+    return not self.payload.response.oclIsUndefined();
+}
