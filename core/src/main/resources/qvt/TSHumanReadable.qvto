@@ -22,8 +22,7 @@ helper ResponseSpecification::humanReadableString(): String {
 	return str;
 }
 
-helper Structure::humanReadableString(prefix: String): String 
-{
+helper Structure::humanReadableString(prefix: String): String {
 	return prefix + "Structure";
 }
 

@@ -1,11 +1,14 @@
+import PUMLMessages2TSRoundtrip;
+import PUMLPreprocessing;
 import PUMLHumanReadable;
-import PUMLMessages;
+
+import TSTimeUnit;
 import TSHumanReadable;
 
 modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
 modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
 
-transformation puml2reqres(in input: plantUML, out output: testscenario);
+transformation puml2testscenario(in input: plantUML, out output: testscenario);
 
 configuration property diagramName : String;
 configuration property verbose : Boolean;
@@ -14,8 +17,8 @@ configuration property verbose : Boolean;
  * DISCLAIMER:
  * THIS CODE WAS CREATED UNDER IMMENSE TIME PRESSURE,
  * NEITHER I NOR ANY OTHER COMMITER FROM GIT BLAME
- * TAKES ANY RESPONSIBILITY; WE WOULD NEVER WRITE CODE 
- * LIKE THIS IN ANY PROFESSIONAL ENVIRONMENT
+ * TAKE ANY RESPONSIBILITY; WE WOULD NEVER WRITE CODE 
+ * LIKE THIS IN A PROFESSIONAL ENVIRONMENT
  *
  * Have fun with qvt ;)
  */
@@ -32,6 +35,10 @@ main() {
 	if (verbose) log("Output configs: " + configs->size().toString());
 }
 
+// ==============================
+//   PUML Config Transformation
+// ==============================
+ 
 mapping SQ_Config::transformConfigs(): Config {
     entries := self.entries.map transformConfigEntries();
 }
@@ -41,246 +48,43 @@ mapping SQ_ConfigEntry::transformConfigEntries(): ConfigEntry {
     value := self.value;
 }
 
+// ===============================
+//   PUML Diagram Transformation
+// ===============================
+
 mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
     testScenarioName := diagramName + "_puml";
     configs := configs_;
     var roundtripCounter : Integer := 1;
     
     if (verbose) log("\n1. Preprocessing:");
-    var elements := self.elements->flatten_SQ_SequenceElements("")->asList();
+    var elements := self.elements->preprocess("")->asList();
 
-	if (verbose) log("\n2. Parsing:");
+	if (verbose) log("\n2. Transform:");
     var prec := object List(SQ_SequenceElement) {};
-	structure := elements->structures("", 1, prec).structure;
+	structure := elements->toStructures("", 1, prec).structure;
 	
 	if (verbose) {
-		log("\n3. Result:");
+		log("\n==============\n    Result\n==============");
 		structure->forEach(struct) { log(struct.humanReadableString("")); };
 	}
 }
 
-helper findRequest(msgPrefix: String, response: SQ_Message, preceedingElements: Sequence(SQ_SequenceElement)) : Tuple(index: Integer, requestMsg: SQ_Message) {
-	if (verbose) log(msgPrefix + "FIND REQUEST: " + response.humanReadableString());
-	
-	var potInd := 0;
-	var preceedingRev := preceedingElements->reverse();
-	while (potInd <= preceedingRev->size()) {
-		potInd := potInd + 1;
-		var precElem := preceedingRev->at(potInd);
-		if (precElem.oclIsTypeOf(SQ_Message)) {
-			var msg = precElem.oclAsType(SQ_Message);
-			
-			if (verbose) log(msgPrefix + "  * " + msg.humanReadableString());
-			
-			if (msg.isRequest() 
-				and msg.sender().name = response.receiver().name
-				and msg.receiver().name = response.sender().name) {
-				
-				if (verbose) {
-					log(msgPrefix + "  FOUND: " + msg.humanReadableString());
-					log(msgPrefix + "END FIND REQUEST");
-				};
-				
-				return Tuple{index = potInd, requestMsg = msg};
-			}
-		}	
-	};
-	
-	if (verbose) {
-		log(msgPrefix + "  NOTHING FOUND");
-		log(msgPrefix + "END FIND REQUEST"); 
-	};
-	
-	return null;
-}
-
-helper findReturnedRequest(msgPrefix: String, preceedingElements: Sequence(SQ_SequenceElement)) : Tuple(index: Integer, requestMsg: SQ_Message) {
-	if (verbose) log(msgPrefix + "FIND REQUEST FOR RETURN");
-	
-	var potInd := 0;
-	var returnCnt := 0;
-	var preceedingRev := preceedingElements->reverse();
-	while (potInd <= preceedingRev->size()) {
-		potInd := potInd + 1;
-		var precElem := preceedingRev->at(potInd);
-		if (precElem.oclIsTypeOf(SQ_Return)) {
-			if (verbose) log(msgPrefix + "  x found previous return");
-			returnCnt := returnCnt + 1;	
-		} elif (precElem.oclIsTypeOf(SQ_Message)) {
-			var msg = precElem.oclAsType(SQ_Message);
-			if (verbose) log(msgPrefix + "  * " + msg.humanReadableString());
-			if (msg.isRequest()) {
-				if (returnCnt = 0) {
-					if (verbose) {
-						log(msgPrefix + "  FOUND: " + msg.humanReadableString());
-						log(msgPrefix + "END FIND REQUEST FOR RETURN");
-					};
-					return Tuple{index = potInd, requestMsg = msg};
-				} else {
-					returnCnt := returnCnt - 1;	
-				};
-			}
-		};
-	};
-	
-	if (verbose) {
-		log(msgPrefix + "  NOTHING FOUND");
-		log(msgPrefix + "END FIND REQUEST FOR RETURN");
-	};
-	return null;
-}
-
-helper OrderedSet(SQ_SequenceElement)::flatten_SQ_SequenceElements(msgPrefix: String): OrderedSet(SQ_SequenceElement) {
-	if (verbose) log(msgPrefix + "START ELEMENTS");
-
-    var sequenceElements : OrderedSet(SQ_SequenceElement);
-    self->forEach(umlElement) {
-        if (umlElement.oclIsTypeOf(SQ_Message)) {
-            var message := umlElement.oclAsType(SQ_Message);
-            if (verbose) log(msgPrefix + "MESSAGE: " + message.humanReadableString());
-            if (not message.payload.oclIsUndefined()) {
-                sequenceElements += message;
-            };
-        }
-        elif (umlElement.oclIsTypeOf(SQ_Group)) {
-            sequenceElements += umlElement.oclAsType(SQ_Group).map flatten_SQ_Group(msgPrefix);
-        }
-        elif (umlElement.oclIsTypeOf(SQ_Return)) {
-			var ret := umlElement.oclAsType(SQ_Return);
-			if (verbose) log(msgPrefix + "RETURN: " + ret.humanReadableString());
-			if (not ret.response.oclIsUndefined()) {
-        		sequenceElements += ret;
-        	}
-        }
-        elif (umlElement.oclIsTypeOf(SQ_Delay)) {
-        	var delay := umlElement.oclAsType(SQ_Delay);
-        	if (not delay.wait.oclIsUndefined()) {
-	        	if (verbose) log(msgPrefix + "DELAY: " + delay.humanReadableString());
-	        	sequenceElements += delay;
-        	}
-        };
-    };
-    
-	if (verbose) log(msgPrefix + "END ELEMENTS");
-    return sequenceElements;
-}
-
-mapping SQ_Group::flatten_SQ_Group(msgPrefix: String): SQ_Group {
-	if (verbose) log(msgPrefix + "START GROUP: " + self.humanReadableString());
-
-	keyword := self.keyword;
-    elements += self.elements->flatten_SQ_SequenceElements(msgPrefix + "  ");
-    alternatives += self.alternatives->oclAsType(SQ_GroupAlternative).map flatten_SQ_GroupAlternative(msgPrefix);
-    label := self.label;
-    
-	if (verbose) log(msgPrefix + "END GROUP");
-}
-
-mapping SQ_GroupAlternative::flatten_SQ_GroupAlternative(msgPrefix: String): SQ_GroupAlternative {
-	if (verbose) log(msgPrefix + "START ALTERNATIVE: else" + " " + self.label.toString() + " (" + self.elements->size().toString() + ")");
-
-    elements += self.elements->flatten_SQ_SequenceElements(msgPrefix + "  ");
-    label := self.label;
-    
-	if (verbose) log(msgPrefix + "END ALTERNATIVE");
-}
-
-helper generateRoundtrip(msgPrefix: String, roundtripId: Integer, request: RequestSpecification, response: ResponseSpecification): TestRoundtrip {
-	if (verbose) log(msgPrefix + "GENERATING Roundtrip: " + roundtripId.toString() + ":");
-	
-	var rt := object TestRoundtrip {
-		testRoundtripName := "roundtrip" + roundtripId.toString();
-		requestspecification := request;
-		responsespecification := response;
-	};
-	
-	if (verbose) {
-		log(msgPrefix + "  "  + rt.requestspecification.humanReadableString() + " => " + rt.responsespecification.humanReadableString());
-		log(msgPrefix + "END GENERATING");
-	};
-	
-	return rt;
-}
-
-mapping SQ_Message::message2request(): RequestSpecification {
-	assert fatal (not self.payload.request.oclIsUndefined())
-		with log('Message should have contained a request');
-
-	method := self.payload.request.method;
-    url := self.payload.request.url;
-	receiver := self.receiver().name;
-	sender := self.sender().name;
-	requestdatum := self.payload.request.parametermap.params->map param2requestDatum();
-}
-
-mapping PT_Response::pumlresponse2testscenarioresponse(): ResponseSpecification {
-	responsedatum := self.parametermap.params->map param2responseDatum();
-    statuscode := self.acceptedcodes.code;
-}
-
-mapping PT_Parameter::param2requestDatum(): RequestDatum {
-    variableName := self.name;
-    value := self.value;
-}
-
-mapping PT_Parameter::param2responseDatum(): ResponseDatum {
-    variableName := self.name;
-    value := self.value;
-}
-
-helper String::string2timeUnit(): TimeUnit {
-	var normalized := self.trim();
-	if (normalized.equalsIgnoreCase("ns")) {
-		return TimeUnit::NANOSECONDS;
-	} else if (normalized.equalsIgnoreCase("us")) {
-		return TimeUnit::MICROSECONDS;
-	} else if (normalized.equalsIgnoreCase("ms")) {
-		return TimeUnit::MILLISECONDS;
-	} else if (normalized.equalsIgnoreCase("s")) {
-		return TimeUnit::SECONDS;
-	} else if (normalized.equalsIgnoreCase("min")) {
-		return TimeUnit::MINUTES;
-	} else if (normalized.equalsIgnoreCase("h")) {
-		return TimeUnit::HOURS;
-	} else if (normalized.equalsIgnoreCase("d")) {
-		return TimeUnit::DAYS;
-	} else {
-		return TimeUnit::MILLISECONDS;
-	}
-}
-
-helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, preceeding: List(SQ_SequenceElement)): Tuple(structure: Alternative, roundtripCnt: Integer) {
-	if (verbose) log(msgPrefix + "TO ALTERNATIVE (hasCond=" + (not self.label.oclIsUndefined()).toString() + ", rdID=" + roundtripIdStart.toString() + ") " + self.humanReadableString());
-	var alternative := object Alternative {};
-
-	var res := self.elements->asList()->structures(msgPrefix + "  ", roundtripIdStart, preceeding);
-	alternative.condition := self.label;
-	alternative.provided := res.structure->asOrderedSet();
-	var roundtripCnt := res.roundtripCnt;
-
-	if (self.alternatives->size() > 0) {
-		var alt1 := self.alternatives->at(1);
-		var othr := object SQ_Group {
-			keyword := self.keyword;
-			label := alt1.label;
-			alternatives := self.alternatives->subOrderedSet(2, self.alternatives->size());
-			elements := alt1.elements;
-		};
-		
-		var res2 := othr.toAlternative(msgPrefix + "  ", roundtripCnt, preceeding);
-		alternative.otherwise := res2.structure;
-		roundtripCnt := res2.roundtripCnt;
-	};
-	
-	if (verbose) log(msgPrefix + "END ALTERNATIVE");
-	return Tuple { structure = alternative, roundtripCnt = roundtripCnt };
-}
-
-helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart: Integer, parentScopePreceeding: List(SQ_SequenceElement)): Tuple(structure: List(Structure), elements: List(SQ_SequenceElement), roundtripCnt: Integer) {
+/**
+ * Takes a list of SQ_SequenceElements, i.e., a preprocessed PUML file, and transforms
+ * it into a list of Structure elements
+ * 
+ * @param msgPrefix prefix for log messages; used for indentation in verbose printing
+ * @param roundtripIdStart next available (globally unique!) roundtrip id
+ * @param parentScopePreceeding preceeding SQ_SequenceElements from parent scope, used for request<->response matching
+ *
+ * @return list of generated Structure elements as well as next available roundtrip id
+ */
+helper List(SQ_SequenceElement)::toStructures(msgPrefix: String, roundtripIdStart: Integer, parentScopePreceeding: List(SQ_SequenceElement)): Tuple(structure: List(Structure), nextRoundtripId: Integer) {
 	if (verbose) log(msgPrefix + "BEGIN STRUCTURES #" + self->size().toString() + " (rtID=" + roundtripIdStart.toString() + ")");
 
 	var structures := object List(Structure) {};
-	var roundtripCnt := roundtripIdStart;
+	var nextRoundtripId := roundtripIdStart;
 	var elements := self;
 
 	var elemInd := 1;
@@ -289,33 +93,33 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 			with log('INTERNAL: logic tried accessing index < 0');
 	
 		var elem := elements->at(elemInd);
+		elemInd := elemInd + 1;
 		
+		// Preceeding are all preceeding from parent scope
+		// + all preceeding elements from this scope
 		var prec := object List(SQ_SequenceElement) {};
 		parentScopePreceeding->forEach(p) {
 			prec += p;	
 		};
-		self->subSequence(1, elemInd-1)->forEach(p) {
+		self->subSequence(1, elemInd-2)->forEach(p) {
 			prec += p;
 		};
-		
-		// Ordering is important to ensure prec is built correctly
-		elemInd := elemInd + 1;
 	
 		if (elem.oclIsTypeOf(SQ_Message)) {
     		var msg := elem.oclAsType(SQ_Message);
     		if (verbose) log(msgPrefix + "  message(" + elemInd.toString() + "): " + msg.humanReadableString());
     		
     		if (msg.isResponse()) {
-				var reqT := findRequest(msgPrefix + "    ", msg, prec);
+				var reqMsg := findRequest(msgPrefix + "    ", msg, prec);
 				
-				if (not reqT.oclIsUndefined()) {
+				if (not reqMsg.oclIsUndefined()) {
 					structures += generateRoundtrip(
     					msgPrefix + "    ", 
-    					roundtripCnt, 
-    					reqT.requestMsg.deepclone().map message2request(), 
-    					msg.payload.response.deepclone().map pumlresponse2testscenarioresponse()
+    					nextRoundtripId, 
+    					reqMsg.deepclone().map message2request(), 
+    					msg.payload.response.deepclone().map pumlresponse2tsresponse()
 					);
-					roundtripCnt := roundtripCnt + 1;
+					nextRoundtripId := nextRoundtripId + 1;
 				}
     		}
     	} elif (elem.oclIsTypeOf(SQ_Return)) {
@@ -323,25 +127,25 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
     		if (verbose) log(msgPrefix + "  return " + ret.humanReadableString());
     		
     		if (not ret.response.oclIsUndefined()) {
-    			var reqT := findReturnedRequest(msgPrefix + "    ", prec);
+    			var reqMsg := findReturnedRequest(msgPrefix + "    ", prec);
     			
-    			if (not reqT.oclIsUndefined()) {
+    			if (not reqMsg.oclIsUndefined()) {
     				structures += generateRoundtrip(
     					msgPrefix + "    ", 
-    					roundtripCnt, 
-    					reqT.requestMsg.deepclone().map message2request(), 
-    					ret.response.deepclone().map pumlresponse2testscenarioresponse()
+    					nextRoundtripId, 
+    					reqMsg.deepclone().map message2request(), 
+    					ret.response.deepclone().map pumlresponse2tsresponse()
 					);
-					roundtripCnt := roundtripCnt + 1;
+					nextRoundtripId := nextRoundtripId + 1;
     			}
     		}
     	} elif (elem.oclIsTypeOf(SQ_Group)) {
     		var grp = elem.oclAsType(SQ_Group);
     		if (verbose) log(msgPrefix + "  " + grp.humanReadableString());
     		
-    		var res := grp.toAlternative(msgPrefix + "  ", roundtripCnt, prec);
+    		var res := grp.toAlternative(msgPrefix + "  ", nextRoundtripId, prec);
     		structures += res.structure;
-    		roundtripCnt := res.roundtripCnt;
+    		nextRoundtripId := res.nextRoundtripId;
     	} elif (elem.oclIsTypeOf(SQ_Delay)) {
     		var delay = elem.oclAsType(SQ_Delay);
     		if (verbose) log(msgPrefix + "  " + delay.humanReadableString());
@@ -353,5 +157,43 @@ helper List(SQ_SequenceElement)::structures(msgPrefix: String, roundtripIdStart:
 	};
 	
 	if (verbose) log(msgPrefix + "END STRUCTURES");
-	return Tuple { structure = structures, elements = elements, roundtripCnt = roundtripCnt };
+	return Tuple { structure = structures, nextRoundtripId = nextRoundtripId };
+}
+
+/**
+ * This function transforms SQ_Group with SQ_SequenceElements
+ * to Alternative with Roundtrips
+ *
+ * @param msgPrefix prefix for log messages, used for indentation in debug/verbose printout
+ * @param roundtripIdStart first id to be used when generating new roundtrips (must be globally unique)
+ * @param parentScopePreceeding SequenceElements from parent scope, used for request<->response matching
+ *
+ * @returns Alternative structure element with request/responses aswell as total (global!) amount of existing roundtrips
+ *			Since roundtripIds are always incremented by 1, this effectively is the next usable roundtrip ID
+ */
+helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, parentScopePreceeding: List(SQ_SequenceElement)): Tuple(structure: Alternative, nextRoundtripId: Integer) {
+	if (verbose) log(msgPrefix + "TO ALTERNATIVE (hasCond=" + (not self.label.oclIsUndefined()).toString() + ", rdID=" + roundtripIdStart.toString() + ") " + self.humanReadableString());
+	var alternative := object Alternative {};
+
+	var res := self.elements->asList()->toStructures(msgPrefix + "  ", roundtripIdStart, parentScopePreceeding);
+	alternative.condition := self.label;
+	alternative.provided := res.structure->asOrderedSet();
+	var nextRoundtripId := res.nextRoundtripId;
+
+	if (self.alternatives->size() > 0) {
+		var alt1 := self.alternatives->at(1);
+		var othr := object SQ_Group {
+			keyword := self.keyword;
+			label := alt1.label;
+			alternatives := self.alternatives->subOrderedSet(2, self.alternatives->size());
+			elements := alt1.elements;
+		};
+		
+		var res2 := othr.toAlternative(msgPrefix + "  ", nextRoundtripId, parentScopePreceeding);
+		alternative.otherwise := res2.structure;
+		nextRoundtripId := res2.nextRoundtripId;
+	};
+	
+	if (verbose) log(msgPrefix + "END ALTERNATIVE");
+	return Tuple { structure = alternative, nextRoundtripId = nextRoundtripId };
 }

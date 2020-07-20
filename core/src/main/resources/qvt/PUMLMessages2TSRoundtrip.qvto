@@ -1,0 +1,182 @@
+library PUMLMessages2TSRoundtrip;
+
+import PUMLHumanReadable;
+import TSHumanReadable;
+
+modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
+modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
+
+configuration property verbose : Boolean;
+
+/**
+ * Generates a roundtrip from request/response specification
+ *
+ * @param msgPrefix prefix for log messages, used for verbose output indentation
+ * @param roundtripId id of the roundtrip
+ * @params [request, response] request/response pair for the roundtrip
+ */
+helper generateRoundtrip(msgPrefix: String, roundtripId: Integer, request: RequestSpecification, response: ResponseSpecification): TestRoundtrip {
+	if (verbose) log(msgPrefix + "GENERATING Roundtrip: " + roundtripId.toString() + ":");
+	
+	var rt := object TestRoundtrip {
+		testRoundtripName := "roundtrip" + roundtripId.toString();
+		requestspecification := request;
+		responsespecification := response;
+	};
+	
+	if (verbose) {
+		log(msgPrefix + "  "  + rt.requestspecification.humanReadableString() + " => " + rt.responsespecification.humanReadableString());
+		log(msgPrefix + "END GENERATING");
+	};
+	
+	return rt;
+}
+
+/**
+ * Locates a matching request for the given response within a sequence of preceeding SQ_SequenceElements
+ *
+ * @param msgPrefix prefix for log messages, used for verbose output indentation
+ * @param response the response for which the matching request is desired
+ * @param preceedingElements all SQ_SequenceElements that logically preceed the response, searched in reverse order
+ *
+ * @returns SQ_Message instance containing the matching request
+ */
+helper findRequest(msgPrefix: String, response: SQ_Message, preceedingElements: Sequence(SQ_SequenceElement)) : SQ_Message {
+	if (verbose) log(msgPrefix + "FIND REQUEST: " + response.humanReadableString());
+	
+	var potInd := 0;
+	var preceedingRev := preceedingElements->reverse();
+	while (potInd <= preceedingRev->size()) {
+		potInd := potInd + 1;
+		var precElem := preceedingRev->at(potInd);
+		if (precElem.oclIsTypeOf(SQ_Message)) {
+			var msg = precElem.oclAsType(SQ_Message);
+			
+			if (verbose) log(msgPrefix + "  * " + msg.humanReadableString());
+			
+			if (msg.isRequest() 
+				and msg.sender().name = response.receiver().name
+				and msg.receiver().name = response.sender().name) {
+				
+				if (verbose) {
+					log(msgPrefix + "  FOUND: " + msg.humanReadableString());
+					log(msgPrefix + "END FIND REQUEST");
+				};
+				
+				return msg;
+			}
+		}	
+	};
+	
+	if (verbose) {
+		log(msgPrefix + "  NOTHING FOUND");
+		log(msgPrefix + "END FIND REQUEST"); 
+	};
+	
+	return null;
+}
+
+/**
+ * Locates a matching request for a SQ_Return within a sequence of preceeding SQ_SequenceElements
+ *
+ * @param msgPrefix prefix for log messages, used for verbose output indentation
+ * @param preceedingElements all SQ_SequenceElements that logically preceed the response, searched in reverse order
+ *
+ * @returns SQ_Message instance containing the matching request
+ */
+helper findReturnedRequest(msgPrefix: String, preceedingElements: Sequence(SQ_SequenceElement)) : SQ_Message {
+	if (verbose) log(msgPrefix + "FIND REQUEST FOR RETURN");
+	
+	var potInd := 0;
+	var returnCnt := 0;
+	var preceedingRev := preceedingElements->reverse();
+	while (potInd <= preceedingRev->size()) {
+		potInd := potInd + 1;
+		var precElem := preceedingRev->at(potInd);
+		if (precElem.oclIsTypeOf(SQ_Return)) {
+			if (verbose) log(msgPrefix + "  x found previous return");
+			returnCnt := returnCnt + 1;	
+		} elif (precElem.oclIsTypeOf(SQ_Message)) {
+			var msg = precElem.oclAsType(SQ_Message);
+			if (verbose) log(msgPrefix + "  * " + msg.humanReadableString());
+			if (msg.isRequest()) {
+				if (returnCnt = 0) {
+					if (verbose) {
+						log(msgPrefix + "  FOUND: " + msg.humanReadableString());
+						log(msgPrefix + "END FIND REQUEST FOR RETURN");
+					};
+					return msg;
+				} else {
+					returnCnt := returnCnt - 1;	
+				};
+			}
+		};
+	};
+	
+	if (verbose) {
+		log(msgPrefix + "  NOTHING FOUND");
+		log(msgPrefix + "END FIND REQUEST FOR RETURN");
+	};
+	return null;
+}
+
+
+mapping SQ_Message::message2request(): RequestSpecification {
+	assert fatal (not self.payload.request.oclIsUndefined())
+		with log('Message should have contained a request');
+
+	method := self.payload.request.method;
+    url := self.payload.request.url;
+	receiver := self.receiver().name;
+	sender := self.sender().name;
+	requestdatum := self.payload.request.parametermap.params->map param2requestDatum();
+}
+
+mapping PT_Response::pumlresponse2tsresponse(): ResponseSpecification {
+	responsedatum := self.parametermap.params->map param2responseDatum();
+    statuscode := self.acceptedcodes.code;
+}
+
+mapping PT_Parameter::param2requestDatum(): RequestDatum {
+    variableName := self.name;
+    value := self.value;
+}
+
+mapping PT_Parameter::param2responseDatum(): ResponseDatum {
+    variableName := self.name;
+    value := self.value;
+}
+
+helper SQ_Arrow::isR2L(): Boolean {
+    return not self.lefttip.oclIsUndefined() and self.righttip.oclIsUndefined();
+}
+
+helper SQ_Arrow::isL2R(): Boolean {
+    return self.lefttip.oclIsUndefined() and not self.righttip.oclIsUndefined();
+}
+
+helper SQ_Message::receiver(): SQ_Participant {
+    if (self.arrow.isR2L()) {
+        return self.participantLeft;
+    } else if (self.arrow.isL2R()) {
+        return self.participantRight;
+    };
+    return null;
+}
+
+helper SQ_Message::sender(): SQ_Participant {
+    if (self.arrow.isR2L()) {
+        return self.participantRight;
+    } else if (self.arrow.isL2R()) {
+        return self.participantLeft;
+    };
+    return null;
+}
+
+helper SQ_Message::isRequest(): Boolean {
+    return not self.payload.request.oclIsUndefined();
+}
+
+helper SQ_Message::isResponse(): Boolean {
+    return not self.payload.response.oclIsUndefined();
+}
