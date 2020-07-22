@@ -50,9 +50,13 @@ class End2EndTest : StringSpec({
               "itemB" : "value2",
             }"""
         wireMockServer.stubFor(
-            WireMock
-                .get(WireMock.urlPathMatching("/testB/test/123"))
+            get(urlPathMatching("/testB/test/123"))
                 .willReturn(aResponse().withStatus(200).withBody(body)))
+
+        wireMockServer.stubFor(
+            get(urlPathMatching("/swagger/openapi.yaml"))
+                .willReturn(aResponse().withStatus(200).withBody(SWAGGER_FILE.readText()))
+        )
 
         runTransformationPipeline(COMPLEX_HELLO_INPUT_FILE, OUTPUT_FOLDER)
 
