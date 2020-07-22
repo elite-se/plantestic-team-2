@@ -22,21 +22,10 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ResponseSpecification" instanceTypeName="ResponseSpecification">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="bodymatchergroup" eType="#//BodyMatcherGroup"
-        containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="statusmatcher" eType="#//Matcher"
-        containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="responsedatum" upperBound="-1"
         eType="#//ResponseDatum" containment="true"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="BodyMatcherGroup" instanceTypeName="BodyMatcherGroup">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="bodymatcher" upperBound="-1"
-        eType="#//BodyMatcher" containment="true"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Matcher" instanceClassName="Matcher"/>
-  <eClassifiers xsi:type="ecore:EClass" name="IsIn" instanceClassName="IsIn" eSuperTypes="#//Matcher">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" upperBound="-1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="statuscode" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TestScenario" instanceClassName="TestScenario">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="testScenarioName" lowerBound="1"
@@ -46,17 +35,10 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="structure" upperBound="-1"
         eType="#//Structure" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="HasXPath" eSuperTypes="#//Matcher">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="xPath" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="BodyMatcher" instanceTypeName="BodyMatcher">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="matcher" lowerBound="1"
-        eType="#//Matcher" containment="true"/>
-  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ResponseDatum" instanceTypeName="ResponseDatum">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="variableName" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="xPath" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RequestDatum" instanceTypeName="RequestDatum">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="variableName" lowerBound="1"
@@ -73,9 +55,25 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Structure" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="Alternative" eSuperTypes="#//Structure">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="if" upperBound="-1" eType="#//Structure"
-        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="provided" upperBound="-1"
+        eType="#//Structure" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="otherwise" eType="#//Structure"
         containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="condition" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Delay" eSuperTypes="#//Structure">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="unit" lowerBound="1" eType="#//TimeUnit"
+        defaultValueLiteral="MILLISECONDS"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TimeUnit">
+    <eLiterals name="DAYS"/>
+    <eLiterals name="HOURS" value="1"/>
+    <eLiterals name="MICROSECONDS" value="2"/>
+    <eLiterals name="MILLISECONDS" value="3"/>
+    <eLiterals name="MINUTES" value="4"/>
+    <eLiterals name="NANOSECONDS" value="5"/>
+    <eLiterals name="SECONDS" value="6"/>
   </eClassifiers>
 </ecore:EPackage>

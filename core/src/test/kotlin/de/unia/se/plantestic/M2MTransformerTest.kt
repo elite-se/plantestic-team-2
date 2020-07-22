@@ -15,7 +15,7 @@ class M2MTransformerTest : StringSpec({
 
         val pumlInputModel = ResourceSetImpl().getResource(URI.createFileURI(MINIMAL_HELLO_PUML_INPUT_PATH), true).contents[0]
 
-        val reqRespOutputModel = M2MTransformer.transformPuml2ReqRes(pumlInputModel)
+        val reqRespOutputModel = M2MTransformer.transformPuml2TestScenario(pumlInputModel)
         reqRespOutputModel shouldNotBe null
 
         printModel(reqRespOutputModel)
@@ -29,7 +29,7 @@ class M2MTransformerTest : StringSpec({
 
         val pumlInputModel = ResourceSetImpl().getResource(URI.createFileURI(COMPLEX_HELLO_PUML_INPUT_PATH), true).contents[0]
 
-        val reqRespOutputModel = M2MTransformer.transformPuml2ReqRes(pumlInputModel)
+        val reqRespOutputModel = M2MTransformer.transformPuml2TestScenario(pumlInputModel)
         reqRespOutputModel shouldNotBe null
 
         printModel(reqRespOutputModel)
@@ -43,7 +43,7 @@ class M2MTransformerTest : StringSpec({
 
         val pumlInputModel = ResourceSetImpl().getResource(URI.createFileURI(REROUTING_PUML_INPUT_PATH), true).contents[0]
 
-        val reqRespOutputModel = M2MTransformer.transformPuml2ReqRes(pumlInputModel)
+        val reqRespOutputModel = M2MTransformer.transformPuml2TestScenario(pumlInputModel)
         reqRespOutputModel shouldNotBe null
 
         printModel(reqRespOutputModel)
@@ -57,73 +57,13 @@ class M2MTransformerTest : StringSpec({
 
         val pumlInputModel = ResourceSetImpl().getResource(URI.createFileURI(XCALL_PUML_INPUT_PATH), true).contents[0]
 
-        val reqRespOutputModel = M2MTransformer.transformPuml2ReqRes(pumlInputModel)
+        val reqRespOutputModel = M2MTransformer.transformPuml2TestScenario(pumlInputModel)
         reqRespOutputModel shouldNotBe null
 
         printModel(reqRespOutputModel)
 
         reqRespOutputModel.eClass().name shouldBe "Scenario"
         reqRespOutputModel.eContents().filter { f -> f.eClass().name == "Roundtrip" }.size shouldBe 6
-    }
-
-    "[ReqRes->RestAssured] Transform minimal hello example" {
-        MetaModelSetup.doSetup()
-
-        val reqresInputModel =
-            ResourceSetImpl().getResource(URI.createFileURI(MINIMAL_HELLO_REQRES_INPUT_PATH), true).contents[0]
-
-        val restAssuredOutputModel = M2MTransformer.transformReqRes2RestAssured(reqresInputModel)
-        restAssuredOutputModel shouldNotBe null
-
-        printModel(restAssuredOutputModel)
-
-        restAssuredOutputModel.eClass().name shouldBe "TestScenario"
-        restAssuredOutputModel.eContents().filter { f -> f.eClass().name == "TestRoundtrip" }.size shouldBe 1
-    }
-
-    "[ReqRes->RestAssured] Transform complex hello example" {
-        MetaModelSetup.doSetup()
-
-        val reqresInputModel =
-            ResourceSetImpl().getResource(URI.createFileURI(COMPLEX_HELLO_REQRES_INPUT_PATH), true).contents[0]
-
-        val restAssuredOutputModel = M2MTransformer.transformReqRes2RestAssured(reqresInputModel)
-        restAssuredOutputModel shouldNotBe null
-
-        printModel(restAssuredOutputModel)
-
-        restAssuredOutputModel.eClass().name shouldBe "TestScenario"
-        restAssuredOutputModel.eContents().filter { f -> f.eClass().name == "TestRoundtrip" }.size shouldBe 1
-    }
-
-    "[ReqRes->RestAssured] Transform rerouting example" {
-        MetaModelSetup.doSetup()
-
-        val reqresInputModel =
-            ResourceSetImpl().getResource(URI.createFileURI(REROUTING_REQRES_INPUT_PATH), true).contents[0]
-
-        val restAssuredOutputModel = M2MTransformer.transformReqRes2RestAssured(reqresInputModel)
-        restAssuredOutputModel shouldNotBe null
-
-        printModel(restAssuredOutputModel)
-
-        restAssuredOutputModel.eClass().name shouldBe "TestScenario"
-        restAssuredOutputModel.eContents().filter { f -> f.eClass().name == "TestRoundtrip" }.size shouldBe 3
-    }
-
-    "[ReqRes->RestAssured] Transform xcall example" {
-        MetaModelSetup.doSetup()
-
-        val reqresInputModel =
-            ResourceSetImpl().getResource(URI.createFileURI(XCALL_REQRES_INPUT_PATH), true).contents[0]
-
-        val restAssuredOutputModel = M2MTransformer.transformReqRes2RestAssured(reqresInputModel)
-        restAssuredOutputModel shouldNotBe null
-
-        printModel(restAssuredOutputModel)
-
-        restAssuredOutputModel.eClass().name shouldBe "TestScenario"
-        restAssuredOutputModel.eContents().filter { f -> f.eClass().name == "TestRoundtrip" }.size shouldBe 6
     }
 }) {
     companion object {
