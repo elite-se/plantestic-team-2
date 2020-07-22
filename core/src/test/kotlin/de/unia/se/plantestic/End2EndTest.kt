@@ -1,7 +1,6 @@
 package de.unia.se.plantestic
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.google.common.io.Resources
 import de.unia.se.plantestic.Main.runTransformationPipeline
