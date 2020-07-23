@@ -1,6 +1,8 @@
 @startvariant
-XCS.path = path
-vin = vin
+
+XCS.path = "path"
+
+vin = "vin"
 
 @endvariant
 
@@ -24,7 +26,7 @@ note over CCC : Agent is being called in callcenter for breakdown and triggers r
 autonumber
 autoactivate on
 
-CCC -> XCS : async[1] request(POST, "/xcs/vin/v1/{vin}") \n (<CCCTarget>, ServiceType=BCALL)
+CCC -> XCS : async[1] request(POST, "/xcs/vin/v1/${vin}") \n (<CCCTarget>, ServiceType=BCALL)
 
 note over XCS : XCS creates a new event from data provided by CCC\nresponse contains new eventid
 autoactivate off
@@ -38,7 +40,7 @@ SVDS -> ELOS : request(GET, "dafdsf")
 return response(200)
 '/
 
-XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/{vin}")
+XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/${vin}")
 SVDS --> XCS : response(200, {MarketRegion})
 
 autoactivate off
@@ -49,7 +51,7 @@ Vehicle -[#green]> XCS : <joynr>:notifyXCall(requestId, sequenceId, CoreData)
 XCS -> CCC : async[1] request(POST, "<CCCTarget>/xcs/v1/eventUpdated", {eventId, xcsEventData})
 
 autoactivate on
-XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/{vin}")
+XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/${vin}")
 return response(200, {MarketRegion})
 
 autoactivate off
