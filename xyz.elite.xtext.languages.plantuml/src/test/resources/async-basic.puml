@@ -1,6 +1,6 @@
-@startconfig
+@startasyncconfig
 async[1]=Alice request(GET, "did/bob/call") response(200 ACCEPTED)
-@endconfig
+@endasyncconfig
 
 @startuml
 

@@ -45,8 +45,8 @@ helper generateAsyncRoundtrip(msgPrefix: String, roundtripId: Integer, asyncEntr
 	
 	var rt := object AsyncTestRoundtrip {
 		name := "roundtrip" + roundtripId.toString();
-		requestspecification := asyncEntry.map async2request();
-		responsespecification := asyncEntry.map async2response();
+		requestspecification := asyncEntry.deepclone().map async2request();
+		responsespecification := asyncEntry.deepclone().map async2response();
 		
 		if (not asyncEntry.timeout.oclIsUndefined()) {
 			maxTimeout := object TimeInterval {
@@ -129,7 +129,7 @@ helper findAsyncRequest(msgPrefix: String, asyncresponse: SQ_Message, preceeding
 	if (verbose) log(msgPrefix + "FIND ASYNC REQUEST FOR: " + asyncresponse.humanReadableString());
 	assert fatal (not asyncresponse.payload.asyncid.oclIsUndefined())
 		with log("findAsyncRequest() expects an async response that has an id!");
-	assert fatal (not asyncresponse.isRequest())
+	assert fatal (asyncresponse.isRequest())
 		with log("findAsyncRequest() expects an async response (which is a http request!)");
 	
 	var potInd := 0;

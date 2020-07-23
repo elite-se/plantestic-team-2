@@ -3,6 +3,9 @@ library TSHumanReadable;
 modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
 
 helper RequestSpecification::humanReadableString(): String {
+	if (self.sender.oclIsUndefined()) {
+		return "request(method=" + self.method + ", url=\"" + self.url + "\", sender=null" + ", receiver=" + self.receiver + ")";
+	};
 	return "request(method=" + self.method + ", url=\"" + self.url + "\", sender=" + self.sender + ", receiver=" + self.receiver + ")";
 }
 

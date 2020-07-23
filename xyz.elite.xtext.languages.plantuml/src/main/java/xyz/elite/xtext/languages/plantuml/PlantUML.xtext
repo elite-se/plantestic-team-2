@@ -29,7 +29,7 @@ SQ_AsyncEntry:
 			participant=[SQ_Participant] & 
 			request=PT_Request & 
 			response=PT_Response & 
-			('timeout(' timeout=INT timeoutunit=PT_TimeUnit (',' interval=INT intervalunit=PT_TimeUnit)? ')')
+			('timeout(' timeout=INT timeoutunit=PT_TimeUnit (',' interval=INT intervalunit=PT_TimeUnit)? ')')?
 		)
 	);
 

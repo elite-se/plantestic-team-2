@@ -140,6 +140,7 @@ helper List(SQ_SequenceElement)::toStructures(msgPrefix: String, roundtripIdStar
     			
     			if (not reqMsg.oclIsUndefined()) {
     				var asyncentry := asyncEntries->get(asyncID);
+
     				assert fatal (not asyncentry.oclIsUndefined())
     					with log("Found no matching configuration for async response, request with id " + asyncID.toString());
     					
