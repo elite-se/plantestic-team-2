@@ -27,15 +27,16 @@ main() {
     if (verbose) log('Started transforming PlantUML to RequestResponse pairs');
 
     var variants = input.objectsOfType(Model).variants[SQ_Variant].map transformVariants();
+    var asyncconfig = input.objectsOfType(Model).asyncconfigs[SQ_AsyncConfig]->flattenAsyncConfigs();
 	if (verbose) log("Output configs: " + variants->size().toString());
 
-    input.objectsOfType(Model).sequence_diagram[SQ_Diagram].map transformUmlDiagram(variants);
+    input.objectsOfType(Model).sequence_diagram[SQ_Diagram].map transformUmlDiagram(variants, asyncconfig);
 }
 
 // ==============================
-//   PUML Config Transformation
+//   PUML Variant Transformation
 // ==============================
- 
+
 mapping SQ_Variant::transformVariants(): Variant {
     entries := self.entries.map transformVariantEntries();
 }
@@ -45,12 +46,27 @@ mapping SQ_VariantEntry::transformVariantEntries(): VariantEntry {
     value := self.value;
 }
 
+// ==============================
+//       PUML Async Configs
+// ==============================
+
+helper Bag(SQ_AsyncConfig)::flattenAsyncConfigs(): Dict(Integer, SQ_AsyncEntry) {
+	var dict := object Dict(Integer, SQ_AsyncEntry) {};
+	self->forEach(conf) { 
+		conf.entries->forEach(entr) {
+			dict->put(entr.asyncid, entr);
+		};
+	};
+	return dict;
+}
+
+
 // ===============================
 //   PUML Diagram Transformation
 // ===============================
 
-mapping SQ_Diagram::transformUmlDiagram(variants_: Bag(Variant)): TestScenario {
-    testScenarioName := diagramName + "_puml";
+mapping SQ_Diagram::transformUmlDiagram(variants_: Bag(Variant), asyncEntries: Dict(Integer, SQ_AsyncEntry)): TestScenario {
+    name := diagramName + "_puml";
     variants := variants_;
     var roundtripCounter : Integer := 1;
     
@@ -59,7 +75,7 @@ mapping SQ_Diagram::transformUmlDiagram(variants_: Bag(Variant)): TestScenario {
 
 	if (verbose) log("\n2. Transform:");
     var prec := object List(SQ_SequenceElement) {};
-	structure := elements->toStructures("", 1, prec).structure;
+	structure := elements->toStructures("", 1, prec, asyncEntries).structure;
 	
 	if (verbose) {
 		log("\n==============\n    Result\n==============");
@@ -77,7 +93,7 @@ mapping SQ_Diagram::transformUmlDiagram(variants_: Bag(Variant)): TestScenario {
  *
  * @return list of generated Structure elements as well as next available roundtrip id
  */
-helper List(SQ_SequenceElement)::toStructures(msgPrefix: String, roundtripIdStart: Integer, parentScopePreceeding: List(SQ_SequenceElement)): Tuple(structure: List(Structure), nextRoundtripId: Integer) {
+helper List(SQ_SequenceElement)::toStructures(msgPrefix: String, roundtripIdStart: Integer, parentScopePreceeding: List(SQ_SequenceElement), asyncEntries: Dict(Integer, SQ_AsyncEntry)): Tuple(structure: List(Structure), nextRoundtripId: Integer) {
 	if (verbose) log(msgPrefix + "BEGIN STRUCTURES #" + self->size().toString() + " (rtID=" + roundtripIdStart.toString() + ")");
 
 	var structures := object List(Structure) {};
@@ -118,7 +134,23 @@ helper List(SQ_SequenceElement)::toStructures(msgPrefix: String, roundtripIdStar
 					);
 					nextRoundtripId := nextRoundtripId + 1;
 				}
-    		}
+    		} elif (msg.isRequest() and not msg.payload.asyncid.oclIsUndefined()) {
+    			var asyncID = msg.payload.asyncid;
+    			var reqMsg := findAsyncRequest(msgPrefix + "    ", msg, prec);
+    			
+    			if (not reqMsg.oclIsUndefined()) {
+    				var asyncentry := asyncEntries->get(asyncID);
+    				assert fatal (not asyncentry.oclIsUndefined())
+    					with log("Found no matching configuration for async response, request with id " + asyncID.toString());
+    					
+    				structures += generateAsyncRoundtrip(
+	    				msgPrefix + "    ",
+	    				nextRoundtripId,
+						asyncentry.deepclone()
+					);
+					nextRoundtripId := nextRoundtripId + 1;
+    			}
+    		};
     	} elif (elem.oclIsTypeOf(SQ_Return)) {
     		var ret := elem.oclAsType(SQ_Return);
     		if (verbose) log(msgPrefix + "  return " + ret.humanReadableString());
@@ -140,7 +172,7 @@ helper List(SQ_SequenceElement)::toStructures(msgPrefix: String, roundtripIdStar
     		var grp = elem.oclAsType(SQ_Group);
     		if (verbose) log(msgPrefix + "  " + grp.humanReadableString());
     		
-    		var res := grp.toAlternative(msgPrefix + "  ", nextRoundtripId, prec);
+    		var res := grp.toAlternative(msgPrefix + "  ", nextRoundtripId, prec, asyncEntries);
     		structures += res.structure;
     		nextRoundtripId := res.nextRoundtripId;
     	} elif (elem.oclIsTypeOf(SQ_Delay)) {
@@ -170,11 +202,11 @@ helper List(SQ_SequenceElement)::toStructures(msgPrefix: String, roundtripIdStar
  * @returns Alternative structure element with request/responses aswell as total (global!) amount of existing roundtrips
  *			Since roundtripIds are always incremented by 1, this effectively is the next usable roundtrip ID
  */
-helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, parentScopePreceeding: List(SQ_SequenceElement)): Tuple(structure: Alternative, nextRoundtripId: Integer) {
+helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, parentScopePreceeding: List(SQ_SequenceElement), asyncEntries: Dict(Integer, SQ_AsyncEntry)): Tuple(structure: Alternative, nextRoundtripId: Integer) {
 	if (verbose) log(msgPrefix + "TO ALTERNATIVE (hasCond=" + (not self.label.oclIsUndefined()).toString() + ", rdID=" + roundtripIdStart.toString() + ") " + self.humanReadableString());
 	var alternative := object Alternative {};
 
-	var res := self.elements->asList()->toStructures(msgPrefix + "  ", roundtripIdStart, parentScopePreceeding);
+	var res := self.elements->asList()->toStructures(msgPrefix + "  ", roundtripIdStart, parentScopePreceeding, asyncEntries);
 	alternative.condition := self.label;
 	alternative.provided := res.structure->asOrderedSet();
 	var nextRoundtripId := res.nextRoundtripId;
@@ -188,7 +220,7 @@ helper SQ_Group::toAlternative(msgPrefix: String, roundtripIdStart: Integer, par
 			elements := alt1.elements;
 		};
 		
-		var res2 := othr.toAlternative(msgPrefix + "  ", nextRoundtripId, parentScopePreceeding);
+		var res2 := othr.toAlternative(msgPrefix + "  ", nextRoundtripId, parentScopePreceeding, asyncEntries);
 		alternative.otherwise := res2.structure;
 		nextRoundtripId := res2.nextRoundtripId;
 	};

@@ -2,6 +2,7 @@ library PUMLMessages2TSRoundtrip;
 
 import PUMLHumanReadable;
 import TSHumanReadable;
+import TSTimeUnit;
 
 modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
 modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
@@ -19,7 +20,7 @@ helper generateRoundtrip(msgPrefix: String, roundtripId: Integer, request: Reque
 	if (verbose) log(msgPrefix + "GENERATING Roundtrip: " + roundtripId.toString() + ":");
 	
 	var rt := object TestRoundtrip {
-		testRoundtripName := "roundtrip" + roundtripId.toString();
+		name := "roundtrip" + roundtripId.toString();
 		requestspecification := request;
 		responsespecification := response;
 	};
@@ -31,6 +32,45 @@ helper generateRoundtrip(msgPrefix: String, roundtripId: Integer, request: Reque
 	
 	return rt;
 }
+
+/**
+ * Generates an async roundtrip from a AsyncEntry
+ *
+ * @param msgPrefix prefix for log messages, used for verbose output indentation
+ * @param roundtripId id of the roundtrip
+ * @param asyncEntry
+ */
+helper generateAsyncRoundtrip(msgPrefix: String, roundtripId: Integer, asyncEntry: SQ_AsyncEntry): AsyncTestRoundtrip {
+	if (verbose) log(msgPrefix + "GENERATING ASYNC Roundtrip: " + roundtripId.toString() + ":");
+	
+	var rt := object AsyncTestRoundtrip {
+		name := "roundtrip" + roundtripId.toString();
+		requestspecification := asyncEntry.map async2request();
+		responsespecification := asyncEntry.map async2response();
+		
+		if (not asyncEntry.timeout.oclIsUndefined()) {
+			maxTimeout := object TimeInterval {
+				unit := asyncEntry.timeoutunit.string2timeUnit();
+				value := asyncEntry.timeout;
+			}
+		};
+		if (not asyncEntry.interval.oclIsUndefined()) {
+			requestInterval:= object TimeInterval {
+				unit := asyncEntry.intervalunit.string2timeUnit();
+				value := asyncEntry.interval;
+			}	
+		}
+	};
+	
+	if (verbose) {
+		log(msgPrefix + "  "  + rt.requestspecification.humanReadableString() + " => " + rt.responsespecification.humanReadableString());
+		log(msgPrefix + "END GENERATING");
+	};
+	
+	return rt;
+}
+
+
 
 /**
  * Locates a matching request for the given response within a sequence of preceeding SQ_SequenceElements
@@ -71,6 +111,57 @@ helper findRequest(msgPrefix: String, response: SQ_Message, preceedingElements: 
 	if (verbose) {
 		log(msgPrefix + "  NOTHING FOUND");
 		log(msgPrefix + "END FIND REQUEST"); 
+	};
+	
+	return null;
+}
+
+/**
+ * Locates the matching async request for a given async response (via id)
+ *
+ * @param msgPrefix prefix for log messages, used for verbose output indentation
+ * @param asyncresponse the async response for which the matching request is desired
+ * @param preceedingElements all SQ_SequenceElements that logically preceed the response, searched in reverse order
+ *
+ * @returns SQ_Message instance containing the matching request
+ */
+helper findAsyncRequest(msgPrefix: String, asyncresponse: SQ_Message, preceedingElements: Sequence(SQ_SequenceElement)): SQ_Message {
+	if (verbose) log(msgPrefix + "FIND ASYNC REQUEST FOR: " + asyncresponse.humanReadableString());
+	assert fatal (not asyncresponse.payload.asyncid.oclIsUndefined())
+		with log("findAsyncRequest() expects an async response that has an id!");
+	assert fatal (not asyncresponse.isRequest())
+		with log("findAsyncRequest() expects an async response (which is a http request!)");
+	
+	var potInd := 0;
+	var preceedingRev := preceedingElements->reverse();
+	while (potInd <= preceedingRev->size()) {
+		potInd := potInd + 1;
+		var precElem := preceedingRev->at(potInd);
+		if(precElem.oclIsTypeOf(SQ_Message)) {
+			var msg = precElem.oclAsType(SQ_Message);
+			
+			if (verbose) log(msgPrefix + "  * " + msg.humanReadableString());
+			
+			if (msg.isRequest() 
+				and not msg.payload.asyncid.oclIsUndefined()
+				and msg.payload.asyncid = asyncresponse.payload.asyncid) {
+				assert fatal (msg.sender().name = asyncresponse.receiver().name
+					and msg.receiver().name = asyncresponse.sender().name)
+					with log("async request, response with id " + msg.payload.asyncid.toString() + " have missmatching sender/receiver");
+					
+				if (verbose) {
+					log(msgPrefix + "  FOUND: " + msg.humanReadableString());
+					log(msgPrefix + "END FIND ASYNC REQUEST");
+				};
+				
+				return msg;
+			}
+		}
+	};
+	
+	if (verbose) {
+		log(msgPrefix + "  NOTHING FOUND");
+		log(msgPrefix + "END FIND ASYNC REQUEST"); 
 	};
 	
 	return null;
@@ -130,6 +221,18 @@ mapping SQ_Message::message2request(): RequestSpecification {
 	receiver := self.receiver().name;
 	sender := self.sender().name;
 	requestdatum := self.payload.request.parametermap.params->map param2requestDatum();
+}
+
+mapping SQ_AsyncEntry::async2request(): RequestSpecification {
+	method := self.request.method;
+	url := self.request.url;
+	receiver := self.participant.name;
+	requestdatum := self.request.parametermap.params->map param2requestDatum();
+}
+
+mapping SQ_AsyncEntry::async2response(): ResponseSpecification {
+	responsedatum := self.response.parametermap.params->map param2responseDatum();
+	statuscode := self.response.acceptedcodes.code;
 }
 
 mapping PT_Response::pumlresponse2tsresponse(): ResponseSpecification {

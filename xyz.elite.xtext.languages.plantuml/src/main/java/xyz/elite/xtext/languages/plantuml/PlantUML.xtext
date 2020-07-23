@@ -23,7 +23,15 @@ SQ_AsyncConfig:
 	'@startasyncconfig' (NEWLINE | entries+=SQ_AsyncEntry)* '@endasyncconfig';
 
 SQ_AsyncEntry:
-	NEWLINE ('async[' asyncid=INT ']' '=' participant=[SQ_Participant] request=PT_Request response=PT_Response);
+	NEWLINE (
+		'async[' asyncid=INT ']' '=' 
+		(
+			participant=[SQ_Participant] & 
+			request=PT_Request & 
+			response=PT_Response & 
+			('timeout(' timeout=INT timeoutunit=PT_TimeUnit (',' interval=INT intervalunit=PT_TimeUnit)? ')')
+		)
+	);
 
 // --------------------------
 //     		DIAGRAM
@@ -54,7 +62,7 @@ SQ_SequenceElement:
 	| SQ_HideFootbox
 	| SQ_Skinparam);
 
-	// -------- MESSAGES --------
+// -------- MESSAGES --------
 SQ_Message:
 	(('[' arrow=SQ_Arrow participantRight=SQ_Participant)
 	| (participantLeft=SQ_Participant arrow=SQ_Arrow participantRight=SQ_Participant)
@@ -93,7 +101,7 @@ SQ_Description:
 	'of' | SQ_LifelineKeyword | 'autoactivate' | 'on' | 'off' | 'return' | 'create' |
 	'!' | '*' | '+' | 'box' | 'hide' | 'footbox' | 'skinparam' | 'ref' | '...' | '=' | ':')*;
 
-	// -------- DEFINING PARTICIPANTS --------
+// -------- DEFINING PARTICIPANTS --------
 SQ_ParticipantDefiniton:
 	(('create' keyword=(SQ_ParticipantKeyword)?) | keyword=SQ_ParticipantKeyword) participant=SQ_Participant ('order'
 	priority=INT)?;
@@ -114,12 +122,12 @@ SQ_Stereotype:
 SQ_Color:
 	color=HEXCOLOR | color=NAMEDCOLOR;
 
-	// -------- AUTONUMBERING --------
+// -------- AUTONUMBERING --------
 SQ_Autonumber:
 	{SQ_Autonumber}
 	'autonumber' ('stop' | 'resume')? (start=INT | start=INT step=INT)? format=(STRING)?;
 
-	// -------- PAGE META/FORMATTING INFORMATION --------
+// -------- PAGE META/FORMATTING INFORMATION --------
 SQ_PageMetaInfo:
 	keyword=SQ_PageMetaInfoKeyword content=SQ_Description;
 
@@ -129,7 +137,7 @@ SQ_PageMetaInfoKeyword:
 SQ_HideFootbox:
 	'hide' 'footbox';
 
-	// -------- GROUPS --------
+// -------- GROUPS --------
 SQ_Group:
 	keyword=SQ_GroupEntryKeyword label=SQ_Description
 	(elements+=SQ_SequenceElement | NEWLINE)*
@@ -143,7 +151,7 @@ SQ_GroupAlternative:
 SQ_GroupEntryKeyword:
 	'alt' | 'opt' | 'loop' | 'par' | 'break' | 'critical' | 'group';
 
-	// -------- NOTES --------
+// -------- NOTES --------
 SQ_Note:
 	type=SQ_NoteType
 	((('left' | 'right') ('of' anchors+=[SQ_Participant])?)
@@ -155,24 +163,24 @@ SQ_Note:
 SQ_NoteType:
 	'note' | 'hnote' | 'rnote';
 
-	// -------- DIVIDER --------
+// -------- DIVIDER --------
 SQ_Divider:
 	'=' '=' label=SQ_Description;
 
-	// -------- REF --------
+// -------- REF --------
 SQ_Ref:
 	'ref' 'over' anchors+=[SQ_Participant] (',' anchors+=[SQ_Participant])* ':' content=SQ_Description;
 
-	// -------- DELAY --------
+// -------- DELAY --------
 SQ_Delay:
 	'...' (wait=PT_Wait)? description=SQ_Description;
 
-	// -------- SPACE --------
+// -------- SPACE --------
 SQ_Space:
 	{SQ_Space}
 	'|' '|' ('|' | (height=INT '|' '|'));
 
-	// -------- LIFELINES --------
+// -------- LIFELINES --------
 SQ_LifelineCtrl:
 	keyword=SQ_LifelineKeyword (participant=[SQ_Participant|ID] | participant=[SQ_Participant|STRING]) (color=SQ_Color)?;
 
@@ -188,20 +196,20 @@ SQ_LifetimeHint:
 SQ_Return:
 	'return' (response=PT_Response)? label=SQ_Description;
 
-	// -------- ENCOMPASS --------
+// -------- ENCOMPASS --------
 SQ_Encompass:
 	'box' title=STRING color=SQ_Color
 	(NEWLINE | elements+=SQ_SequenceElement)*
 	NEWLINE 'end' 'box';
 
-	// -------- SKINPARAM --------
+// -------- SKINPARAM --------
 SQ_Skinparam:
 	'skinparam' name=ID value=SQ_SkinparamValue;
 
 SQ_SkinparamValue:
 	SQ_Color | {SQ_SkinparamValue} INT | {SQ_SkinparamValue} ID | {SQ_SkinparamValue} STRING;
 
-	// ----------------------------
+// ----------------------------
 //   PLANTESTIC MODIFICATIONS
 // ----------------------------
 PT_Wait:

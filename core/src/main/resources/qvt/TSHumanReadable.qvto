@@ -27,7 +27,7 @@ helper Structure::humanReadableString(prefix: String): String {
 }
 
 helper TestRoundtrip::humanReadableString(prefix: String): String {
-	var intro := prefix + "Roundtrip(" + self.testRoundtripName + "): "; 
+	var intro := prefix + "Roundtrip(" + self.name + "): "; 
 	var add := self.requestspecification.humanReadableString() + " => " + self.responsespecification.humanReadableString() + "\n";
 	if (not add.oclIsUndefined()) {
 		return intro + add;

@@ -7,8 +7,7 @@
         eType="#//RequestSpecification" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="responsespecification"
         lowerBound="1" eType="#//ResponseSpecification" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="testRoundtripName" lowerBound="1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RequestSpecification" instanceTypeName="RequestSpecification">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="method" lowerBound="1"
@@ -28,8 +27,7 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TestScenario" instanceClassName="TestScenario">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="testScenarioName" lowerBound="1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="variants" upperBound="-1"
         eType="#//Variant" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="structure" upperBound="-1"
