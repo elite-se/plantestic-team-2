@@ -11,7 +11,8 @@ app.get('/png/:uml', function (req, res) {
     var decode = plantuml.decode(req.params.uml);
     var gen = plantuml.generate({format: 'png'});
 
-    decode.out.pipe(replaceStream(/@startconfig[\s\S]*@endconfig/, '')).pipe(gen.in);
+    decode.out.pipe(replaceStream(/@startvariant[\s\S]*@endvariant/, '')).pipe(gen.in);
+    decode.out.pipe(replaceStream(/@startasyncconfig[\s\S]*@endasyncconfig/, '')).pipe(gen.in);
     gen.out.pipe(res);
 });
 
@@ -21,7 +22,8 @@ app.get('/svg/:uml', function (req, res) {
     var decode = plantuml.decode(req.params.uml);
     var gen = plantuml.generate({format: 'svg'});
 
-    decode.out.pipe(replaceStream(/@startconfig[\s\S]*@endconfig/, '')).pipe(gen.in);
+    decode.out.pipe(replaceStream(/@startvariant[\s\S]*@endvariant/, '')).pipe(gen.in);
+    decode.out.pipe(replaceStream(/@startasyncconfig[\s\S]*@endasyncconfig/, '')).pipe(gen.in);
     gen.out.pipe(res);
 });
 

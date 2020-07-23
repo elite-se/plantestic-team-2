@@ -137,20 +137,20 @@ Example: ```(name1 : "/value/value1", name2 : "/value2")```
 
 ![./core/src/test/resources/rerouting.png](./core/src/test/resources/rerouting.png)
 
-#### Configs
+#### Variants
 
-Configs can be prepended to PlantUML files:
+Variants can be prepended to PlantUML files:
 
 ```puml
-@startconfig
+@startvariant
 vin = "987"
 eventid = "123"
-@endconfig
+@endvariant
 
-@startconfig
+@startvariant
 vin = "120"
 eventid = "20"
-@endconfig
+@endvariant
 
 SEQUENCE @startuml
 
@@ -158,7 +158,7 @@ participant CCCMock
 ...
 ```
 
-For each config a separate test case is generated.
+For each variant a separate test case is generated.
 
 #### Environment variables
 
