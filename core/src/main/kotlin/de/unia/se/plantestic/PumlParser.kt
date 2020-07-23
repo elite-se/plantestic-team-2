@@ -1,9 +1,11 @@
 package de.unia.se.plantestic
 
+import java.io.File
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.util.EcoreUtil
+import org.eclipse.emf.ecore.resource.Resource
 import xyz.elite.xtext.languages.plantuml.plantUML.Model
 
 object PumlParser {
@@ -15,7 +17,7 @@ object PumlParser {
      */
     fun parse(inputUri: String): Model {
         require(EPackage.Registry.INSTANCE["http://www.elite.xyz/xtext/languages/plantuml/PlantUML"] != null) {
-            "Please run MetaModelSetup.doSetup() first!"
+            "Please run MetaModelSetup.doSetup() first"
         }
 
         val uri = URI.createFileURI(inputUri)
@@ -24,10 +26,28 @@ object PumlParser {
         // Resolve cross references
         EcoreUtil.resolveAll(resource)
 
-		// TODO: print errrors from parsing puml (see xtext language testcases)
-
-        require(resource.contents.size > 0) { "File should contain something meaningful." }
-        require(resource.contents[0] is Model) { "File should contain a diagram." }
+		// Ensure resource loaded without errors☝︎
+		if (resource.getErrors().size > 0) {
+			System.out.println(displayErrors(resource, inputUri))
+			System.exit(-1)
+		}
+        require(resource.contents.size > 0) { "input PUML file either is empty or could not be properly parsed" }
         return resource.contents[0] as Model
     }
+	
+	fun displayErrors(resource: Resource, path: String): String  {
+		val file = File(path)
+		val lines = file.useLines { it.toList() }
+		var str = "\n\n"
+		
+		resource.getErrors().forEach {
+			str += "Error in line ${it.getLine()}, column ${it.getColumn()} while parsing ${file.getName()}:\n\n"
+			val lineNr = it.getLine()-1;
+			str += "  ${lines[lineNr]}\n"
+			(0..it.getColumn()).forEach { str += " " }
+			str += "\u001B[31m⎺ ${it.getMessage()}\u001B[0m\n"
+		}
+		
+		return str
+	}
 }
