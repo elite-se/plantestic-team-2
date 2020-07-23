@@ -24,8 +24,8 @@ paths:
         - complexHello
       summary: Add a new element
       parameters:
-        - in: path
-        name: id
+        - name: vin
+          in: path
         type: string
         required: true
         schema:
