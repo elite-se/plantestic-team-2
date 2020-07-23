@@ -26,24 +26,21 @@ configuration property verbose : Boolean;
 main() {
     if (verbose) log('Started transforming PlantUML to RequestResponse pairs');
 
-    assert fatal ( input.objectsOfType(Model).sequence_diagrams[SQ_Diagram]->size() = 1)
-        with log('Input does not contain exactly one SequenceDiagram');
+    var variants = input.objectsOfType(Model).variants[SQ_Variant].map transformVariants();
+	if (verbose) log("Output configs: " + variants->size().toString());
 
-    var configs = input.objectsOfType(Model).configs[SQ_Config].map transformConfigs();
-    input.objectsOfType(Model).sequence_diagrams[SQ_Diagram].map transformUmlDiagram(configs);
-    
-	if (verbose) log("Output configs: " + configs->size().toString());
+    input.objectsOfType(Model).sequence_diagram[SQ_Diagram].map transformUmlDiagram(variants);
 }
 
 // ==============================
 //   PUML Config Transformation
 // ==============================
  
-mapping SQ_Config::transformConfigs(): Config {
-    entries := self.entries.map transformConfigEntries();
+mapping SQ_Variant::transformVariants(): Variant {
+    entries := self.entries.map transformVariantEntries();
 }
 
-mapping SQ_ConfigEntry::transformConfigEntries(): ConfigEntry {
+mapping SQ_VariantEntry::transformVariantEntries(): VariantEntry {
     key := self.name;
     value := self.value;
 }
@@ -52,9 +49,9 @@ mapping SQ_ConfigEntry::transformConfigEntries(): ConfigEntry {
 //   PUML Diagram Transformation
 // ===============================
 
-mapping SQ_Diagram::transformUmlDiagram(configs_ : Bag(Config)): TestScenario {
+mapping SQ_Diagram::transformUmlDiagram(variants_: Bag(Variant)): TestScenario {
     testScenarioName := diagramName + "_puml";
-    configs := configs_;
+    variants := variants_;
     var roundtripCounter : Integer := 1;
     
     if (verbose) log("\n1. Preprocessing:");
