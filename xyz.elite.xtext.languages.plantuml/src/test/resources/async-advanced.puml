@@ -1,5 +1,5 @@
 @startconfig
-async[1]=CCC request(GET, "/test/asyncresponse/xcs") response(200)
+async[1]=CCC request(GET, "/test/asyncresponse/xcs") response(200) timeout(30s, 2s)
 @endconfig
 
 @startuml
