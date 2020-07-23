@@ -1,8 +1,9 @@
 @startvariant
 
-XCS.path = "path"
+XCS.path = "http://localhost:8000"
 
 vin = "vin"
+XCS.swagger = "http://localhost:8000/openapi.yaml"
 
 @endvariant
 
@@ -40,7 +41,7 @@ SVDS -> ELOS : request(GET, "dafdsf")
 return response(200)
 '/
 
-XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/${vin}")
+XCS -> SVDS : request(GET, "svds/vehicle/internal/v1/")
 SVDS --> XCS : response(200, {MarketRegion})
 
 autoactivate off

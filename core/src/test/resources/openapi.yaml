@@ -57,4 +57,3 @@ paths:
       responses:
         '200':
           description: success
-    
