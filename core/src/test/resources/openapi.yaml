@@ -51,13 +51,8 @@ paths:
           required: true
           schema:
             type: object
-            required:
-              - variableA
-              - variableB
             properties:
-              variableA:
-                type: string
-              variableB:
+              vin:
                 type: string
       responses:
         '200':
