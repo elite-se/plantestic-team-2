@@ -150,8 +150,10 @@ helper List(SQ_SequenceElement)::toStructures(msgPrefix: String, roundtripIdStar
     		var delay = elem.oclAsType(SQ_Delay);
     		if (verbose) log(msgPrefix + "  " + delay.humanReadableString());
     		structures += object Delay {
-    			value := delay.wait.time;
-    			unit := delay.wait.unit.string2timeUnit();
+    			timeinterval := object TimeInterval {
+    				value := delay.wait.time;
+    				unit := delay.wait.unit.string2timeUnit();
+    			};
     		};
     	}
 	};

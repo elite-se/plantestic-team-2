@@ -120,7 +120,11 @@ if (eval("[alternative.condition/]")) {
 [/template]
 
 [template private generateDelay(delay : Delay) post(trim())]
-Thread.sleep(TimeUnit.MILLISECONDS.convert([delay.value/], TimeUnit.[delay.unit/]));
+[generateSleep(delay.timeinterval)/]
+[/template]
+
+[template private generateSleep(timeInterval : TimeInterval) post(trim())]
+Thread.sleep(TimeUnit.MILLISECONDS.convert([timeInterval.value/], TimeUnit.[timeInterval.unit/]));
 [/template]
 
 [template private generateTestRoundtripWithTesterCheck(testRoundtrip : TestRoundtrip) post(trim())]

@@ -63,9 +63,8 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Delay" eSuperTypes="#//Structure">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="unit" lowerBound="1" eType="#//TimeUnit"
-        defaultValueLiteral="MILLISECONDS"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="timeinterval" lowerBound="1"
+        eType="#//TimeInterval"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="TimeUnit">
     <eLiterals name="DAYS"/>
@@ -75,5 +74,16 @@
     <eLiterals name="MINUTES" value="4"/>
     <eLiterals name="NANOSECONDS" value="5"/>
     <eLiterals name="SECONDS" value="6"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AsyncTestRoundtrip" eSuperTypes="#//TestRoundtrip">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="requestInterval" lowerBound="1"
+        eType="#//TimeInterval"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="maxTimeout" lowerBound="1"
+        eType="#//TimeInterval"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TimeInterval">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="unit" lowerBound="1" eType="#//TimeUnit"
+        defaultValueLiteral="MILLISECONDS"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
   </eClassifiers>
 </ecore:EPackage>

@@ -68,5 +68,9 @@ helper Alternative::humanReadableString(prefix: String): String {
 }
 
 helper Delay::humanReadableString(prefix: String): String {
-	return prefix + "Delay: " + self.value.toString() + " " + self.unit.toString();
+	return prefix + "Delay of " + self.timeinterval.humanReadableString(""); 
+}
+
+helper TimeInterval::humanReadableString(prefix: String): String {
+	return prefix + "TimeInterval: " + self.value.toString() + " " + self.unit.toString();	
 }
