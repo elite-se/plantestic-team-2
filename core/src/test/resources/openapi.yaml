@@ -18,7 +18,7 @@ paths:
       responses:
         '200':
           description: success
-  /testB/hello{id}:
+  /testB/hello/{vin}:
     post:
       tags:
         - complexHello
@@ -26,18 +26,40 @@ paths:
       parameters:
         - name: vin
           in: path
-        type: string
-        required: true
-        schema:
-          type: object
-          required:
-            - variableA
-            - variableB
-          properties:
-            variableA:
-              type: string
-            variableB:
-              type: string
+          required: true
+          schema:
+            type: object
+            required:
+              - variableA
+              - variableB
+            properties:
+              variableA:
+                type: string
+              variableB:
+                type: string
       responses:
         '200':
           description: success
+  /xcs/vin/v1/{vin}:
+    post:
+      tags:
+        - complexHello
+      summary: Add a new element
+      parameters:
+        - name: vin
+          in: path
+          required: true
+          schema:
+            type: object
+            required:
+              - variableA
+              - variableB
+            properties:
+              variableA:
+                type: string
+              variableB:
+                type: string
+      responses:
+        '200':
+          description: success
+    
