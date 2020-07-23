@@ -5,20 +5,32 @@
 [comment @main /]
 [file ('Test_'.concat(testScenario.testScenarioName.concat('.java')), false, 'UTF-8')]
 
+import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
+import io.restassured.RestAssured;
+import io.restassured.filter.Filter;
+import io.restassured.filter.FilterContext;
+import io.restassured.response.Response;
+import io.restassured.specification.FilterableRequestSpecification;
+import io.restassured.specification.FilterableResponseSpecification;
 import org.apache.commons.text.StringSubstitutor;
+import org.hamcrest.collection.IsIn;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class [ 'Test'.concat(testScenario.testScenarioName) /] {
+import static org.hamcrest.Matchers.hasXPath;
 
-	Map<String, String> paramsMap;
+public class [ 'Test_'.concat(testScenario.testScenarioName) /] {
+
+	Map<String, String> paramsMap = new HashMap<>();
+	Map<String, Filter> swaggerParamsMap = new HashMap<>();
+
 	ScriptEngine engine;
 	StringSubstitutor substitutor;
 
@@ -80,6 +92,7 @@ public void test[ nameSuffix /]() {
 [for (entry : ConfigEntry | config.entries) ]
     paramsMap.put("[ entry.key /]", "[ entry.value /]");
 [/for]
+
 [/if]
     String tester = paramsMap.get("tester");
 
@@ -101,7 +114,7 @@ public void test[ nameSuffix /]() {
 [elseif (structure.oclIsTypeOf(Delay))]
 [generateDelay(structure.oclAsType(Delay))/]
 [/if]
-[/template] 
+[/template]
 
 [template private generateAlternative(alternative : Alternative) post(trim())]
 [if (alternative.condition.oclIsUndefined())]
@@ -134,6 +147,14 @@ if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/
 [/template]
 
 [template private generateTestRoundtrip(testRoundtrip : TestRoundtrip) post(trim())]
+[let reqSpec : RequestSpecification = testRoundtrip.requestspecification]
+if (!swaggerParamsMap.containsKey("[reqSpec.receiver/]")) {
+    try {
+	    swaggerParamsMap.put("[reqSpec.receiver/]", new OpenApiValidationFilter(subst("${[reqSpec.receiver/].swagger}")));
+    } catch (Exception e) {
+      swaggerParamsMap.put("[reqSpec.receiver/]", (rS, rpS, context) -> context.next(rS, rpS));
+    }
+[/let]
 	[if (testRoundtrip.requestspecification.requestdatum->notEmpty())][testRoundtrip.requestspecification.generateAddRequestParams()/]	[/if]
 Response [testRoundtrip.testRoundtripName/] = RestAssured.given()
         [testRoundtrip.requestspecification.generateGivenPart()/]
@@ -156,6 +177,7 @@ paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value/]");
 
 [template private generateGivenPart(requestSpecification : RequestSpecification) post(trim())]
 .auth().basic(subst("${[requestSpecification.receiver/].username}"), subst("${[requestSpecification.receiver/].password}"))
+.filter(swaggerParamsMap.get("[requestSpecification.receiver/]"))
 	[if (requestSpecification.requestdatum->notEmpty())]
 		[for (requestDatum : RequestDatum | requestSpecification.requestdatum)]
 .param("[requestDatum.variableName/]", subst("${[requestDatum.variableName/]}"))

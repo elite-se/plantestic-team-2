@@ -89,6 +89,8 @@ class PlantesticPlugin : Plugin<Project> {
         project.dependencies.add("testImplementation", "org.apache.commons:commons-text:1.7")
         project.dependencies.add("testImplementation", "io.rest-assured:rest-assured:3.0.0")
         project.dependencies.add("testImplementation", "javax.xml.bind:jaxb-api:2.3.1")
+        project.dependencies.add("testImplementation", "com.atlassian.oai:swagger-request-validator-core:2.10")
         project.dependencies.add("testImplementation", "org.junit.jupiter:junit-jupiter-engine:5.3.1")
+        project.dependencies.add("testImplementation", "com.atlassian.oai:swagger-request-validator-restassured:2.10.0")
     }
 }
