@@ -1,38 +1,59 @@
 @startconfig
-vin = "987"
-eventid = "123"
+
+
 @endconfig
 
-@startconfig
-vin = "120"
-eventid = "20"
-@endconfig
+@startuml
 
-SEQUENCE @startuml
-
-participant CCCMock
+participant CCC
 participant XCS
-participant Tester
 participant SVDS
+participant ELOS
+actor Vehicle
 
-CCCMock -> SVDS : GET "svds/vehicle/internal/v2/${vin}"
-activate SVDS
-SVDS --> CCCMock : 200 - (marketRegion : "1")
-deactivate SVDS
+activate CCC
 
-Tester -> XCS : GET "xcs/vin/v1/${vin}"
-activate XCS
-XCS --> Tester : 200
-deactivate XCS
+== XCS Event Creation via Joynr ==
 
-Tester -> CCCMock : GET "event/${eventid}"
-activate CCCMock
-CCCMock --> Tester : 200 - (eventData : "1")
-deactivate CCCMock
+note over XCS : Only mandatory or important parameters are visible in
+note over XCS: This diagram does not describe error handling, only happy path
 
-XCS -> SVDS : GET "test"
-activate XCS
-SVDS --> XCS : 200
-deactivate XCS
+note over CCC : Agent is being called in callcenter for breakdown and triggers remote bcall
+
+autonumber
+autoactivate on
+
+CCC -> XCS : async[1] request(POST, "/xcs/vin/v1/{vin}") \n (<CCCTarget>, ServiceType=BCALL)
+
+note over XCS : XCS creates a new event from data provided by CCC\nresponse contains new eventid
+autoactivate off
+XCS -> CCC : response(202 ACCEPTED, {eventId})
+
+XCS -[#green]> Vehicle : <joynr>:requestXCall(requestId, sequenceId, CoreData)
+autoactivate on
+
+/'
+SVDS -> ELOS : request(GET, "dafdsf")
+return response(200)
+'/
+
+XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/{vin}")
+SVDS --> XCS : response(200, {MarketRegion})
+
+autoactivate off
+XCS -> ELOS : <jms elos topic>publish(elos data, CREATED)
+activate Vehicle
+Vehicle -[#green]> XCS : <joynr>:notifyXCall(requestId, sequenceId, CoreData)
+
+XCS -> CCC : async[1] request(POST, "<CCCTarget>/xcs/v1/eventUpdated", {eventId, xcsEventData})
+
+autoactivate on
+XCS -> SVDS : request(GET, "svds/vehicle/internal/v2/{vin}")
+return response(200, {MarketRegion})
+
+autoactivate off
+XCS -> ELOS : <jms elos topic>publish(elos data, UPDATED)
+
+note over CCC : Remote Bcall Event is visible in CC and can be handled by Agent
 
 @enduml
