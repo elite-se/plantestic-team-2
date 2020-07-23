@@ -126,13 +126,13 @@ Thread.sleep([timeInterval.toDuration()/].toMillis());
 [/template]
 
 [template private generateTestRoundtripWithTesterCheck(testRoundtrip : TestRoundtrip) post(trim())]
-if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/]")) {
 [if (testRoundtrip.oclIsTypeOf(AsyncTestRoundtrip))]
-	[testRoundtrip.oclAsType(AsyncTestRoundtrip).generateAsyncTestRoundtrip()/]
+[testRoundtrip.oclAsType(AsyncTestRoundtrip).generateAsyncTestRoundtrip()/]
 [else]
+if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/]")) {
     [testRoundtrip.generateTestRoundtrip()/]
-[/if]
 }
+[/if]
 [/template]
 
 [template private generateAsyncTestRoundtrip(testRoundtrip : AsyncTestRoundtrip) post(trim())]
