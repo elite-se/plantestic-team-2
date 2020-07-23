@@ -29,7 +29,6 @@ import static org.hamcrest.Matchers.hasXPath;
 public class [ 'Test_'.concat(testScenario.testScenarioName) /] {
 
 	Map<String, String> paramsMap = new HashMap<>();
-	Map<String, Filter> swaggerParamsMap = new HashMap<>();
 
 	ScriptEngine engine;
 	StringSubstitutor substitutor;
@@ -147,17 +146,10 @@ if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/
 [/template]
 
 [template private generateTestRoundtrip(testRoundtrip : TestRoundtrip) post(trim())]
-[let reqSpec : RequestSpecification = testRoundtrip.requestspecification]
-if (!swaggerParamsMap.containsKey("[reqSpec.receiver/]")) {
-    try {
-	    swaggerParamsMap.put("[reqSpec.receiver/]", new OpenApiValidationFilter(subst("${[reqSpec.receiver/].swagger}")));
-    } catch (Exception e) {
-      swaggerParamsMap.put("[reqSpec.receiver/]", (rS, rpS, context) -> context.next(rS, rpS));
-    }
-[/let]
-	[if (testRoundtrip.requestspecification.requestdatum->notEmpty())][testRoundtrip.requestspecification.generateAddRequestParams()/]	[/if]
+[if (testRoundtrip.requestspecification.requestdatum->notEmpty())][testRoundtrip.requestspecification.generateAddRequestParams()/]
+[/if]
 Response [testRoundtrip.testRoundtripName/] = RestAssured.given()
-        [testRoundtrip.requestspecification.generateGivenPart()/]
+        [testRoundtrip.requestspecification.generateGivenPart(testRoundtrip.requestspecification)/]
     .when()
         [testRoundtrip.requestspecification.generateWhenPart()/]
     .then()
@@ -177,7 +169,7 @@ paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value/]");
 
 [template private generateGivenPart(requestSpecification : RequestSpecification) post(trim())]
 .auth().basic(subst("${[requestSpecification.receiver/].username}"), subst("${[requestSpecification.receiver/].password}"))
-.filter(swaggerParamsMap.get("[requestSpecification.receiver/]"))
+.filter(paramsMap.containsKey("[requestSpecification.receiver/].swagger") ? new OpenApiValidationFilter(subst("${[requestSpecification.receiver/].swagger}")) : (rS, rpS, context) -> context.next(rS, rpS))
 	[if (requestSpecification.requestdatum->notEmpty())]
 		[for (requestDatum : RequestDatum | requestSpecification.requestdatum)]
 .param("[requestDatum.variableName/]", subst("${[requestDatum.variableName/]}"))

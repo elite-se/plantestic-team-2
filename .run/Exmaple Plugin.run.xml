@@ -17,7 +17,7 @@
     </ExternalSystemSettings>
     <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
     <method v="2">
-      <option name="RunConfigurationTask" enabled="true" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Publish All" run_configuration_type="GradleRunConfiguration" />
     </method>
   </configuration>
 </component>

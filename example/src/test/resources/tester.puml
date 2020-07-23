@@ -1,5 +1,6 @@
 @startconfig
-
+XCS.path = path
+vin = vin
 
 @endconfig
 

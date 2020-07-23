@@ -76,27 +76,6 @@ object Main {
         |
         |	async[<ID>, <TIMEOUT>]
         |
-        |CONFIG FILE
-        |===========
-        |
-        TODO: MAX CHANGE THIS
-        |Because your test might contain sensitive data or data you quickly want to change between tests,
-        |Plantestic also supports config files in .toml format.
-        |You can define arbitrary variables and their values in the [Templating] section.
-        |Every service might additionally get values for "path", "username" and "password".
-        |
-        |Example:
-        |--------
-        |
-        |[Templating]
-        |id = "asdf"
-        |important_value = 5
-        |
-        |[ServiceA]
-        |path = "www.example.com"
-        |username = "admin"
-        |password = "admin"
-        |
         |LEGAL
         |=====
         |
@@ -110,7 +89,7 @@ object Main {
 
         private val input: String by option(help = "Path to the PlantUML file containing the API specification.")
             .required()
-		
+
         private val output: String by option(help = "Output folder where the test cases should be written to. Default is './plantestic-test'")
             .default("./plantestic-test")
 
