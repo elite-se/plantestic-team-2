@@ -24,6 +24,8 @@ object PumlParser {
         // Resolve cross references
         EcoreUtil.resolveAll(resource)
 
+				// TODO: print errrors from parsing puml (see xtext language testcases)
+
         require(resource.contents.size > 0) { "File should contain something meaningful." }
         require(resource.contents[0] is Model) { "File should contain a diagram." }
         return resource.contents[0] as Model

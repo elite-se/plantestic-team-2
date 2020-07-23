@@ -1,0 +1,24 @@
+library TSTimeUnit;
+
+modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
+
+helper String::string2timeUnit(): TimeUnit {
+	var normalized := self.trim();
+	if (normalized.equalsIgnoreCase("ns")) {
+		return TimeUnit::NANOSECONDS;
+	} else if (normalized.equalsIgnoreCase("us")) {
+		return TimeUnit::MICROSECONDS;
+	} else if (normalized.equalsIgnoreCase("ms")) {
+		return TimeUnit::MILLISECONDS;
+	} else if (normalized.equalsIgnoreCase("s")) {
+		return TimeUnit::SECONDS;
+	} else if (normalized.equalsIgnoreCase("min")) {
+		return TimeUnit::MINUTES;
+	} else if (normalized.equalsIgnoreCase("h")) {
+		return TimeUnit::HOURS;
+	} else if (normalized.equalsIgnoreCase("d")) {
+		return TimeUnit::DAYS;
+	} else {
+		return TimeUnit::MILLISECONDS;
+	}
+}

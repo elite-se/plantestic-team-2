@@ -1,0 +1,71 @@
+library PUMLPreprocessing;
+
+import PUMLHumanReadable;
+
+modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
+
+configuration property verbose : Boolean;
+
+/**
+ * Filters & Applies some flattening/reformatting to an OrderedSet of SQ_SequenceElements.
+ * Used to make parsing easier 
+ *
+ * @param msgPrefix prefix for log messages, used for verbose output indentation
+ */
+helper OrderedSet(SQ_SequenceElement)::preprocess(msgPrefix: String): OrderedSet(SQ_SequenceElement) {
+	if (verbose) log(msgPrefix + "START ELEMENTS");
+
+    var sequenceElements : OrderedSet(SQ_SequenceElement);
+    self->forEach(umlElement) {
+        if (umlElement.oclIsTypeOf(SQ_Message)) {
+            var message := umlElement.oclAsType(SQ_Message);
+            if (verbose) log(msgPrefix + "MESSAGE: " + message.humanReadableString());
+            if (not message.payload.oclIsUndefined()) {
+            	// Only keep messages that contain payloads (either a request or a response)
+                sequenceElements += message;
+            };
+        }
+        elif (umlElement.oclIsTypeOf(SQ_Group)) {
+            sequenceElements += umlElement.oclAsType(SQ_Group).map preprocess(msgPrefix);
+        }
+        elif (umlElement.oclIsTypeOf(SQ_Return)) {
+			var ret := umlElement.oclAsType(SQ_Return);
+			if (verbose) log(msgPrefix + "RETURN: " + ret.humanReadableString());
+			if (not ret.response.oclIsUndefined()) {
+				// Only keep returns with response annotations
+        		sequenceElements += ret;
+        	}
+        }
+        elif (umlElement.oclIsTypeOf(SQ_Delay)) {
+        	var delay := umlElement.oclAsType(SQ_Delay);
+        	if (not delay.wait.oclIsUndefined()) {
+        		// Only keep delays with specified waits
+	        	if (verbose) log(msgPrefix + "DELAY: " + delay.humanReadableString());
+	        	sequenceElements += delay;
+        	}
+        };
+    };
+    
+	if (verbose) log(msgPrefix + "END ELEMENTS");
+    return sequenceElements;
+}
+
+mapping SQ_Group::preprocess(msgPrefix: String): SQ_Group {
+	if (verbose) log(msgPrefix + "START GROUP: " + self.humanReadableString());
+
+	keyword := self.keyword;
+    elements += self.elements->preprocess(msgPrefix + "  ");
+    alternatives += self.alternatives->oclAsType(SQ_GroupAlternative).map preprocess(msgPrefix);
+    label := self.label;
+    
+	if (verbose) log(msgPrefix + "END GROUP");
+}
+
+mapping SQ_GroupAlternative::preprocess(msgPrefix: String): SQ_GroupAlternative {
+	if (verbose) log(msgPrefix + "START ALTERNATIVE: else" + " " + self.label.toString() + " (" + self.elements->size().toString() + ")");
+
+    elements += self.elements->preprocess(msgPrefix + "  ");
+    label := self.label;
+    
+	if (verbose) log(msgPrefix + "END ALTERNATIVE");
+}
