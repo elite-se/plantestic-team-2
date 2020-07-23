@@ -41,9 +41,9 @@ public class [ 'Test_'.concat(testScenario.testScenarioName) /] {
 		engine = new ScriptEngineManager().getEngineByName("JavaScript");
 	}
 
-    [if (testScenario.configs->notEmpty())]
-    [for (config : Config | testScenario.configs) ]
-    [generateTest(testScenario, config, testScenario.configs->indexOf(config).toString()) /]
+    [if (testScenario.variants->notEmpty())]
+    [for (variant : Variant | testScenario.variants) ]
+    [generateTest(testScenario, variant, testScenario.variants->indexOf(variant).toString()) /]
 
 	[/for]
 	[else]
@@ -85,11 +85,11 @@ public class [ 'Test_'.concat(testScenario.testScenarioName) /] {
 [/file]
 [/template]
 
-[template private generateTest(testScenario : TestScenario, config : Config, nameSuffix : String) post(trim())]
+[template private generateTest(testScenario : TestScenario, variant : Variant, nameSuffix : String) post(trim())]
 @Test
 public void test[ nameSuffix /]() {
-[if (not config.entries->oclIsUndefined())]
-[for (entry : ConfigEntry | config.entries) ]
+[if (not variant.entries->oclIsUndefined())]
+[for (entry : VariantEntry | variant.entries) ]
     paramsMap.put("[ entry.key /]", "[ entry.value /]");
 [/for]
 

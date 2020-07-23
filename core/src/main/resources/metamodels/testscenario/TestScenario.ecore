@@ -30,8 +30,8 @@
   <eClassifiers xsi:type="ecore:EClass" name="TestScenario" instanceClassName="TestScenario">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="testScenarioName" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="configs" upperBound="-1"
-        eType="#//Config" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="variants" upperBound="-1"
+        eType="#//Variant" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="structure" upperBound="-1"
         eType="#//Structure" containment="true"/>
   </eClassifiers>
@@ -45,11 +45,11 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Config" instanceTypeName="Config">
+  <eClassifiers xsi:type="ecore:EClass" name="Variant" instanceTypeName="Variant">
     <eStructuralFeatures xsi:type="ecore:EReference" name="entries" upperBound="-1"
-        eType="#//ConfigEntry" containment="true"/>
+        eType="#//VariantEntry" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="ConfigEntry" instanceTypeName="ConfigEntry">
+  <eClassifiers xsi:type="ecore:EClass" name="VariantEntry" instanceTypeName="VariantEntry">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
