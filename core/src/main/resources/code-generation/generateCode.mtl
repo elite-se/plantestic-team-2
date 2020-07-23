@@ -136,13 +136,13 @@ if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/
 [/template]
 
 [template private generateAsyncTestRoundtrip(testRoundtrip : AsyncTestRoundtrip) post(trim())]
-LocalDate [testRoundtrip.testRoundtripName/]TimeoutDate = LocalDate.now().plus([testRoundtrip.maxTimeout.value/], [testRoundtrip.maxTimeout.unit.toChronoUnit()/]);
-for (boolean [testRoundtrip.testRoundtripName/]Done = false; ![testRoundtrip.testRoundtripName/]Done;) {
+LocalDate [testRoundtrip.name/]TimeoutDate = LocalDate.now().plus([testRoundtrip.maxTimeout.value/], [testRoundtrip.maxTimeout.unit.toChronoUnit()/]);
+for (boolean [testRoundtrip.name/]Done = false; ![testRoundtrip.name/]Done;) {
 	try {
 		[testRoundtrip.generateTestRoundtrip()/]
-		[testRoundtrip.testRoundtripName/]Done = true;
+		[testRoundtrip.name/]Done = true;
 	} catch (AssertionError as) {
-		if (LocalDate.now().compareTo([testRoundtrip.testRoundtripName/]TimeoutDate) > 0) {
+		if (LocalDate.now().compareTo([testRoundtrip.name/]TimeoutDate) > 0) {
 			throw as;
 		} else {
 			[testRoundtrip.requestInterval.generateSleep()/]
@@ -184,7 +184,7 @@ Duration.ofDays([timeInterval.value/])
 [template private generateTestRoundtrip(testRoundtrip : TestRoundtrip) post(trim())]
 [if (testRoundtrip.requestspecification.requestdatum->notEmpty())][testRoundtrip.requestspecification.generateAddRequestParams()/]
 [/if]
-Response [testRoundtrip.testRoundtripName/] = RestAssured.given()
+Response [testRoundtrip.name/] = RestAssured.given()
         [testRoundtrip.requestspecification.generateGivenPart(testRoundtrip.requestspecification)/]
     .when()
         [testRoundtrip.requestspecification.generateWhenPart()/]
@@ -238,6 +238,6 @@ paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value/]");
 
 [template private generateExtractions(testRoundtrip : TestRoundtrip) post(trim())]
 	[for (responseDatum : ResponseDatum | testRoundtrip.responsespecification.responsedatum)]
-paramsMap.put("[responseDatum.variableName/]", [testRoundtrip.testRoundtripName/].jsonPath().getString("[responseDatum.variableName/]"));
+paramsMap.put("[responseDatum.variableName/]", [testRoundtrip.name/].jsonPath().getString("[responseDatum.variableName/]"));
 	[/for]
 [/template]
