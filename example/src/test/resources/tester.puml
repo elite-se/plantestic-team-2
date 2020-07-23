@@ -1,8 +1,8 @@
-@startconfig
+@startvariant
 XCS.path = path
 vin = vin
 
-@endconfig
+@endvariant
 
 @startuml
 
