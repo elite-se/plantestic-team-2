@@ -73,9 +73,11 @@ public class [ 'Test_'.concat(testScenario.testScenarioName) /] {
 [template private generateTest(testScenario : TestScenario, variant : Variant, nameSuffix : String) post(trim())]
 @Test
 public void test[ nameSuffix /]() {
+[if (not variant.oclIsUndefined())]
 [for (entry : VariantEntry | variant.entries) ]
     paramsMap.put("[ entry.key /]", "[ entry.value /]");
 [/for]
+[/if]
 
     String tester = paramsMap.get("tester");
 
