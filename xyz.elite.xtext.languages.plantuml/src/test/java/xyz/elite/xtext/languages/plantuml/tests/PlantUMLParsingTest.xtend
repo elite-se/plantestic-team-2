@@ -151,7 +151,8 @@ class PlantUMLParsingTest {
 
     @Test
     def void async() {
-        parsesWithoutErrors("async")
+        parsesWithoutErrors("async-basic")
+        parsesWithoutErrors("async-advanced")
     }
 
 	@Test

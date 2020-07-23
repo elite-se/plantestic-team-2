@@ -1,0 +1,11 @@
+@startconfig
+async[1]=Alice request(GET, "did/bob/call") response(200 ACCEPTED)
+@endconfig
+
+@startuml
+
+	Alice -> Bob : async[1] request(GET, "name")
+	return response(200 ACCEPTED)
+	Bob --> Alice : async[1] request(POST, "hi, I am bob :)")
+
+@enduml

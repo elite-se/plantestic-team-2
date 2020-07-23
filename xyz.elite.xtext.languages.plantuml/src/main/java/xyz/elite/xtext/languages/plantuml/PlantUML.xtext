@@ -8,13 +8,23 @@ generate plantUML "http://www.elite.xyz/xtext/languages/plantuml/PlantUML"
 Model:
     (configs+=SQ_Config|NEWLINE)* sequence_diagrams+=SQ_Diagram NEWLINE*;
 
+
+// --------------------------
+//     		CONFIG
+// --------------------------
 SQ_Config:
     {SQ_Config}
     '@startconfig' (NEWLINE | entries+=SQ_ConfigEntry)* '@endconfig';
 
 SQ_ConfigEntry:
-	NEWLINE name=ID '=' value=STRING;
-
+	NEWLINE (
+		(name=ID '=' value=STRING)
+		| ('async[' asyncid=INT ']' '=' participant=[SQ_Participant] request=PT_Request response=PT_Response)
+	);
+	
+// --------------------------
+//     		DIAGRAM
+// --------------------------
 SQ_Diagram:
     {SQ_Diagram}
     'SEQUENCE'? '@startuml' (NEWLINE | elements+=SQ_SequenceElement)* '@enduml';
@@ -214,9 +224,7 @@ PT_Wait:
     'wait(' time=INT unit=PT_TimeUnit ')';
 
 PT_RequestResponse:
-    (('async[' asyncid=INT (',' timeout=INT unit=PT_TimeUnit)? ']')? request=PT_Request) 
-    | 
-    (('async[' asyncid=INT ']')? response=PT_Response);
+    (('async[' asyncid=INT ']')? request=PT_Request) | response=PT_Response;
 
 PT_Request:
     'request(' method=PT_RequestMethod ',' url=STRING (',' parametermap=(PT_ParameterMap))? ')';
