@@ -1,6 +1,7 @@
-@startconfig
+@startasyncconfig
 async[1]=CCC request(GET, "/test/asyncresponse/xcs") response(200) timeout(30s, 2s)
-@endconfig
+async[2]=ECS request(GET, "test") response(410 GONE) timeout(1min)
+@endasyncconfig
 
 @startuml
 
