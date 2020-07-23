@@ -66,22 +66,6 @@ public class [ 'Test_'.concat(testScenario.testScenarioName) /] {
 	    // Second, we can simply pipe the string through the JavaScript engine and get a result.
 	    return (Boolean) engine.eval(substCondition);
 	}
-
-    /// Helper method to flatten the tree-like structure of a TOML file.
-    /// Here, we use the path of an item as the key and the item itself as the value.
-    /// The path of an item separated by dots, e.g. "A.B.item".
-	private static Map<String, Object> unnestTomlMap(String prefix, Map<String, Object> tree) {
-        Map<String, Object> resultMap = new HashMap<>();
-        for (Map.Entry<String, Object> entry : tree.entrySet()) {
-            String identifierPath = prefix + entry.getKey();
-            if(entry.getValue() instanceof Map){
-                resultMap.putAll(unnestTomlMap(identifierPath + ".", (Map<String, Object>)entry.getValue()));
-            } else {
-                resultMap.put(identifierPath, entry.getValue());
-            }
-        }
-        return resultMap;
-	}
 }
 [/file]
 [/template]
@@ -89,12 +73,10 @@ public class [ 'Test_'.concat(testScenario.testScenarioName) /] {
 [template private generateTest(testScenario : TestScenario, variant : Variant, nameSuffix : String) post(trim())]
 @Test
 public void test[ nameSuffix /]() {
-[if (not variant.entries->oclIsUndefined())]
 [for (entry : VariantEntry | variant.entries) ]
     paramsMap.put("[ entry.key /]", "[ entry.value /]");
 [/for]
 
-[/if]
     String tester = paramsMap.get("tester");
 
 	[generateStructures(testScenario.structure)/]
