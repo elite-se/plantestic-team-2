@@ -17,7 +17,7 @@ define([], function() {
             {name: "comment.block.puml", begin: "/'", end: "'/"},
             {name: "constant.numeric.puml", match: "#([0-9]|[a-f]|[A-F])([0-9]|[a-f]|[A-F])([0-9]|[a-f]|[A-F])(([0-9]|[a-f]|[A-F])([0-9]|[a-f]|[A-F])([0-9]|[a-f]|[A-F]))?\\b"},
             {name: "constant.numeric.puml", match: "\\b\\d+\\s*(ns|ms|s|min|h|d)?\\b"},
-            {name: "support.function.puml", match: "\\b(request|response)\\b"},
+            {name: "support.function.puml", match: "\\b(request|response|timeout|wait)\\b"},
         ]
     };
 });
