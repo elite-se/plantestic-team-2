@@ -15,7 +15,7 @@ import java.nio.file.StandardOpenOption
 
 class PlantUMLHandler extends AbstractHandler implements Handler {
 	override handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		val tmpPath = this.class.classLoader.getResource("tmp").path
+		val tmpPath = this.class.classLoader.getResource("temporary").path
 
 		val outputPathStr = tmpPath + "/image.png"
 		val outputPath = Paths.get(outputPathStr)
