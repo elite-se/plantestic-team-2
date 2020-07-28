@@ -62,11 +62,17 @@ class PlantUMLHandler extends AbstractHandler implements Handler {
 				es.read(b, 0, b.length)
 				System.err.println(new String(b))
 			}
-			val imageBytes = Files.readAllBytes(Paths.get(outputPathStr))
-			response.setContentType("image/png")
-			response.contentLength = imageBytes.length
-			response.outputStream.write(imageBytes)
-			response.setStatus(HttpServletResponse.SC_OK)
+			
+
+			if (Files.exists(outputPath)) {
+				val imageBytes = Files.readAllBytes(outputPath)
+				response.setContentType("image/png")
+				response.contentLength = imageBytes.length
+				response.outputStream.write(imageBytes)
+				response.setStatus(HttpServletResponse.SC_OK)
+			} else {
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			}
 		}
 
 		if (request instanceof Request) {
