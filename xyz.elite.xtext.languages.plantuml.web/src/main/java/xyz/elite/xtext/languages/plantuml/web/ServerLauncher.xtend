@@ -37,7 +37,7 @@ class ServerLauncher {
 	
 	def static Server configureBackend() {
 		val server = new Server(new InetSocketAddress('localhost', 8081))
-		server.handler = new PlantumlHandler 
+		server.handler = new PlantUMLHandler 
 		
 		return server
 	}

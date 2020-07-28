@@ -36,14 +36,13 @@
                         baseUrl: baseUrl,
                         syntaxDefinition: "puml-syntax",
                     }).then(function (editor) {
-                        setInterval(updatePUML, 2000);
+                        setInterval(updatePUML, 3000);
                         function updatePUML() {
                             editor.editor.getEditorContext().getText().then(function(text) {
                             	var preprocessed = text
                             		.replace(/@startvariant[\s\S]*@endvariant/, '')
                             		.replace(/@startasyncconfig[\s\S]*@endasyncconfig/, '')
-                                var encoded = encoder.encode(preprocessed)
-                                document.getElementById("plantuml-img").src = "http://localhost:8081/png/" + encoded
+                                document.getElementById("plantuml-img").src = "http://localhost:8081/?puml=" + encodeURIComponent(preprocessed)
                             })
                         }
                     });
@@ -57,7 +56,7 @@
     <div id="xtext-editor" data-editor-xtext-lang="puml"></div>
     <div id="plantuml-preview">
         <img id="plantuml-img"
-             src="http://localhost:8081/png/0m00"
+             src="http://localhost:8081/"
              style="max-width:100%;max-height:100%"
         />
     </div>
