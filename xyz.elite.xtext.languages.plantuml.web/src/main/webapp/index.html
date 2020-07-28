@@ -39,7 +39,10 @@
                         setInterval(updatePUML, 2000);
                         function updatePUML() {
                             editor.editor.getEditorContext().getText().then(function(text) {
-                                var encoded = encoder.encode(text)
+                            	var preprocessed = text
+                            		.replace(/@startvariant[\s\S]*@endvariant/, '')
+                            		.replace(/@startasyncconfig[\s\S]*@endasyncconfig/, '')
+                                var encoded = encoder.encode(preprocessed)
                                 document.getElementById("plantuml-img").src = "http://localhost:8081/png/" + encoded
                             })
                         }
