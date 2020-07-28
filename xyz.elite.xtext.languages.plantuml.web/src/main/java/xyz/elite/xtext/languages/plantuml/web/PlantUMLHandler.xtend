@@ -49,21 +49,6 @@ class PlantUMLHandler extends AbstractHandler implements Handler {
 			val ps = Runtime.runtime.exec(#["java", "-Djava.awt.headless=true", "-jar", plantumlPath, "-tpng", pumlPath])
 			ps.waitFor
 
-			// Print process stdout and stderr
-			val is = ps.inputStream
-			val es = ps.errorStream
-			if (is.available > 0) {
-				var b = newByteArrayOfSize(is.available)
-				is.read(b, 0, b.length);
-				System.out.println(new String(b))
-			}
-			if (es.available > 0) {
-				var b = newByteArrayOfSize(es.available)
-				es.read(b, 0, b.length)
-				System.err.println(new String(b))
-			}
-			
-
 			if (Files.exists(outputPath)) {
 				val imageBytes = Files.readAllBytes(outputPath)
 				response.setContentType("image/png")
