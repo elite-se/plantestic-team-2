@@ -6,18 +6,18 @@ package xyz.elite.xtext.languages.plantuml.web
 import java.net.InetSocketAddress
 import org.eclipse.jetty.annotations.AnnotationConfiguration
 import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.util.log.Slf4jLog
 import org.eclipse.jetty.webapp.MetaInfConfiguration
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.webapp.WebInfConfiguration
 import org.eclipse.jetty.webapp.WebXmlConfiguration
+import org.eclipse.jetty.util.log.Slf4jLog
 
 /**
  * This program starts an HTTP server for testing the web integration of your DSL.
  * Just execute it and point a web browser to http://localhost:8080/
  */
 class ServerLauncher {
-	def static void main(String[] args) {
+	def static Server configureFrontend() {
 		val server = new Server(new InetSocketAddress('localhost', 8080))
 		server.handler = new WebAppContext => [
 			resourceBase = 'src/main/webapp'
@@ -32,20 +32,38 @@ class ServerLauncher {
 			setAttribute(WebInfConfiguration.CONTAINER_JAR_PATTERN, '.*/xyz\\.elite\\.xtext\\.languages\\.plantuml\\.web/.*,.*\\.jar')
 			setInitParameter("org.mortbay.jetty.servlet.Default.useFileMappedBuffer", "false")
 		]
+		return server
+	}
+	
+	def static Server configureBackend() {
+		val server = new Server(new InetSocketAddress('localhost', 8081))
+		server.handler = new PlantumlHandler 
+		
+		return server
+	}
+	
+	def static void main(String[] args) {
+		val frontend = configureFrontend
+		val backend = configureBackend
+		
 		val log = new Slf4jLog(ServerLauncher.name)
 		try {
-			server.start
-			log.info('Server started ' + server.getURI + '...')
+			frontend.start
+			log.info('Frontend started ' + frontend.getURI + '...')
+			backend.start
+			log.info('Backend started ' + backend.getURI + '...')
 			new Thread[
-				log.info('Press enter to stop the server...')
+				log.info('Press enter to stop ...')
 				val key = System.in.read
 				if (key != -1) {
-					server.stop
+					frontend.stop
+					backend.stop
 				} else {
 					log.warn('Console input is not available. In order to stop the server, you need to cancel process manually.')
 				}
 			].start
-			server.join
+			frontend.join
+			backend.join
 		} catch (Exception exception) {
 			log.warn(exception.message)
 			System.exit(1)
