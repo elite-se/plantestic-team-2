@@ -28,8 +28,8 @@ class PlantUMLHandler extends AbstractHandler implements Handler {
 		if (puml === null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
 		} else {
-			val pumlPath = tmpPath + "/image.puml"
 			val pumlFile = new File(tmpPath, "image.puml")
+			val pumlPath = pumlFile.path
 			if (!pumlFile.exists) {
 				try {
 					pumlFile.createNewFile
