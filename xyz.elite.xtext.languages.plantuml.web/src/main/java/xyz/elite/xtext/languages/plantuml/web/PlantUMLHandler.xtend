@@ -12,6 +12,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.io.File
 import java.nio.file.StandardOpenOption
+import net.sourceforge.plantuml.Run
 
 class PlantUMLHandler extends AbstractHandler implements Handler {
 	override handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -41,18 +42,30 @@ class PlantUMLHandler extends AbstractHandler implements Handler {
 			writer.write(puml)
 			writer.close
 
-			val plantumlPath = class.classLoader.getResource("plantuml.jar").path
-			val ps = Runtime.runtime.exec(#["java", "-Djava.awt.headless=true", "-jar", plantumlPath, "-tpng", pumlPath])
-			ps.waitFor
-
-			if (Files.exists(outputPath)) {
-				val imageBytes = Files.readAllBytes(outputPath)
-				response.setContentType("image/png")
-				response.contentLength = imageBytes.length
-				response.outputStream.write(imageBytes)
-				response.setStatus(HttpServletResponse.SC_OK)
-			} else {
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			val String[] args = #["-failfast2", "-tpng", pumlPath]
+			try {
+				val chungus = new BigChungus
+				System.securityManager = chungus
+				System.properties.setProperty("java.awt.headless", "true")
+				
+				try {
+					Run::main(args)
+				} catch (SecurityException e) {
+					// Big Chungus has prevented PlantUML from tearing down 
+					// the entire JVM. Good boy :')
+				}
+				
+				if (Files.exists(outputPath)) {
+					val imageBytes = Files.readAllBytes(outputPath)
+					response.setContentType("image/png")
+					response.contentLength = imageBytes.length
+					response.outputStream.write(imageBytes)
+					response.setStatus(HttpServletResponse.SC_OK)
+				} else {
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				}
+			} catch (Exception e) {
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
 			}
 		}
 

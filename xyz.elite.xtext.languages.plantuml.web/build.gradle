@@ -18,6 +18,8 @@ dependencies {
     compile "org.webjars:jquery:2.2.4"
     providedCompile "org.eclipse.jetty:jetty-annotations:9.4.9.v20180320"
     providedCompile "org.slf4j:slf4j-simple:1.7.21"
+
+    compile files('src/main/resources/plantuml.jar')
 }
 def orionDir = file('src/main/webapp/orion')
 def orionUrl = 'http://download.eclipse.org/orion/drops/R-11.0-201602232219/built-codeEdit.zip'
@@ -35,6 +37,7 @@ task unpackOrion(dependsOn: downloadOrion, type: Copy) {
 task jettyRun(type: JavaExec) {
     dependsOn(sourceSets.main.runtimeClasspath, unpackOrion)
     classpath = sourceSets.main.runtimeClasspath.filter { it.exists() }
+    
     main = 'xyz.elite.xtext.languages.plantuml.web.ServerLauncher'
     standardInput = System.in
     group = 'run'

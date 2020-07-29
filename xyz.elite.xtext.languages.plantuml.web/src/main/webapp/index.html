@@ -34,7 +34,7 @@
 					baseUrl: baseUrl,
 					syntaxDefinition: "puml-syntax",
 				}).then(function (editor) {
-					setInterval(updatePUML, 3000);
+					setInterval(updatePUML, 2000);
 					function updatePUML() {
 						editor.editor.getEditorContext().getText().then(function(text) {
 							var preprocessed = text
