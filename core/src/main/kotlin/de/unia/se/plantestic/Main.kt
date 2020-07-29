@@ -3,6 +3,7 @@ package de.unia.se.plantestic
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.required
 import java.io.File
 
@@ -92,6 +93,8 @@ object Main {
 
         private val output: String by option(help = "Output folder where the test cases should be written to. Default is './plantestic-test'")
             .default("./plantestic-test")
+		
+		private val verbose by option("--verbose", "-v").flag()
 
         override fun run() {
             val inputFile = File(input).normalize()
@@ -102,16 +105,16 @@ object Main {
                 return
             }
 
-            runTransformationPipeline(inputFile, outputFolder)
+            runTransformationPipeline(inputFile, outputFolder, verbose)
         }
     }
 
-    fun runTransformationPipeline(inputFile: File, outputFolder: File) {
+    fun runTransformationPipeline(inputFile: File, outputFolder: File, verbose: Boolean) {
         MetaModelSetup.doSetup()
 
         val pumlDiagramModel = PumlParser.parse(inputFile.absolutePath)
 
-		val testScenarioModel = M2MTransformer.transformPuml2TestScenario(pumlDiagramModel)
+		val testScenarioModel = M2MTransformer.transformPuml2TestScenario(pumlDiagramModel, verbose)
 
         println("Generating code into $outputFolder")
         AcceleoCodeGenerator.generateCode(testScenarioModel, outputFolder)

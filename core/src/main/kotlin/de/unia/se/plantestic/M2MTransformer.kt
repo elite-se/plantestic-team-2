@@ -22,12 +22,12 @@ object M2MTransformer {
      * @param inputModel The UmlDiagram to transform
      * @return Request Response Pair
      */
-    fun transformPuml2TestScenario(inputModel: EObject): EObject {
+    fun transformPuml2TestScenario(inputModel: EObject, verbose: Boolean): EObject {
         require(inputModel is Model) { "Puml transformation input wasn't a puml object" }
-        return doQvtoTransformation(inputModel, QVT_PUML2TESTSCENARIO_TRANSFORMATION_URI)
+        return doQvtoTransformation(inputModel, QVT_PUML2TESTSCENARIO_TRANSFORMATION_URI, verbose)
     }
 
-    private fun doQvtoTransformation(inputModel: EObject, transformationUri: URI): EObject {
+    private fun doQvtoTransformation(inputModel: EObject, transformationUri: URI, verbose: Boolean): EObject {
         // Sources:
         // - https://github.com/mrcalvin/qvto-cli/blob/master/qvto-app/src/main/java/at/ac/wu/nm/qvto/App.java
         // - https://wiki.eclipse.org/QVTOML/Examples/InvokeInJava
@@ -44,7 +44,7 @@ object M2MTransformer {
         val context = ExecutionContextImpl()
         context.setConfigProperty("keepModeling", true)
         context.setConfigProperty("diagramName", EcoreUtil.getURI(inputModel).trimFileExtension().lastSegment())
-        context.setConfigProperty("verbose", true) // TODO: make configurable via command line
+        context.setConfigProperty("verbose", verbose)
 
         require(System.out != null) { "System.out was null" }
         val outStream = OutputStreamWriter(System.out!!)
