@@ -38,11 +38,7 @@ class PlantUMLHandler extends AbstractHandler implements Handler {
 			}
 			val writer = Files.newBufferedWriter(Paths.get(pumlFile.absolutePath), StandardOpenOption.WRITE,
 				StandardOpenOption.TRUNCATE_EXISTING)
-			val split = puml.split("\\\\n")
-			split.forEach [ e |
-				writer.write(e)
-				writer.newLine
-			]
+			writer.write(puml)
 			writer.close
 
 			val plantumlPath = class.classLoader.getResource("plantuml.jar").path
