@@ -134,7 +134,7 @@ helper List(SQ_SequenceElement)::toStructures(msgPrefix: String, roundtripIdStar
 					);
 					nextRoundtripId := nextRoundtripId + 1;
 				}
-    		} elif (msg.isRequest() and not msg.payload.asyncid.oclIsUndefined()) {
+    		} elif (msg.isRequest() and not msg.payload.asyncid.oclIsUndefined() and msg.payload.asyncid != 0) {
     			var asyncID = msg.payload.asyncid;
     			var reqMsg := findAsyncRequest(msgPrefix + "    ", msg, prec);
     			
