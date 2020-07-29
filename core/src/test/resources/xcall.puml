@@ -1,4 +1,10 @@
-SEQUENCE @startuml
+@startvariant
+id="123"
+eventId="645"
+vin="987"
+@endvariant
+
+@startuml
 
 participant "Voicemanager" as VM
 participant XCS
