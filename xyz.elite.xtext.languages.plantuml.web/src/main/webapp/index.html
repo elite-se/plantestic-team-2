@@ -24,29 +24,26 @@
             paths: {
                 text: "webjars/requirejs-text/2.0.15/text",
                 jquery: "webjars/jquery/2.2.4/jquery.min",
-                "xtext/xtext-orion": "xtext/2.16.0/xtext-orion",
-                "plantuml-encoder": "plantuml-encoder",
+                "xtext/xtext-orion": "xtext/2.16.0/xtext-orion"
             },
         });
 
         require(["orion/code_edit/built-codeEdit-amd"], function () {
             require(["xtext/xtext-orion"], function (xtext) {
-                require(["plantuml-encoder"], function (encoder) {
-                    xtext.createEditor({
-                        baseUrl: baseUrl,
-                        syntaxDefinition: "puml-syntax",
-                    }).then(function (editor) {
-                        setInterval(updatePUML, 3000);
-                        function updatePUML() {
-                            editor.editor.getEditorContext().getText().then(function(text) {
-                            	var preprocessed = text
-                            		.replace(/@startvariant[\s\S]*@endvariant/, '')
-                            		.replace(/@startasyncconfig[\s\S]*@endasyncconfig/, '')
-                                document.getElementById("plantuml-img").src = "http://localhost:8081/?puml=" + encodeURIComponent(preprocessed)
-                            })
-                        }
-                    });
-                });
+				xtext.createEditor({
+					baseUrl: baseUrl,
+					syntaxDefinition: "puml-syntax",
+				}).then(function (editor) {
+					setInterval(updatePUML, 3000);
+					function updatePUML() {
+						editor.editor.getEditorContext().getText().then(function(text) {
+							var preprocessed = text
+								.replace(/@startvariant[\s\S]*@endvariant/, '')
+								.replace(/@startasyncconfig[\s\S]*@endasyncconfig/, '')
+							document.getElementById("plantuml-img").src = "http://localhost:8081/?puml=" + encodeURIComponent(preprocessed)
+						})
+					}
+				});
             });
         });
     </script>
