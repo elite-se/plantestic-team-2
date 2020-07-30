@@ -75,7 +75,7 @@ public class [ 'Test_'.concat(testScenario.name) /] {
 public void test[ nameSuffix /]() {
 [if (not variant.oclIsUndefined())]
 [for (entry : VariantEntry | variant.entries) ]
-    paramsMap.put("[ entry.key /]", "[ entry.value /]");
+    paramsMap.put("[ entry.key /]", "[ entry.value.substituteAll('\"', '\\\"') /]");
 [/for]
 [/if]
 
@@ -105,11 +105,11 @@ public void test[ nameSuffix /]() {
 [if (alternative.condition.oclIsUndefined())]
 [generateStructures(alternative.provided)/]
 [else][if (alternative.provided->isEmpty() and alternative.otherwise->notEmpty())]
-if (!eval("[alternative.condition/]")) {
+if (!eval("[alternative.condition.substituteAll('\"', '\\\"')/]")) {
 	[generateStructure(alternative.otherwise)/]
 }
 [else]
-if (eval([alternative.condition/])) {
+if (eval("[alternative.condition.substituteAll('\"', '\\\"')/]")) {
 	[generateStructures(alternative.provided)/]
 }[if (alternative.otherwise->notEmpty())] else {
 	[generateStructure(alternative.otherwise)/]
@@ -129,7 +129,7 @@ Thread.sleep([timeInterval.toDuration()/].toMillis());
 [if (testRoundtrip.oclIsTypeOf(AsyncTestRoundtrip))]
 [testRoundtrip.oclAsType(AsyncTestRoundtrip).generateAsyncTestRoundtrip()/]
 [else]
-if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender/]")) {
+if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender.substituteAll('\"', '\\\"')/]")) {
     [testRoundtrip.generateTestRoundtrip()/]
 }
 [/if]
@@ -198,7 +198,7 @@ Response [testRoundtrip.name/] = RestAssured.given()
 [template private generateAddRequestParams(requestSpecification : RequestSpecification)]
 	[if (requestSpecification.requestdatum->notEmpty())]
 		[for (requestDatum : RequestDatum | requestSpecification.requestdatum)]
-paramsMap.put("[requestDatum.variableName/]", [requestDatum.value/]);
+paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value.substituteAll('\"', '\\\"')/]");
 		[/for]
 	[/if]
 [/template]

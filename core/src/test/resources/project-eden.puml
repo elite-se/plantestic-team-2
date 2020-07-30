@@ -1,5 +1,5 @@
 @startasyncconfig
-async[1] = Owner request(GET, "planted/${plantname}") response(200, {success: true})
+async[1] = Owner request(GET, "planted/${plantname}") response(200, {success: true}) timeout(10s, 1s)
 @endasyncconfig
 
 @startvariant
@@ -14,13 +14,13 @@ plantname="Cactus"
 
 activate Owner
 
-Owner -[#green]> Gardener : async[1] request(POST, "task/plant/${plantname}")
+"Owner" -[#green]> Gardener : async[1] request(POST, "task/plant/${plantname}")
 activate Gardener
-Gardener -[#green]-> Owner : response(200)
+Gardener -[#green]-> "Owner" : response(200)
 
 autoactivate on
 
-alt weather=sunny
+alt weather=="sunny"
 	note over Gardener : Nur bei schönem Wetter Pflanzt\nder Gärtner Pflanzen
 	Gardener -[#green]> Garden : request(DELETE, "plants/all", {force: true})
 	return response(410 GONE)
@@ -33,11 +33,11 @@ alt weather=sunny
 	return response(200)
 
 	autoactivate off
-	Gardener --> Owner : async[1] request(PATCH, "planted/success", {plantname: "${plantname}"})
-else weather=cloudy
+	Gardener --> "Owner" : async[1] request(PATCH, "planted/success", {plantname: "${plantname}"})
+else weather=="cloudy"
 	note over Gardener : Zurücklehnen und auf Sonne warten
 	... wait(1s) ...
-	Gardener --> Owner : async[1] request(PATCH, "planted/failure", {plantname: "${plantname}"})
+	Gardener --> "Owner" : async[1] request(PATCH, "planted/failure", {plantname: "${plantname}"})
 end 
 
 deactivate Gardener
