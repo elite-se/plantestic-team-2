@@ -14,7 +14,7 @@ import java.io.File
 val wireMockServer = WireMockServer(8080)
 
 class End2EndTest : StringSpec({
-    "End2End test receives request on mock server for the minimal hello" {
+    "End2End test receives request on mock server for the minimal hello".config(enabled = false) {
         wireMockServer.stubFor(
             get(urlEqualTo("/hello"))
                 .willReturn(aResponse()
@@ -22,7 +22,7 @@ class End2EndTest : StringSpec({
         wireMockServer.stubFor(get(urlPathEqualTo("/swagger/openapi.yaml"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withBodyFile(SWAGGER_FILE.toString())))
+                        .withBodyFile(MINIMAL_SWAGGER_FILE.toString())))
 
         runTransformationPipeline(MINIMAL_EXAMPLE_INPUT_FILE, OUTPUT_FOLDER)
 
@@ -46,10 +46,34 @@ class End2EndTest : StringSpec({
     // This test is the greatest test the world has ever seen. Behind me even grown man that have never cried before in
     // their lives - not even when they were babies - cried when I signed this bill.
     "End2End test project-eden" {
-        wireMockServer.stubFor(get(urlPathEqualTo("/swagger/openapi.yaml"))
+        wireMockServer.stubFor(
+                post(urlMatching("/gardener/doplant/([a-z]*)"))
+                        .willReturn(aResponse()
+                                .withStatus(200)))
+        wireMockServer.stubFor(
+                get(urlMatching("/garden/plant/exists/([a-z]*)"))
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withBody("{ \"exists\": true }")))
+        wireMockServer.stubFor(
+                get(urlMatching("/PflanzenKoelle/buy/([a-z]*)"))
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withBody("{ \"plant\": \"pflonzn\"}")))
+        wireMockServer.stubFor(
+                post(urlMatching("/garden/plant/([a-z]*)"))
+                        .willReturn(aResponse()
+                                .withStatus(200)))
+        wireMockServer.stubFor(
+                get(urlMatching("/owner/isplanted/([a-z]*)"))
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withBody("{ \"success\": true }")))
+
+        wireMockServer.stubFor(get(urlPathEqualTo("/swagger/project-eden.yaml"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withBodyFile(SWAGGER_FILE.toString())))
+                        .withBodyFile(EDEN_SWAGGER_FILE.toString())))
 
         runTransformationPipeline(EDEN_INPUT_FILE, OUTPUT_FOLDER)
 
@@ -61,20 +85,21 @@ class End2EndTest : StringSpec({
         ).create()
         compiledTest.call("setup")
         compiledTest.call("test1")
-        compiledTest.call("setup")
-        compiledTest.call("test2")
 
         // Check if we received a correct request
         wireMockServer.allServeEvents.forEach { serveEvent -> println(serveEvent.request) }
-        wireMockServer.allServeEvents.size shouldBe 1
+        wireMockServer.allServeEvents.size shouldBe 3
         wireMockServer.allServeEvents[0].response.status shouldBe 200
+        wireMockServer.allServeEvents[1].response.status shouldBe 200
+        wireMockServer.allServeEvents[2].response.status shouldBe 200
     }
 }) {
     companion object {
         private val MINIMAL_EXAMPLE_INPUT_FILE = File(Resources.getResource("minimal_hello.puml").path)
+        private val MINIMAL_SWAGGER_FILE = File(Resources.getResource("openapi.yaml").path)
         private val EDEN_INPUT_FILE = File(Resources.getResource("project-eden.puml").path)
+        private val EDEN_SWAGGER_FILE = File(Resources.getResource("project-eden.yaml").path)
         private val OUTPUT_FOLDER = File(Resources.getResource("code-generation").path + "/End2EndTests/GeneratedCode")
-        private val SWAGGER_FILE = File(Resources.getResource("openapi.yaml").path)
     }
 
     override fun beforeTest(description: Description) {

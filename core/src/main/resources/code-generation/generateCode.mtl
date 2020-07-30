@@ -21,14 +21,12 @@ import org.junit.jupiter.api.Test;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.hamcrest.Matchers.hasXPath;
 
 public class [ 'Test_'.concat(testScenario.name.substituteAll('-', '_')) /] {
 
@@ -138,13 +136,13 @@ if (tester == null || tester.equals("[testRoundtrip.requestspecification.sender.
 [/template]
 
 [template private generateAsyncTestRoundtrip(testRoundtrip : AsyncTestRoundtrip) post(trim())]
-LocalDate [testRoundtrip.name/]TimeoutDate = LocalDate.now().plus([testRoundtrip.maxTimeout.value/], [testRoundtrip.maxTimeout.unit.toChronoUnit()/]);
+LocalTime [testRoundtrip.name/]TimeoutDate = LocalTime.now().plus([testRoundtrip.maxTimeout.value/], [testRoundtrip.maxTimeout.unit.toChronoUnit()/]);
 for (boolean [testRoundtrip.name/]Done = false; ![testRoundtrip.name/]Done;) {
 	try {
 		[testRoundtrip.generateTestRoundtrip()/]
 		[testRoundtrip.name/]Done = true;
 	} catch (AssertionError as) {
-		if (LocalDate.now().compareTo([testRoundtrip.name/]TimeoutDate) > 0) {
+		if (LocalTime.now().compareTo([testRoundtrip.name/]TimeoutDate) > 0) {
 			throw as;
 		} else {
 			[testRoundtrip.requestInterval.generateSleep()/]
@@ -222,7 +220,6 @@ paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value.substituteAll
 [template private generateThenPart(responseSpecification : ResponseSpecification) post(trim())]
 	.assertThat()
     [responseSpecification.generateExpectStatusCode()/]
-    [responseSpecification.generateExpectations()/]
 	.and().extract().response()
 [/template]
 
