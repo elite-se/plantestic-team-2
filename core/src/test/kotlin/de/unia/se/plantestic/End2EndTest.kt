@@ -43,19 +43,26 @@ class End2EndTest : StringSpec({
         }
     }
 
-    // This test is bullshit because the mock server setup has nothing to do with the actual scenario
-    "End2End test receives request on mock server for the project-eden example".config(enabled = false) {
-        wireMockServer.stubFor(get(urlEqualTo("/hello/123")).willReturn(aResponse().withBody("test")))
+    // This test is the greatest test the world has ever seen. Behind me even grown man that have never cried before in
+    // their lives - not even when they were babies - cried when I signed this bill.
+    "End2End test project-eden" {
+        wireMockServer.stubFor(get(urlPathEqualTo("/swagger/openapi.yaml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBodyFile(SWAGGER_FILE.toString())))
 
         runTransformationPipeline(EDEN_INPUT_FILE, OUTPUT_FOLDER)
 
         // Now compile the resulting code to check for syntax errors
-        val generatedSourceFile = OUTPUT_FOLDER.listFiles().filter { f -> f.name == "Test_xcall_puml.java" }.first()
+        val generatedSourceFile = OUTPUT_FOLDER.listFiles().filter { f -> f.name == "Test_project_eden_puml.java" }.first()
         val compiledTest = Reflect.compile(
             "com.plantestic.test.${generatedSourceFile.nameWithoutExtension}",
             generatedSourceFile.readText()
         ).create()
-        compiledTest.call("test")
+        compiledTest.call("setup")
+        compiledTest.call("test1")
+        compiledTest.call("setup")
+        compiledTest.call("test2")
 
         // Check if we received a correct request
         wireMockServer.allServeEvents.forEach { serveEvent -> println(serveEvent.request) }

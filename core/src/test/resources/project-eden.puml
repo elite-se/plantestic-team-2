@@ -30,7 +30,7 @@ activate Owner
 activate Gardener
 Gardener -[#green]-> "Owner" : response(200)
 
-alt weather=="sunny"
+alt "0"==[]
 	note over Gardener : Nur bei schönem Wetter pflanzt\nder Gärtner Pflanzen
 	Gardener -[#green]> Garden : request(GET, "plant/exists/${plantname}")
 	activate Garden
@@ -55,7 +55,7 @@ alt weather=="sunny"
     ... wait(10s) ...
     autoactivate off
     Gardener -[#green]> "Owner" : async[1] request(POST, "/planted-status", {success: true})
-else weather=="cloudy"
+else 0=="0"
 	note over Gardener : Zurücklehnen und auf Sonne warten
 	... wait(1s) ...
 	Gardener -[#green]> "Owner" : async[1] request(POST, "/planted-status", {success: false})
