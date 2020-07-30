@@ -1,0 +1,108 @@
+openapi: 3.0.1
+info:
+  title: PlantesticProjectEden
+  description: swagger file for the tests of plantestic
+  version: 1.0.0
+paths:
+  /owner/isplanted:
+    get:
+      tags:
+        - projectEden
+      responses:
+        '200':
+          description: success
+  /gardener/doplant/{plantname}:
+    post:
+      tags:
+        - projectEden
+      responses:
+        '200':
+          description: working-on-it
+      parameters:
+        - name: plantname
+          in: path
+          required: true
+          schema:
+            type:
+              string
+  /garden/plant/exists/{plantname}:
+    get:
+      tags:
+        - projectEden
+      parameters:
+        - name: plantname
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+                    example: true
+
+  /PflanzenKoelle/buy/{plantname}:
+    get:
+      tags:
+        - projectEden
+      parameters:
+        - name: plantname
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plant:
+                    type: string
+                    example: "Oa Pflonzn"
+
+  /garden/plant/{plant}:
+    post:
+      tags:
+        - projectEden
+      parameters:
+        - name: plant
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: success
+
+
+  /owner/planted-status:
+    post:
+      tags:
+        - projectEden
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+
+

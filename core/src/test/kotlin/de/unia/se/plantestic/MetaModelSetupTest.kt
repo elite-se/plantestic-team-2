@@ -10,14 +10,12 @@ import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.isAccessible
 
 class MetaModelSetupTest : StringSpec() {
-
     init {
         "doSetup should work" {
             MetaModelSetup.doSetup()
 
-            EPackage.Registry.INSTANCE["http://www.example.org/RestAssured"] shouldNotBe null
-            EPackage.Registry.INSTANCE["http://www.example.org/RequestResponsePairs"] shouldNotBe null
-            EPackage.Registry.INSTANCE["http://www.eclipse.plantuml/Puml"] shouldNotBe null
+            EPackage.Registry.INSTANCE["http://elite-se.xyz/plantestic/TestScenario"] shouldNotBe null
+            EPackage.Registry.INSTANCE["http://elite-se.xyz/plantestic/PlantUML"] shouldNotBe null
         }
 
         "RegisterMetaModelFromEcoreFile should fail if a Resource URI is invalid" {

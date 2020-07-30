@@ -6,6 +6,7 @@ plugins {
     id "idea"
     id "eclipse"
     id 'maven-publish'
+    id "io.kotlintest" version "1.1.1"
 }
 mainClassName = "de.unia.se.plantestic.Main"
 
@@ -28,6 +29,8 @@ repositories {
 
 test {
     useJUnitPlatform()
+
+    testLogging.events("passed", "skipped", "failed")
 }
 
 dependencies {
@@ -75,8 +78,8 @@ dependencies {
     runtimeOnly group: 'lpg.runtime', name: 'java', version: '2.0.17-v201004271640'
     runtimeOnly group: 'org.osgi', name: 'org.osgi.service.prefs', version: '1.1.1'
 
-    testImplementation "io.kotlintest:kotlintest-runner-junit5:3.1.7"
     testImplementation "io.mockk:mockk:1.8.9"
+    testCompile 'io.kotlintest:kotlintest-runner-junit5:3.1.9'
 
     // End-2-End Test
     testImplementation "org.jooq:joor-java-8:0.9.12"

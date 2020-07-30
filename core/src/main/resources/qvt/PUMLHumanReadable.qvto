@@ -1,6 +1,6 @@
 library PUMLHumanReadable;
 
-modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
+modeltype plantUML "strict" uses plantUML('http://elite-se.xyz/plantestic/PlantUML');
 
 helper SQ_Delay::humanReadableString(): String {
 	return "delay " + self.wait.time.toString() + self.wait.unit.toString();

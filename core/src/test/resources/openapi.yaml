@@ -4,56 +4,10 @@ info:
   description: swagger file for the tests of plantestic
   version: 1.0.0
 paths:
-  /testB/hello:
+  /hello:
     get:
       tags:
         - minimalHello
-      responses:
-        '200':
-          description: success
-  /testB:
-    get:
-      tags:
-        - tester
-      responses:
-        '200':
-          description: success
-  /testB/hello/{vin}:
-    post:
-      tags:
-        - complexHello
-      summary: Add a new element
-      parameters:
-        - name: vin
-          in: path
-          required: true
-          schema:
-            type: object
-            required:
-              - variableA
-              - variableB
-            properties:
-              variableA:
-                type: string
-              variableB:
-                type: string
-      responses:
-        '200':
-          description: success
-  /xcs/vin/v1/{vin}:
-    post:
-      tags:
-        - complexHello
-      summary: Add a new element
-      parameters:
-        - name: vin
-          in: path
-          required: true
-          schema:
-            type: object
-            properties:
-              vin:
-                type: string
       responses:
         '200':
           description: success

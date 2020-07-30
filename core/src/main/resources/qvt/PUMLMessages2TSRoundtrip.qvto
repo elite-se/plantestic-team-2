@@ -4,8 +4,8 @@ import PUMLHumanReadable;
 import TSHumanReadable;
 import TSTimeUnit;
 
-modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
-modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
+modeltype plantUML "strict" uses plantUML('http://elite-se.xyz/plantestic/PlantUML');
+modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/plantestic/TestScenario');
 
 configuration property verbose : Boolean;
 
