@@ -1,5 +1,5 @@
 @startasyncconfig
-async[1] = Owner request(GET, "planted/${plantname}") response(200, {success: true}) timeout(10s, 1s)
+async[1] = Owner request(GET, "planted/${plantname}") response(200, {success: true}) ' timeout(10s, 1s)
 @endasyncconfig
 
 @startvariant
@@ -18,32 +18,35 @@ activate Owner
 activate Gardener
 Gardener -[#green]-> "Owner" : response(200)
 
-autoactivate on
-
 alt weather=="sunny"
-	note over Gardener : Nur bei schönem Wetter Pflanzt\nder Gärtner Pflanzen
-	Gardener -[#green]> Garden : request(DELETE, "plants/all", {force: true})
-	return response(410 GONE)
-	
-	Gardener-[#green]> PflanzenKoelle: request(GET, "plants/${plantname}")
-	
-	alt meetsFriend
-		Gardener-[#green]> Friend:request(GET, "smalltalk")
-		return response(400 FORBIDDEN)
-	end
-	
-	return response(200, {plant: "PflanzenDing"})
-	
-	Gardener-[#green]> Garden : request(PUT, "plant/${plant}")
-	... wait(10s) ...
-	return response(200)
+	note over Gardener : Nur bei schönem Wetter pflanzt\nder Gärtner Pflanzen
+	Gardener -[#green]> Garden : request(GET, "plants/all/${plantname}")
+	activate Garden
 
-	autoactivate off
-	Gardener --> "Owner" : async[1] request(PATCH, "planted/success", {plantname: "${plantname}"})
+	alt garden.hasPlant(${plantname})
+	    Garden --> Gardener : response(200, { plantexists: true })
+	else
+	    Garden --> Gardener : response(200, { plantexists: false })
+	end
+	deactivate Garden
+
+    autoactivate on
+
+    alt ${plantexists}
+	    Gardener-[#green]> PflanzenKoelle: request(GET, "plants/${plantname}")
+	    return response(200, {plant: "Oa Pflonzn"})
+	
+	    Gardener-[#green]> Garden : request(POST, "plant/${plant}")
+	    return response(200)
+	end
+
+    ... wait(10s) ...
+    autoactivate off
+    Gardener --> "Owner" : async[1] request(POST, "planted/success", {plantname: "${plantname}"})
 else weather=="cloudy"
 	note over Gardener : Zurücklehnen und auf Sonne warten
 	... wait(1s) ...
-	Gardener --> "Owner" : async[1] request(PATCH, "planted/failure", {plantname: "${plantname}"})
+	Gardener --> "Owner" : async[1] request(POST, "planted/failure", {plantname: "${plantname}"})
 end 
 
 deactivate Gardener

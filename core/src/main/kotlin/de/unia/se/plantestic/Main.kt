@@ -109,7 +109,7 @@ object Main {
         }
     }
 
-    fun runTransformationPipeline(inputFile: File, outputFolder: File, verbose: Boolean) {
+    fun runTransformationPipeline(inputFile: File, outputFolder: File, verbose: Boolean = false) {
         MetaModelSetup.doSetup()
 
         val pumlDiagramModel = PumlParser.parse(inputFile.absolutePath)

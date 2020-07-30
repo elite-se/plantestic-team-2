@@ -1,0 +1,9 @@
+@startuml
+
+autoactivate on
+activate A
+A -> B : request(GET, "/hello")
+return response(200)
+deactivate A
+
+@enduml

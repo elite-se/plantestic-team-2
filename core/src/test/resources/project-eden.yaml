@@ -1,0 +1,6 @@
+openapi: 3.0.1
+info:
+  title: PlantesticProjectEden
+  description: swagger file for the tests of plantestic
+  version: 1.0.0
+paths:

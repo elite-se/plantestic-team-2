@@ -22,7 +22,7 @@ object M2MTransformer {
      * @param inputModel The UmlDiagram to transform
      * @return Request Response Pair
      */
-    fun transformPuml2TestScenario(inputModel: EObject, verbose: Boolean): EObject {
+    fun transformPuml2TestScenario(inputModel: EObject, verbose: Boolean = false): EObject {
         require(inputModel is Model) { "Puml transformation input wasn't a puml object" }
         return doQvtoTransformation(inputModel, QVT_PUML2TESTSCENARIO_TRANSFORMATION_URI, verbose)
     }
