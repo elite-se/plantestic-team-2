@@ -22,10 +22,20 @@ paths:
         - name: plantname
           in: path
           required: true
+          schema:
+            type:
+              string
   /garden/plant/exists/{plantname}:
     get:
       tags:
         - projectEden
+      parameters:
+        - name: plantname
+          in: path
+          required: true
+          schema:
+            type: string
+
       responses:
         '200':
           description: success
