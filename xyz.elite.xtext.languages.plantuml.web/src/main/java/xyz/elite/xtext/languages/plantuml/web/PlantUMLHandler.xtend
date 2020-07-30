@@ -42,7 +42,7 @@ class PlantUMLHandler extends AbstractHandler implements Handler {
 			writer.write(puml)
 			writer.close
 
-			val String[] args = #["-failfast2", "-tpng", pumlPath]
+			val String[] args = #["-failfast", "-tpng", pumlPath]
 			try {
 				val chungus = new BigChungus
 				System.securityManager = chungus
@@ -65,6 +65,7 @@ class PlantUMLHandler extends AbstractHandler implements Handler {
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				}
 			} catch (Exception e) {
+				System.err.println(e)
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
 			}
 		}
