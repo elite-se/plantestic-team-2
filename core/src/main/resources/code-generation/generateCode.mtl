@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.Duration;
 import java.util.Arrays;
@@ -73,7 +74,7 @@ public class [ 'Test_'.concat(testScenario.name.substituteAll('-', '_')) /] {
 
 [template private generateTest(testScenario : TestScenario, variant : Variant, nameSuffix : String) post(trim())]
 @Test
-public void test[ nameSuffix /]() {
+public void test[ nameSuffix /]() throws ScriptException, InterruptedException {
 [if (not variant.oclIsUndefined())]
 [for (entry : VariantEntry | variant.entries) ]
     paramsMap.put("[ entry.key /]", "[ entry.value.substituteAll('\"', '\\\"') /]");
