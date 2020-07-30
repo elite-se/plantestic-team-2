@@ -4,9 +4,9 @@ modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScena
 
 helper RequestSpecification::humanReadableString(): String {
 	if (self.sender.oclIsUndefined()) {
-		return "request(method=" + self.method + ", url=\"" + self.url + "\", sender=null" + ", receiver=" + self.receiver + ")";
+		return "request(method=" + self.method + ", url=\"" + self.url + "\", sender=null" + ", receiver=" + self.receiver + ", requestdatum=" + self.requestdatum->humanReadableString() + ")";
 	};
-	return "request(method=" + self.method + ", url=\"" + self.url + "\", sender=" + self.sender + ", receiver=" + self.receiver + ")";
+	return "request(method=" + self.method + ", url=\"" + self.url + "\", sender=" + self.sender + ", receiver=" + self.receiver + ", requestdatum=" + self.requestdatum->humanReadableString() + ")";
 }
 
 helper ResponseSpecification::humanReadableString(): String {
@@ -21,8 +21,44 @@ helper ResponseSpecification::humanReadableString(): String {
 			str := str +  " || ";
 	 	}
 	};
-	str := str + ")";
+	str := str + ", " + self.responsedatum->humanReadableString() + ")";
 	return str;
+}
+
+helper OrderedSet(ResponseDatum)::humanReadableString(): String {
+    var str := "{";
+    var ind := 1;
+    while (ind <= self->size()) {
+    	var datum := self->at(ind);
+		str := str + datum.humanReadableString();
+		ind := ind + 1;
+		if (ind <= self->size()) {
+			str := str + ", ";
+		};
+    };
+	return str + "}";
+}
+
+helper ResponseDatum::humanReadableString(): String {
+	return self.variableName + ": " + self.value;
+}
+
+helper OrderedSet(RequestDatum)::humanReadableString(): String {
+    var str := "{";
+    var ind := 1;
+    while (ind <= self->size()) {
+    	var datum := self->at(ind);
+		str := str + datum.humanReadableString();
+		ind := ind + 1;
+		if (ind <= self->size()) {
+			str := str + ", ";
+		};
+    };
+	return str + "}";
+}
+
+helper RequestDatum::humanReadableString(): String {
+	return self.variableName + ": " + self.value;
 }
 
 helper Structure::humanReadableString(prefix: String): String {

@@ -16,7 +16,7 @@ class RestAssuredAcceleoGenerator : AbstractAcceleoGenerator() {
     private var tempDir: File? = null
 
     override fun initialize(model: EObject, targetFolder: File, arguments: List<Any>) {
-        println("Compiling .mtl file for generating code from Rest assured Model")
+        println("Compiling .mtl file for generating code")
         val acceleoCompiler = AcceleoCompiler()
 
         tempDir = createTempDir()
@@ -33,7 +33,7 @@ class RestAssuredAcceleoGenerator : AbstractAcceleoGenerator() {
 
     @Throws(IOException::class)
     override fun doGenerate(monitor: Monitor) {
-        println("Generating code from Rest assured Model")
+        println("Generating code")
         super.doGenerate(monitor)
     }
 

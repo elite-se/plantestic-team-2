@@ -78,7 +78,7 @@ mapping SQ_Diagram::transformUmlDiagram(variants_: Bag(Variant), asyncEntries: D
 	structure := elements->toStructures("", 1, prec, asyncEntries).structure;
 	
 	if (verbose) {
-		log("\n==============\n    Result\n==============");
+		log("\n============== Result ==============");
 		structure->forEach(struct) { log(struct.humanReadableString("")); };
 	}
 }
