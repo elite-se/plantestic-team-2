@@ -3,7 +3,7 @@
 
 [template public generateTestScenario(testScenario : TestScenario) post(trim())]
 [comment @main /]
-[file ('Test_'.concat(testScenario.name.concat('.java')), false, 'UTF-8')]
+[file ('Test_'.concat(testScenario.name.substituteAll('-', '_').concat('.java')), false, 'UTF-8')]
 
 import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
 import io.restassured.RestAssured;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.hasXPath;
 
-public class [ 'Test_'.concat(testScenario.name) /] {
+public class [ 'Test_'.concat(testScenario.name.substituteAll('-', '_')) /] {
 
 	Map<String, String> paramsMap = new HashMap<>();
 
