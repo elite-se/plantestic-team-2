@@ -10,6 +10,7 @@ import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
 import io.restassured.RestAssured;
 import io.restassured.filter.Filter;
 import io.restassured.filter.FilterContext;
+import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
@@ -28,6 +29,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.equalTo;
+
 public class [ 'Test_'.concat(testScenario.name.substituteAll('-', '_')) /] {
 
 	Map<String, String> paramsMap = new HashMap<>();
@@ -40,6 +43,9 @@ public class [ 'Test_'.concat(testScenario.name.substituteAll('-', '_')) /] {
 	    paramsMap = new HashMap<>(System.getenv());
 	    substitutor = new StringSubstitutor(paramsMap);
 		engine = new ScriptEngineManager().getEngineByName("JavaScript");
+
+		// Fallback to JSON parsing if response does not contain a content type
+		RestAssured.defaultParser = Parser.JSON;
 	}
 
     [if (testScenario.variants->notEmpty())]
@@ -220,6 +226,7 @@ paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value.substituteAll
 [template private generateThenPart(responseSpecification : ResponseSpecification) post(trim())]
 	.assertThat()
     [responseSpecification.generateExpectStatusCode()/]
+    [responseSpecification.generateExpectations()/]
 	.and().extract().response()
 [/template]
 
@@ -231,7 +238,7 @@ paramsMap.put("[requestDatum.variableName/]", "[requestDatum.value.substituteAll
 
 [template private generateExpectations(responseSpecification : ResponseSpecification) post(trim())]
 	[for (datum : ResponseDatum | responseSpecification.responsedatum)]
-.body(hasXPath("[datum.variableName/]"))
+.body("[datum.variableName/]", equalTo([datum.value/]))
 	[/for]
 [/template]
 

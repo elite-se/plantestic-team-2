@@ -52,9 +52,8 @@ class End2EndTest : StringSpec({
                                 .withStatus(200)))
         wireMockServer.stubFor(
                 get(urlMatching("/garden/plant/exists/([a-z]*)"))
-                        .willReturn(aResponse()
-                                .withStatus(200)
-                                .withBody("{ \"exists\": true }")))
+                        .willReturn(okJson("{ \"exists\": true }")
+                                .withStatus(200)))
         wireMockServer.stubFor(
                 get(urlMatching("/PflanzenKoelle/buy/([a-z]*)"))
                         .willReturn(aResponse()
@@ -66,6 +65,7 @@ class End2EndTest : StringSpec({
                                 .withStatus(200)))
         wireMockServer.stubFor(
                 get(urlMatching("/owner/isplanted/([a-z]*)"))
+                        // Test fallback to json parsing (sane default)
                         .willReturn(aResponse()
                                 .withStatus(200)
                                 .withBody("{ \"success\": true }")))
