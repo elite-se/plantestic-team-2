@@ -40,10 +40,13 @@ paths:
         '200':
           description: success
           content:
-            text/plain:
+            application/json:
               schema:
-                type: boolean
-                example: true
+                type: object
+                properties:
+                  plantexists:
+                    type: boolean
+                    example: true
 
 
 
