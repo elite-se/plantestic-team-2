@@ -26,6 +26,12 @@ alt weather=="sunny"
 	return response(410 GONE)
 	
 	Gardener-[#green]> PflanzenKoelle: request(GET, "plants/${plantname}")
+	
+	alt meetsFriend
+		Gardener-[#green]> Friend:request(GET, "smalltalk")
+		return response(400 FORBIDDEN)
+	end
+	
 	return response(200, {plant: "PflanzenDing"})
 	
 	Gardener-[#green]> Garden : request(PUT, "plant/${plant}")
