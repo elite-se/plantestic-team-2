@@ -44,7 +44,63 @@ paths:
               schema:
                 type: object
                 properties:
-                  plantexists:
+                  exists:
+                    type: boolean
+                    example: true
+
+  /gardener/buy/{plantname}:
+    get:
+      tags:
+        - projectEden
+      parameters:
+        - name: plantname
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plant:
+                    type: string
+                    example: "Oa Pflonzn"
+
+  /gardener/plant/{plant}:
+    post:
+      tags:
+        - projectEden
+      parameters:
+        - name: plant
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: success
+
+
+  /gardener/planted-status:
+    post:
+      tags:
+        - projectEden
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
                     type: boolean
                     example: true
 
