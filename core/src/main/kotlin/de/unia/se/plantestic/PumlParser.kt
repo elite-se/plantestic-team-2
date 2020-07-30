@@ -16,6 +16,8 @@ object PumlParser {
      * @return Root model object
      */
     fun parse(inputUri: String): Model {
+    	println("Parsing PUML file \"" + inputUri + "\"")
+		
         require(EPackage.Registry.INSTANCE["http://www.elite.xyz/xtext/languages/plantuml/PlantUML"] != null) {
             "Please run MetaModelSetup.doSetup() first"
         }
@@ -28,8 +30,8 @@ object PumlParser {
 
 		// Ensure resource loaded without errors☝︎
 		if (resource.getErrors().size > 0) {
-			System.out.println(displayErrors(resource, inputUri))
-			System.exit(-1)
+			println(displayErrors(resource, inputUri))
+			exit(-1)
 		}
         require(resource.contents.size > 0) { "input PUML file either is empty or could not be properly parsed" }
         return resource.contents[0] as Model
