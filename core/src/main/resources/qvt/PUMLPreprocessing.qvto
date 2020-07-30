@@ -2,7 +2,7 @@ library PUMLPreprocessing;
 
 import PUMLHumanReadable;
 
-modeltype plantUML "strict" uses plantUML('http://www.elite.xyz/xtext/languages/plantuml/PlantUML');
+modeltype plantUML "strict" uses plantUML('http://elite-se.xyz/plantestic/PlantUML');
 
 configuration property verbose : Boolean;
 

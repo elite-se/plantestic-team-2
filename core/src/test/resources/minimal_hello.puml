@@ -1,3 +1,7 @@
+@startvariant
+B.path=""
+@endvariant
+
 @startuml
 
 autoactivate on

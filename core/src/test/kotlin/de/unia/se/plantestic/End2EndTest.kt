@@ -31,19 +31,20 @@ class End2EndTest : StringSpec({
         val compiledTest = Reflect.compile(
             "com.plantestic.test.${generatedSourceFile.nameWithoutExtension}",
             generatedSourceFile.readText()
-        ).create("")
-        compiledTest.call("test")
+        ).create()
+        compiledTest.call("setup")
+        compiledTest.call("test1")
 
         // Only check for hello response
         wireMockServer.allServeEvents.forEach { serveEvent -> println(serveEvent.request) }
-        val event = wireMockServer.allServeEvents.find { serveEvent -> serveEvent.request.url == "/textB/hello" }
+        val event = wireMockServer.allServeEvents.find { serveEvent -> serveEvent.request.url == "/hello" }
         if (event != null) {
             event.response.status shouldBe 200
         }
     }
 
     // This test is bullshit because the mock server setup has nothing to do with the actual scenario
-    "End2End test receives request on mock server for the xcall example".config(enabled = false) {
+    "End2End test receives request on mock server for the project-eden example".config(enabled = false) {
         wireMockServer.stubFor(get(urlEqualTo("/hello/123")).willReturn(aResponse().withBody("test")))
 
         runTransformationPipeline(XCALL_INPUT_FILE, OUTPUT_FOLDER)
@@ -53,7 +54,7 @@ class End2EndTest : StringSpec({
         val compiledTest = Reflect.compile(
             "com.plantestic.test.${generatedSourceFile.nameWithoutExtension}",
             generatedSourceFile.readText()
-        ).create("")
+        ).create()
         compiledTest.call("test")
 
         // Check if we received a correct request
@@ -67,13 +68,6 @@ class End2EndTest : StringSpec({
         private val XCALL_INPUT_FILE = File(Resources.getResource("xcall.puml").path)
         private val OUTPUT_FOLDER = File(Resources.getResource("code-generation").path + "/End2EndTests/GeneratedCode")
         private val SWAGGER_FILE = File(Resources.getResource("openapi.yaml").path)
-
-        fun printCode(folder: File) {
-            folder.listFiles().forEach { file ->
-                val lines = file.readLines()
-                lines.forEach { line -> println(line) }
-            }
-        }
     }
 
     override fun beforeTest(description: Description) {

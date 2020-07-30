@@ -1,6 +1,6 @@
 library TSHumanReadable;
 
-modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
+modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/plantestic/TestScenario');
 
 helper RequestSpecification::humanReadableString(): String {
 	if (self.sender.oclIsUndefined()) {

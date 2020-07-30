@@ -18,7 +18,7 @@ object PumlParser {
     fun parse(inputUri: String): Model {
     	println("Parsing PUML file \"" + inputUri + "\"")
 		
-        require(EPackage.Registry.INSTANCE["http://www.elite.xyz/xtext/languages/plantuml/PlantUML"] != null) {
+        require(EPackage.Registry.INSTANCE["http://elite-se.xyz/plantestic/PlantUML"] != null) {
             "Please run MetaModelSetup.doSetup() first"
         }
 

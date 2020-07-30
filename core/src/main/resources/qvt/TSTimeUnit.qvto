@@ -1,6 +1,6 @@
 library TSTimeUnit;
 
-modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/TestScenario');
+modeltype testscenario "strict" uses TestScenario('http://elite-se.xyz/plantestic/TestScenario');
 
 helper String::string2timeUnit(): TimeUnit {
 	var normalized := self.trim();

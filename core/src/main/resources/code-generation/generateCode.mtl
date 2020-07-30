@@ -1,9 +1,10 @@
 [comment encoding = UTF-8 /]
-[module generateCode('http://elite-se.xyz/TestScenario')]
+[module generateCode('http://elite-se.xyz/plantestic/TestScenario')]
 
 [template public generateTestScenario(testScenario : TestScenario) post(trim())]
 [comment @main /]
 [file ('Test_'.concat(testScenario.name.substituteAll('-', '_').concat('.java')), false, 'UTF-8')]
+package com.plantestic.test;
 
 import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
 import io.restassured.RestAssured;
