@@ -1,0 +1,46 @@
+@startasyncconfig
+async[1] = Owner request(GET, "planted/${plantname}") response(200, {success: true})
+@endasyncconfig
+
+@startvariant
+plantname="Strelitzie"
+@endvariant
+
+@startvariant
+plantname="Cactus"
+@endvariant
+
+@startuml
+
+activate Owner
+
+Owner -[#green]> Gardener : async[1] request(POST, "task/plant/${plantname}")
+activate Gardener
+Gardener -[#green]-> Owner : response(200)
+
+autoactivate on
+
+alt weather=sunny
+	note over Gardener : Nur bei schönem Wetter Pflanzt\nder Gärtner Pflanzen
+	Gardener -[#green]> Garden : request(DELETE, "plants/all", {force: true})
+	return response(410 GONE)
+	
+	Gardener-[#green]> PflanzenKoelle: request(GET, "plants/${plantname}")
+	return response(200, {plant: "PflanzenDing"})
+	
+	Gardener-[#green]> Garden : request(PUT, "plant/${plant}")
+	... wait(10s) ...
+	return response(200)
+
+	autoactivate off
+	Gardener --> Owner : async[1] request(PATCH, "planted/success", {plantname: "${plantname}"})
+else weather=cloudy
+	note over Gardener : Zurücklehnen und auf Sonne warten
+	... wait(1s) ...
+	Gardener --> Owner : async[1] request(PATCH, "planted/failure", {plantname: "${plantname}"})
+end 
+
+deactivate Gardener
+deactivate Owner
+
+@enduml
