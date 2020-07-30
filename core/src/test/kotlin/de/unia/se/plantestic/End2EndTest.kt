@@ -47,7 +47,7 @@ class End2EndTest : StringSpec({
     "End2End test receives request on mock server for the project-eden example".config(enabled = false) {
         wireMockServer.stubFor(get(urlEqualTo("/hello/123")).willReturn(aResponse().withBody("test")))
 
-        runTransformationPipeline(XCALL_INPUT_FILE, OUTPUT_FOLDER)
+        runTransformationPipeline(EDEN_INPUT_FILE, OUTPUT_FOLDER)
 
         // Now compile the resulting code to check for syntax errors
         val generatedSourceFile = OUTPUT_FOLDER.listFiles().filter { f -> f.name == "Test_xcall_puml.java" }.first()
@@ -65,7 +65,7 @@ class End2EndTest : StringSpec({
 }) {
     companion object {
         private val MINIMAL_EXAMPLE_INPUT_FILE = File(Resources.getResource("minimal_hello.puml").path)
-        private val XCALL_INPUT_FILE = File(Resources.getResource("xcall.puml").path)
+        private val EDEN_INPUT_FILE = File(Resources.getResource("project-eden.puml").path)
         private val OUTPUT_FOLDER = File(Resources.getResource("code-generation").path + "/End2EndTests/GeneratedCode")
         private val SWAGGER_FILE = File(Resources.getResource("openapi.yaml").path)
     }

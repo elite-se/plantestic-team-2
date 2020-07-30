@@ -1,39 +1,51 @@
 @startasyncconfig
-async[1] = Owner request(GET, "planted/${plantname}") response(200, {success: true}) ' timeout(10s, 1s)
+async[1] = Owner request(GET, "isplanted/${plantname}") response(200, {success: true}) ' timeout(10s, 1s)
 @endasyncconfig
 
 @startvariant
 plantname="Strelitzie"
+
+' Path setup
+Owner.path="/owner"
+Gardener.path="/gardener"
+Garden.path="/garden"
+PflanzenKoelle.path="/pflanzenshop"
 @endvariant
 
 @startvariant
 plantname="Cactus"
+
+' Path setup
+Owner.path="/owner"
+Gardener.path="/gardener"
+Garden.path="/garden"
+PflanzenKoelle.path="/pflanzenshop"
 @endvariant
 
 @startuml
 
 activate Owner
 
-"Owner" -[#green]> Gardener : async[1] request(POST, "task/plant/${plantname}")
+"Owner" -[#green]> Gardener : async[1] request(POST, "/doplant/${plantname}")
 activate Gardener
 Gardener -[#green]-> "Owner" : response(200)
 
 alt weather=="sunny"
 	note over Gardener : Nur bei schönem Wetter pflanzt\nder Gärtner Pflanzen
-	Gardener -[#green]> Garden : request(GET, "plants/all/${plantname}")
+	Gardener -[#green]> Garden : request(GET, "plant/exists/${plantname}")
 	activate Garden
 
 	alt garden.hasPlant(${plantname})
-	    Garden --> Gardener : response(200, { plantexists: true })
+	    Garden --> Gardener : response(200, { exists: true })
 	else
-	    Garden --> Gardener : response(200, { plantexists: false })
+	    Garden --> Gardener : response(200, { exists: false })
 	end
 	deactivate Garden
 
     autoactivate on
 
-    alt ${plantexists}
-	    Gardener-[#green]> PflanzenKoelle: request(GET, "plants/${plantname}")
+    alt !${exists}
+	    Gardener-[#green]> PflanzenKoelle: request(GET, "buy/${plantname}")
 	    return response(200, {plant: "Oa Pflonzn"})
 	
 	    Gardener-[#green]> Garden : request(POST, "plant/${plant}")
@@ -42,12 +54,12 @@ alt weather=="sunny"
 
     ... wait(10s) ...
     autoactivate off
-    Gardener --> "Owner" : async[1] request(POST, "planted/success", {plantname: "${plantname}"})
+    Gardener -[#green]> "Owner" : async[1] request(POST, "/planted-status", {success: true})
 else weather=="cloudy"
 	note over Gardener : Zurücklehnen und auf Sonne warten
 	... wait(1s) ...
-	Gardener --> "Owner" : async[1] request(POST, "planted/failure", {plantname: "${plantname}"})
-end 
+	Gardener -[#green]> "Owner" : async[1] request(POST, "/planted-status", {success: false})
+end
 
 deactivate Gardener
 deactivate Owner

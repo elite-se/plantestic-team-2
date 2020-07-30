@@ -4,3 +4,36 @@ info:
   description: swagger file for the tests of plantestic
   version: 1.0.0
 paths:
+  /owner/isplanted:
+    get:
+      tags:
+        - projectEden
+      responses:
+        '200':
+          description: success
+  /gardener/doplant/{plantname}:
+    post:
+      tags:
+        - projectEden
+      responses:
+        '200':
+          description: working-on-it
+      parameters:
+        - name: plantname
+          in: path
+          required: true
+  /garden/plant/exists/{plantname}:
+    get:
+      tags:
+        - projectEden
+      responses:
+        '200':
+          description: success
+          content:
+            text/plain:
+              schema:
+                type: boolean
+                example: true
+
+
+
