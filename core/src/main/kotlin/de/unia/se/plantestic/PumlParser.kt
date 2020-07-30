@@ -31,7 +31,7 @@ object PumlParser {
 		// Ensure resource loaded without errors☝︎
 		if (resource.getErrors().size > 0) {
 			println(displayErrors(resource, inputUri))
-			exit(-1)
+			System.exit(-1)
 		}
         require(resource.contents.size > 0) { "input PUML file either is empty or could not be properly parsed" }
         return resource.contents[0] as Model
