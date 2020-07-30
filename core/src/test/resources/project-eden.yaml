@@ -48,7 +48,7 @@ paths:
                     type: boolean
                     example: true
 
-  /gardener/buy/{plantname}:
+  /PflanzenKoelle/buy/{plantname}:
     get:
       tags:
         - projectEden
@@ -71,7 +71,7 @@ paths:
                     type: string
                     example: "Oa Pflonzn"
 
-  /gardener/plant/{plant}:
+  /garden/plant/{plant}:
     post:
       tags:
         - projectEden
@@ -87,7 +87,7 @@ paths:
           description: success
 
 
-  /gardener/planted-status:
+  /owner/planted-status:
     post:
       tags:
         - projectEden
