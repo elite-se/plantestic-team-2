@@ -109,47 +109,73 @@ To run the tests you simply do `./gradlew test` in the root of your project.
 The first execution can take some time because the P2 Eclipse repository is 
 cloned by the plugin. Consecutive executions take significantly less time.
 
+## Integrated PlantUML IDE
+Launch the Web-IDE on localhost:8080 using `./gradlew jettyRun`. It will
+automatically render live PlantUML previews for your code as well as highlight 
+syntax and show inline errors for our customized PlantUML Grammar.
+
+![](doc/imgs/ide.png)
+
 ### Test Specification
 
-<!--TODO: UPDATE THE FOLLOWING SECTION-->
-<!--TODO: ADD ASYNC REQUEST RESULTS-->
+#### Sequence Diagram Format
+Refer to the [official PlantUML language guide](https://plantuml.com/sequence-diagram) to learn how to write PlantUML
+sequence diagrams. Note that our Grammar does not support multiline syntax for some commands, e.g. note. To write
+multiline notes, use a literal '\n': `note over Bob : This is a\nmultiline note`.
+Plantestic adds some features to the PlantUML Grammar, all of which are described in the following.
 
-#### Sequence Diagram
-The input is a PlantUML sequence diagram. 
-This sequence diagram contains several participants and interactions between the participants. 
-One participiant is the client who calls the test cases. The other participants are services of the implementation. 
-In the example diagram, the client is `CCC` and the services are `CRS` and `Voicemanager`.
+#### Request Specification
+Plantestic recognizes request specifications in PlantUML Message descriptions. Generally, a request 
+is expressed as a function call with a request Method, request Route and the optional parameter spec.
 
-An interaction contains a request from the client and a response from a service. 
-A request contains an HTTP method, a URL, and possibly parameters. 
-A response contains an HTTP status code and, if applicable, data. A hyphen separates the HTTP status codes and the data. 
+```
+A -> B : request(<GET|POST|PUT|DELETE|PATCH>, <route>, <optional parameter spec>)
+```
 
-The HTTP method is `GET`, `POST`, or `PUT`. 
+The following examples all constitute valid requests:
 
-The URL path is a String. In it, slashes separate the path components. 
-A parameter name in curly braces, preceded by a dollar symbol, thereby specifies parameterized path components. 
-Example: ```/path/${param}```
+```
+Alice ->  Bob : request(GET, "/weather")
 
-We specify the request parameters in a tuple: 
-An opening bracket is followed by the first request parameter. 
-This request parameter is followed - comma-separated - by the second request parameter, and so on. 
-The last request parameter is followed by a closing bracket.
-We specify the request parameter as a `Name: Value` pair: 
-The name of the request parameter is followed by a space, a colon, a space, and the value of the request parameter as a string. 
-We define the value of the request parameter in curly brackets, preceded by a dollar symbol. 
-Example: ```(name1 : "${value1}", name2 : "${value2}")```
+Alice --> Bob : request(GET, "/weather")
 
-We specify the response data in a tuple: 
-An opening bracket is followed by the first response datum. 
-This response datum is followed - comma-separated - by the second response datum, and so on. 
-The last response datum is followed by a closing bracket.
-We specify the response datum as a `Name: XPath` pair: 
-The name of the response datum is followed by a space, a colon, a space, and the xpath of the response datum as a string. 
-In the xpath, slashes separate the path components. . 
-Example: ```(name1 : "/value/value1", name2 : "/value2")```
+Alice -> Bob : request(POST, "/message", { content: "hello Bob :)", type: "text/plain" })
+```
 
-![./core/src/test/resources/rerouting.png](./core/src/test/resources/rerouting.png)
+In all three examples, Alice sends a request to Bob as signified by the arrow direction.
 
+#### Response Specification
+Plantestic recognizes response specifications in PlantUML Message descriptions and Return statements.
+Generally, a response is expressed as a function call with one or more acceptable status codes and 
+optional descriptions and an optional parameter spec.
+
+```
+B -> A : response(<((INT DESCRIPTION?) (|| INT DESCRIPTION?)*)>, <optional parameter spec>)
+
+return response(<((INT DESCRIPTION?) (|| INT DESCRIPTION?)*)>, <optional parameter spec>)
+```
+
+The following examples all constitute valid responses:
+
+```
+Bob -> Alice : response(200, { weather: "sunny" })
+
+return response(200, { weather: "sunny")
+
+Bob -> Alice : response(410 || 418 I_AM_A_TEAPOT)
+
+return response(410 || 418 I_AM_A_TEAPOT)
+```
+
+In all four examples, Bob returns a response to Alice. Note that return statements match
+the first preceeding request - if available. Parameter specifications are optional as with requests.
+Responses may specify multiple acceptable response codes and an optional description for each code,
+to make their semantic intent explicit.
+
+#### Async Requests
+<!--TODO: ADD ASYNC REQUESTS-->
+
+<!--TODO: UPDATE THE FOLLOWING SECTIONS-->
 #### Variants
 
 Variants can be prepended to PlantUML files:
@@ -189,14 +215,7 @@ export SECRET_PASSWORD=1234656
 2. Save the sequence diagram. 
 3. Call the command `./gradlew run --args="--input=<path/to/sequence/diagram/diagram_name.puml> --output <output_dir>"`.
 
-The generated test cases are in `<path/to/sequence/diagram/generatedCode/<diagramName>.java>`.
-
-## Integrated PlantUML IDE
-Launch the Web-IDE on localhost:8080 using `./gradlew jettyRun`. It will
-automatically render live PlantUML previews for your code as well as highlight 
-syntax and show inline errors.
-
-![](doc/imgs/ide.png)
+The generated test cases are in `<output_dir/<diagramName>.java>`.
 
 ## PlantUML Grammar
 
@@ -208,7 +227,7 @@ We created a new Grammar for PlantUML from scratch. The subproject is split into
 
 The grammer supports all of the official PlantUml syntax except for the special
 multiline syntax, e.g., for notes. To achieve multiline notes, simply use the
-literal '\n' in the description of your notes, e.g.:
+literal '\n' in the description of your notes:
 
 ```
 note over Bob : this is a\nmultiline note
