@@ -1,48 +1,43 @@
-# Plantestic
+# Purpose
+Plantestic is a test case generation tool which transforms sequence diagrams
+written in PlantUML into java testcases with Restassured. Each test case checks 
+one procedure of interactions by sequentially invoking the requests and asserting 
+for the responses specified in the sequence diagram.
 
-## Description
-The test case generator Plantestic produces test cases from a sequence diagram. 
-A sequence diagram models a sequence of interactions between objects. 
-A test case then checks for such an interaction whether it is implemented as the sequence diagram defines it. 
-In an example sequence diagram called `Hello`, let there be two actors Alice and Bob. 
-Alice sends Bob the request `GET /hello ` and Bob answers with `Hello World`. 
-The corresponding test case now sends an HTTP request `GET /hello` to the backend. 
-The test case then expects a response with status `200 OK` and date `Hello World`.
+# Minimal Example
+Suppose a minimal sequence diagram with two actors Alice and Bob. Alice sends an
+HTTP GET request to Bob, with the subroute "/hello" and receives an HTTP response
+with status code 200 and a message that reads "hi there":
 
-![./core/src/test/resources/minimal_hello.png](./core/src/test/resources/minimal_hello.png)
+![](./doc/imgs/minimal_hello.png)
 
-```
-public void test() throws Exception {
-		try {
+Plantestic will in this case generate the following java code:
+
+```java
+@Test
+public void test() throws ScriptException, InterruptedException {
+
+		String tester = paramsMap.get("tester");
+
+	if (tester == null || tester.equals("A")) {
 			Response roundtrip1 = RestAssured.given()
-					.auth().basic(substitutor.replace("${B.username}"), substitutor.replace("${B.password}"))
-				.when()
-					.get(substitutor.replace("${B.path}") + substitutor.replace("/hello"))
-				.then()
-					.assertThat()
-					    .statusCode(IsIn.isIn(Arrays.asList(200)));
-		} catch (Exception exception) {
-			System.out.println("An error occured during evaluating the communication with testReceiver: ");
-			exception.printStackTrace();
-			throw exception;
-		}
+							.auth().basic(subst("${B.username}"), subst("${B.password}"))
+							.filter(paramsMap.containsKey("B.swagger") ? new OpenApiValidationFilter(subst("${B.swagger}")) : (rS, rpS, context) -> context.next(rS, rpS))
+					.when()
+							.get(subst("${B.path}") + subst("/hello"))
+					.then()
+							.assertThat()
+									.statusCode(IsIn.isIn(Arrays.asList(200)))
+									.body("message", equalTo("hi there"))
+								.and().extract().response();
+			paramsMap.put("message", roundtrip1.jsonPath().getString("message"));
 	}
+}
 ```
-
-## Motivation
-The implementation of user requirements often deviates from the specification of the same user requirements. 
-Individual work, teamwork, and collaboration between teams can produce such a divergence. 
-For example, requirements may be misinterpreted or overlooked. 
-Teamwork, especially with multiple teams, causes interface errors. 
-For example, subsystems of the same product may use conflicting technologies or conflicting data formats.
-
-Our test case generator detects deviations at an early stage: 
-The test case generator derives test cases directly from the specification. 
-If the implementation fulfills these test cases, then the implementation fulfills the specification. 
-If the implementation does not fulfill these test cases, the implementation deviates from the specification. 
-With our test case generator, developers can quickly uncover inconsistencies, fix them, and save costs.
 
 ## Features
+TODO: UPDATE THIS SECTION
+
 **Plantestic is universal in that it can run in any IDE.**
 
 For this, Plantestic uses Gradle. Original Eclipse dependencies are used! 
@@ -73,14 +68,16 @@ You can find Java SE Development Kit 8 under the website [https://www.oracle.com
 
 ## Usage as Gradle plugin
 
-A Gradle plugin is available in `./gradle-plantestic-plugin`. This plugin is not published to a remote repository currently.
-Therefore you need to install it and its dependencies to your local Maven repository. You can to this by executing:
+A Gradle plugin is available in `./gradle-plantestic-plugin`. This plugin is not 
+published to a remote repository currently. Therefore you need to install it and 
+its dependencies to your local Maven repository. You can to this by executing:
 
 ```console
 $ ./gradlew publish
 ```
 
-After that you can copy the `./example` standalone Gradle project. Firstly include the plugin via:
+After that you can copy the `./example` standalone Gradle project. Firstly 
+include the plugin via:
 
 ```groovy
 plugins {
@@ -97,9 +94,15 @@ plantestic {
 ```
 
 You can specify where you put your `.puml` files via the `sourceSet` option.
-To run the tests you simply do `./gradlew test` in the root of your project. The first execution can take some time because the P2 Eclipse repository is cloned by the plugin. Consecutive executions take significantly less time.
+To run the tests you simply do `./gradlew test` in the root of your project. 
+The first execution can take some time because the P2 Eclipse repository is 
+cloned by the plugin. Consecutive executions take significantly less time.
 
 ### Test Specification
+
+TODO: Update the following
+TODO: Add async requests!
+TODO: Look Through feature list to find missing features
 
 #### Sequence Diagram
 The input is a PlantUML sequence diagram. 
@@ -152,7 +155,7 @@ vin = "120"
 eventid = "20"
 @endvariant
 
-SEQUENCE @startuml
+@startuml
 
 participant CCCMock
 ...
@@ -163,7 +166,8 @@ For each variant a separate test case is generated.
 #### Environment variables
 
 All environment variables are accessible in the sequence diagrams via string substitution.
-This means you can add the text `${SECRET_PASSWORD}` in the sequence diagram and export the variable before running the tests via the Gradle plugin:
+This means you can add the text `${SECRET_PASSWORD}` in the sequence diagram and export 
+the variable before running the tests via the Gradle plugin:
 
 ```
 export SECRET_PASSWORD=1234656
@@ -178,10 +182,9 @@ export SECRET_PASSWORD=1234656
 The generated test cases are in `<path/to/sequence/diagram/generatedCode/<diagramName>.java>`.
 
 ## Integrated PlantUML IDE
-
-First start the local PlantUml renderer: `cd xyz.elite.xtext.languages.plantuml.server && yarn && yarn serve`.
-Now Launch the integrated using `./gradlew jettyRun`. This launches a web-server on port 8080 and allows you to play with the
-PlantUML grammar and render diagrams.
+Launch the Web-IDE on localhost:8080 using `./gradlew jettyRun`. It will
+automatically render live PlantUML previews for your code as well as highlight 
+syntax and show inline errors.
 
 ## Used PlantUML Grammar
 
@@ -191,14 +194,17 @@ We created a new Grammar for PlantUML from scratch. The subproject is split into
 * xyz.elite.xtext.languages.plantuml.ide - Currently unused IDE
 * xyz.elite.xtext.languages.plantuml - Web IDE with live preview
 
-The grammer supports all of the official PlantUml syntax.
+The grammer supports all of the official PlantUml syntax except for the special
+multiline syntax, e.g., for notes. To achieve multiline notes, simply use the
+literal '\n' in the description of your notes, e.g.:
+
+```
+note over Bob : this is a\nmultiline note
+```
 
 ## Limitations
-- When actor A sends actor B a request, Plantestic expects actor B to send actor A a response. 
-    Actors A and B must be different actors.
-- Plantestic neither supports options nor loops.
-- Plantestic can handle alternatives as long as they are not nested.
-- We only support authenticated requests with username and password.
+- Plantestic currently only supports authenticated requests with 
+  username and password.
 
 ## Credits
 ### Contributors
@@ -219,21 +225,3 @@ The grammer supports all of the official PlantUml syntax.
 - Alex
 
 \* contributed equally
-
-### Repositories
-#### plantuml-eclipse-xtext
-The repository [plantuml-eclipse-xtext](https://github.com/Cooperate-Project/plantuml-eclipse-xtext) defines the grammar of PlantUML. 
-We pass this grammar to Xtext.
-   
-#### qvto-cli
-The repository [qvto-cli](https://github.com/mrcalvin/qvto-cli) demonstrates how QVT operations can be performed without Eclipse.
-   
-### Literature
-#### Standalone Parsing with Xtext
-From the article [Standalone Parsing with Xtext](http://www.davehofmann.de/different-ways-of-parsing-with-xtext/) we learned how to use Xtext without Eclipse.
-    
-#### QVTOML/Examples/InvokeInJava
-From the Wiki article [QVTOML/Examples/InvokeInJava](https://wiki.eclipse.org/QVTOML/Examples/InvokeInJava) we learned how to call QVT from our pipeline.
-
-#### Grammar-based Program Generation Based on Model Finding
-From the paper [Grammar-based Program Generation Based on Model Finding](http://www.informatik.uni-bremen.de/agra/doc/konf/13_idt_program_generation.pdf) we learned about the Eclipse Modeling Framework.
