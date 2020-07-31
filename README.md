@@ -186,7 +186,9 @@ Launch the Web-IDE on localhost:8080 using `./gradlew jettyRun`. It will
 automatically render live PlantUML previews for your code as well as highlight 
 syntax and show inline errors.
 
-## Used PlantUML Grammar
+![](doc/imgs/ide.png)
+
+## PlantUML Grammar
 
 We created a new Grammar for PlantUML from scratch. The subproject is split into three parts:
 
