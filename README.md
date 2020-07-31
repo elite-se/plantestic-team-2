@@ -32,22 +32,22 @@ public void test() throws ScriptException, InterruptedException {
 
     if (tester == null || tester.equals("A")) {
         Response roundtrip1 = RestAssured.given()
-		.auth().basic(subst("${B.username}"), subst("${B.password}"))
-		.filter(paramsMap.containsKey("B.swagger") ? new OpenApiValidationFilter(subst("${B.swagger}")) : (rS, rpS, context) -> context.next(rS, rpS))
-		.when()
-			.get(subst("${B.path}") + subst("/hello"))
-		.then()
-		.assertThat()
-			.statusCode(IsIn.isIn(Arrays.asList(200)))
-			.body("message", equalTo("hi there"))
-			.and().extract().response();
+            .auth().basic(subst("${B.username}"), subst("${B.password}"))
+	    .filter(paramsMap.containsKey("B.swagger") ? new OpenApiValidationFilter(subst("${B.swagger}")) : (rS, rpS, context) -> context.next(rS, rpS))
+	    .when()
+	    	.get(subst("${B.path}") + subst("/hello"))
+	    .then()
+	    .assertThat()
+	    	.statusCode(IsIn.isIn(Arrays.asList(200)))
+		.body("message", equalTo("hi there"))
+	    .and().extract().response();
         paramsMap.put("message", roundtrip1.jsonPath().getString("message"));
     }
 }
 ```
 
 ## Features
-TODO: UPDATE THIS SECTION
+<!--TODO: UPDATE THIS SECTION -> NEW FEATURES & REPHRASE/UPDATE OLD ONES-->
 
 **Plantestic is universal in that it can run in any IDE.**
 
@@ -111,9 +111,8 @@ cloned by the plugin. Consecutive executions take significantly less time.
 
 ### Test Specification
 
-TODO: Update the following
-TODO: Add async requests!
-TODO: Look Through feature list to find missing features
+<!--TODO: UPDATE THE FOLLOWING SECTION-->
+<!--TODO: ADD ASYNC REQUEST RESULTS-->
 
 #### Sequence Diagram
 The input is a PlantUML sequence diagram. 
