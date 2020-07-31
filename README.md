@@ -9,7 +9,17 @@ Suppose a minimal sequence diagram with two actors Alice and Bob. Alice sends an
 HTTP GET request to Bob, with the subroute "/hello" and receives an HTTP response
 with status code 200 and a message that reads "hi there":
 
-![](./doc/imgs/minimal_hello.png)
+```
+@startuml
+
+actor Alice as A
+actor Bob as B
+
+A -> B : request(GET, "/hello")
+return response(200, { message: "hi there" })
+
+@enduml
+```
 
 Plantestic will in this case generate the following java code:
 
