@@ -52,15 +52,15 @@ class End2EndTest : StringSpec({
                                 .withStatus(200)))
         wireMockServer.stubFor(
                 get(urlMatching("/garden/plant/exists/([a-z]*)"))
-                        .willReturn(okJson("{ \"exists\": true }")
+                        .willReturn(okJson("{ \"exists\": false }")
                                 .withStatus(200)))
         wireMockServer.stubFor(
-                get(urlMatching("/PflanzenKoelle/buy/([a-z]*)"))
+                get(urlMatching("/pflanzenshop/buy/([a-z]*)"))
                         .willReturn(aResponse()
                                 .withStatus(200)
-                                .withBody("{ \"plant\": \"pflonzn\"}")))
+                                .withBody("{ \"plant\": \"OaPflonzn\"}")))
         wireMockServer.stubFor(
-                post(urlMatching("/garden/plant/([a-z]*)"))
+                post(urlMatching("/garden/plant/([A-Za-z]*)"))
                         .willReturn(aResponse()
                                 .withStatus(200)))
         wireMockServer.stubFor(
@@ -88,10 +88,8 @@ class End2EndTest : StringSpec({
 
         // Check if we received a correct request
         wireMockServer.allServeEvents.forEach { serveEvent -> println(serveEvent.request) }
-        wireMockServer.allServeEvents.size shouldBe 3
-        wireMockServer.allServeEvents[0].response.status shouldBe 200
-        wireMockServer.allServeEvents[1].response.status shouldBe 200
-        wireMockServer.allServeEvents[2].response.status shouldBe 200
+        wireMockServer.allServeEvents.size shouldBe 5
+        wireMockServer.allServeEvents.forEach { it.response.status shouldBe 200 }
     }
 }) {
     companion object {

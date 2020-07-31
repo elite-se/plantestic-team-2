@@ -245,7 +245,7 @@ PT_ParameterValue:
 PT_TimeUnit:
 	'ns' | 'us' | 'ms' | 's' | 'min' | 'h' | 'd';
 
-	// ----------------------------
+// ----------------------------
 //      LEXER/PARSER ATOMS
 // ----------------------------
 terminal HEXCOLOR:

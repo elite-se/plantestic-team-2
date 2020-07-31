@@ -35,7 +35,7 @@ alt "0"==0
 	Gardener -[#green]> Garden : request(GET, "/plant/exists/${plantname}")
 	activate Garden
 
-	alt []==0
+	alt []=="0"
 	    Garden --> Gardener : response(200, { exists: true })
 	else
 	    Garden --> Gardener : response(200, { exists: false })
@@ -46,7 +46,7 @@ alt "0"==0
 
     alt !${exists}
 	    Gardener-[#green]> PflanzenKoelle: request(GET, "/buy/${plantname}")
-	    return response(200, {plant: "Oa Pflonzn"})
+	    return response(200, {plant: "OaPflonzn"})
 	
 	    Gardener-[#green]> Garden : request(POST, "/plant/${plant}")
 	    return response(200)
@@ -55,7 +55,7 @@ alt "0"==0
     ... wait(10s) ...
     autoactivate off
     Gardener -[#green]> "Owner" : async[1] request(POST, "/planted-status", {success: true})
-else []=="0"
+else
 	note over Gardener : Zurücklehnen und auf Sonne warten
 	... wait(1s) ...
 	Gardener -[#green]> "Owner" : async[1] request(POST, "/planted-status", {success: false})
