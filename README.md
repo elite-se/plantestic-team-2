@@ -173,9 +173,15 @@ Responses may specify multiple acceptable response codes and an optional descrip
 to make their semantic intent explicit.
 
 #### Async Requests
-<!--TODO: ADD ASYNC REQUESTS-->
+TODO: ADD DESCRIPTION
 
-<!--TODO: UPDATE THE FOLLOWING SECTIONS-->
+#### Conditionals
+TODO: ADD DESCRIPTION (especially Javascript evaluation)
+
+#### Templating
+TODO: ADD DESCRIPTION (${var} is replaced with environment vars & variant variables!)
+
+<!--TODO: Potentially UPDATE THE FOLLOWING SECTIONS-->
 #### Variants
 
 Variants can be prepended to PlantUML files:
