@@ -1,8 +1,8 @@
 # Purpose
 Plantestic is a test case generation tool which transforms sequence diagrams
-written in PlantUML into java testcases with Restassured. Each test case checks 
-one procedure of interactions by sequentially invoking the requests and asserting 
-for the responses specified in the sequence diagram.
+written in PlantUML into REST java testcases. Each test case verifies one procedure 
+of interactions by sequentially invoking the requests and asserting for the 
+responses specified in the sequence diagram.
 
 # Minimal Example
 Suppose a minimal sequence diagram with two actors Alice and Bob. Alice sends an
@@ -16,22 +16,21 @@ Plantestic will in this case generate the following java code:
 ```java
 @Test
 public void test() throws ScriptException, InterruptedException {
+    String tester = paramsMap.get("tester");
 
-		String tester = paramsMap.get("tester");
-
-	if (tester == null || tester.equals("A")) {
-			Response roundtrip1 = RestAssured.given()
-							.auth().basic(subst("${B.username}"), subst("${B.password}"))
-							.filter(paramsMap.containsKey("B.swagger") ? new OpenApiValidationFilter(subst("${B.swagger}")) : (rS, rpS, context) -> context.next(rS, rpS))
-					.when()
-							.get(subst("${B.path}") + subst("/hello"))
-					.then()
-							.assertThat()
-									.statusCode(IsIn.isIn(Arrays.asList(200)))
-									.body("message", equalTo("hi there"))
-								.and().extract().response();
-			paramsMap.put("message", roundtrip1.jsonPath().getString("message"));
-	}
+    if (tester == null || tester.equals("A")) {
+        Response roundtrip1 = RestAssured.given()
+		.auth().basic(subst("${B.username}"), subst("${B.password}"))
+		.filter(paramsMap.containsKey("B.swagger") ? new OpenApiValidationFilter(subst("${B.swagger}")) : (rS, rpS, context) -> context.next(rS, rpS))
+		.when()
+			.get(subst("${B.path}") + subst("/hello"))
+		.then()
+		.assertThat()
+			.statusCode(IsIn.isIn(Arrays.asList(200)))
+			.body("message", equalTo("hi there"))
+			.and().extract().response();
+        paramsMap.put("message", roundtrip1.jsonPath().getString("message"));
+    }
 }
 ```
 
