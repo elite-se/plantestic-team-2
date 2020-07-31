@@ -21,6 +21,8 @@ return response(200, { message: "hi there" })
 @enduml
 ```
 
+![](doc/imgs/minimal_hello.png)
+
 Plantestic will in this case generate the following java code:
 
 ```java
