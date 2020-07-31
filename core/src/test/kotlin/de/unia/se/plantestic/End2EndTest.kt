@@ -14,7 +14,7 @@ import java.io.File
 val wireMockServer = WireMockServer(8080)
 
 class End2EndTest : StringSpec({
-    "End2End test receives request on mock server for the minimal hello".config(enabled = false) {
+    "End2End test receives request on mock server for the minimal hello" {
         wireMockServer.stubFor(
             get(urlEqualTo("/hello"))
                 .willReturn(aResponse()
