@@ -1,5 +1,5 @@
 # Purpose
-Plantestic 2.0 the continuation of the [plantestic project](https://github.com/FionaGuerin/plantestic) . It is a test case generation tool which transforms sequence diagrams written in PlantUML into REST java testcases. Each test case verifies one procedure 
+Plantestic 2.0 the continuation of the [plantestic project](https://github.com/FionaGuerin/plantestic). It is a test case generation tool which transforms sequence diagrams written in PlantUML into REST java testcases. Each test case verifies one procedure 
 of interactions by sequentially invoking the requests and asserting for the 
 responses specified in the sequence diagram.
 
@@ -75,24 +75,26 @@ For this, it uses a JavaScript engine.
 
 **You can pass parameters to your sequence diagram if you wish to customize its flows.**
 
-For example, you no longer need to reveal security-critical information such as passwords in your sequence diagram. 
-Plantestic 2.0 evaluates the parameters using templating.
+For example, you no longer need to reveal security-critical information such as passwords in your sequence diagram or
+accompanying configuration files. Plantestic 2.0 evaluates the parameters using templating.
 
 **Plantestic 2.0 is actor oriented.**
 
-The sequence diagrams are constructed from the view of one actor, focusing on its specific actions. This allows are more precise testing from the perspective of a certain actor
+Each testcase request retains information about the actors involved, allowing you to 
+either test the entire sequence or just requests from a certain actor.
 
 **You can add a delay option to messages.**
 
 Annotating a request with `wait(time)`allows you to include general waits in your sequence diagram.
 
-**Web interface for PlantUML usage.**
+**Web IDE.**
 
-Plantestic 2.0 provides a website at which you can create your plantUML diagrams without needing an extra IDE [how to use](###Integrated-PlantUML-IDE).
+Plantestic 2.0 includes a Web IDE with which you can easily create and edit your PlantUML diagrams
+[how to use](###Integrated-PlantUML-IDE).
 
 **Automated checking with swagger API.**
 
-Plantestic 2.0 checks request and response parameters and variables.
+Plantestic 2.0 checks request and response parameters and variables agains swagger API definitions.
 
 
 ## Installation
