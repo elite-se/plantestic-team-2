@@ -1,13 +1,22 @@
 # Purpose
-Plantestic is a test case generation tool which transforms sequence diagrams
-written in PlantUML into REST java testcases. Each test case verifies one procedure 
+Plantestic 2.0 the continuation of the [plantestic project](https://github.com/FionaGuerin/plantestic) . It is a test case generation tool which transforms sequence diagrams written in PlantUML into REST java testcases. Each test case verifies one procedure 
 of interactions by sequentially invoking the requests and asserting for the 
 responses specified in the sequence diagram.
+
+# Motivation
+
+The implementation of user requirements often deviates from the specification of the same user requirements. Individual work, teamwork, and collaboration between teams can produce such a divergence. For example, requirements may be misinterpreted or overlooked. Teamwork, especially with multiple teams, causes interface errors. For example, subsystems of the same product may use conflicting technologies or conflicting data formats.
+
+Our test case generator detects deviations at an early stage: The test case generator derives test cases directly from the specification. If the implementation fulfills these test cases, then the implementation fulfills the specification. If the implementation does not fulfill these test cases, the implementation deviates from the specification. With our test case generator, developers can quickly uncover inconsistencies, fix them, and save costs
 
 # Minimal Example
 Suppose a minimal sequence diagram with two actors Alice and Bob. Alice sends an
 HTTP GET request to Bob, with the subroute "/hello" and receives an HTTP response
 with status code 200 and a message that reads "hi there":
+
+![](doc/imgs/minimal_hello.png)
+
+The following shows the plantUML specification, from which the model was derived.
 
 ```
 @startuml
@@ -21,9 +30,9 @@ return response(200, { message: "hi there" })
 @enduml
 ```
 
-![](doc/imgs/minimal_hello.png)
 
-Plantestic will in this case generate the following java code:
+
+Plantestic 2.0 will in this case generate the following java code:
 
 ```java
 @Test
@@ -49,35 +58,52 @@ public void test() throws ScriptException, InterruptedException {
 ## Features
 <!--TODO: UPDATE THIS SECTION -> NEW FEATURES & REPHRASE/UPDATE OLD ONES-->
 
-**Plantestic is universal in that it can run in any IDE.**
+**Plantestic 2.0 is universal in that it can run in any IDE.**
 
-For this, Plantestic uses Gradle. Original Eclipse dependencies are used! 
+For this, Plantestic 2.0 uses Gradle. Original Eclipse dependencies are used! 
 
-**Plantestic is user-friendly.**
+**Plantestic 2.0  is user-friendly.**
 
-You set it up by installing Java and downloading Plantestic.
+You set it up by installing Java and downloading Plantestic 2.0.
 You generate a test case by filing a sequence diagram and entering one instruction. 
 
-**Plantestic has a powerful condition evaluation.**
+**Plantestic 2.0 has a powerful condition evaluation.**
 
 A sequence diagram can contain alternative or optional interactions that it invokes under a certain condition. 
-Plantestic will evaluate any condition that conforms to JavaScript. 
+Plantestic 2.0 will evaluate any condition that conforms to JavaScript. 
 For this, it uses a JavaScript engine.  
 
 **You can pass parameters to your sequence diagram if you wish to customize its flows.**
 
 For example, you no longer need to reveal security-critical information such as passwords in your sequence diagram. 
-Plantestic evaluates the parameters using templating.
+Plantestic 2.0 evaluates the parameters using templating.
+
+**Plantestic 2.0 is actor oriented.**
+
+The sequence diagrams are constructed from the view of one actor, focusing on its specific actions. This allows are more precise testing from the perspective of a certain actor
+
+**You can add a delay option to messages.**
+
+Annotating a request with `wait(time)`allows you to include general waits in your sequence diagram.
+
+**Web interface for PlantUML usage.**
+
+Plantestic 2.0 provides a website at which you can create your plantUML diagrams without needing an extra IDE [how to use](###Integrated-PlantUML-IDE).
+
+**Automated checking with swagger API.**
+
+Plantestic 2.0 checks request and response parameters and variables.
+
 
 ## Installation
 1. Install Java SE Development Kit 8. 
 You can find Java SE Development Kit 8 under the website [https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
-2. Clone the Plantestic repository.
+2. Clone the Plantestic 2.0 repository.
 3. Run `./gradlew publish`. This can take a while because the Eclipse repository is cloned.
 
 ## How to use
 
-## Usage as Gradle plugin
+### Usage as Gradle plugin
 
 A Gradle plugin is available in `./gradle-plantestic-plugin`. This plugin is not 
 published to a remote repository currently. Therefore you need to install it and 
@@ -109,7 +135,7 @@ To run the tests you simply do `./gradlew test` in the root of your project.
 The first execution can take some time because the P2 Eclipse repository is 
 cloned by the plugin. Consecutive executions take significantly less time.
 
-## Integrated PlantUML IDE
+### Integrated PlantUML IDE
 Launch the Web-IDE on localhost:8080 using `./gradlew jettyRun`. It will
 automatically render live PlantUML previews for your code as well as highlight 
 syntax and show inline errors for our customized PlantUML Grammar.
@@ -122,10 +148,10 @@ syntax and show inline errors for our customized PlantUML Grammar.
 Refer to the [official PlantUML language guide](https://plantuml.com/sequence-diagram) to learn how to write PlantUML
 sequence diagrams. Note that our Grammar does not support multiline syntax for some commands, e.g. note. To write
 multiline notes, use a literal '\n': `note over Bob : This is a\nmultiline note`.
-Plantestic adds some features to the PlantUML Grammar, all of which are described in the following.
+Plantestic 2.0 adds some features to the PlantUML Grammar, all of which are described in the following.
 
 #### Request Specification
-Plantestic recognizes request specifications in PlantUML Message descriptions. Generally, a request 
+Plantestic 2.0 recognizes request specifications in PlantUML Message descriptions. Generally, a request 
 is expressed as a function call with a request Method, request Route and the optional parameter spec.
 
 ```
@@ -145,7 +171,7 @@ Alice -> Bob : request(POST, "/message", { content: "hello Bob :)", type: "text/
 In all three examples, Alice sends a request to Bob as signified by the arrow direction.
 
 #### Response Specification
-Plantestic recognizes response specifications in PlantUML Message descriptions and Return statements.
+Plantestic 2.0 recognizes response specifications in PlantUML Message descriptions and Return statements.
 Generally, a response is expressed as a function call with one or more acceptable status codes and 
 optional descriptions and an optional parameter spec.
 
@@ -214,7 +240,7 @@ the variable before running the tests via the Gradle plugin:
 ```
 export SECRET_PASSWORD=1234656
 ./gradlew test
-``` 
+```
 
 ### Standalone Execution
 1. Create a PlantUML sequence diagram. Note the input requirements above. 
@@ -240,7 +266,7 @@ note over Bob : this is a\nmultiline note
 ```
 
 ## Limitations
-- Plantestic currently only supports authenticated requests with 
+- Plantestic 2.0 currently only supports authenticated requests with 
   username and password.
 
 ## Credits
@@ -256,9 +282,9 @@ note over Bob : this is a\nmultiline note
 \* contributed equally
 
 2020
-- Dominik
-- Max
-- Elias
-- Alex
+- [Max Ammann](https://github.com/maxammann)
+- [Dominik Horn](https://github.com/DominikHorn)
+- [Elias Keis](https://github.com/elKei24)
+- [Alexander Zellner](https://github.com/AlexanderZellner)
 
 \* contributed equally
