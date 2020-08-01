@@ -201,7 +201,26 @@ to make their semantic intent explicit.
 #### Async Requests
 TODO: ADD DESCRIPTION
 
+#### Waiting
+
+There are cases where one wants some time to pass before checking if some action succeeded, maybe due to some internal processing that takes a moment. Plantestic 2.0 supports that using PlantUML delay elements with the following syntax:
+
+```puml
+... wait(<INT> <TIMEUNIT>) <DESCRIPTION?> ...
+```
+
+Allowed time units are `ns` (Nanoseconds), `us` (Microseconds), `ms` (Milliseconds), `s` (Seconds), `min` (Minutes), `h` (Hours) and `d` (Days). For example:
+
+``` puml
+... wait(10s) for all caches to fetch the new value ...
+```
+
+The generated test will pause for ten seconds when it reaches this statement before continuing with the next request.
+
+**Note:** Waiting only has effect between pairs of request and response. You can not use it to determine the timeout between a request and a response.
+
 #### Conditionals
+
 TODO: ADD DESCRIPTION (especially Javascript evaluation)
 
 #### Templating
@@ -242,7 +261,31 @@ export SECRET_PASSWORD=1234656
 ./gradlew test
 ```
 
+#### Tester
+
+Usually you do not want to test each and every request in the PlantUML file. Instead you may want to point out a special test actor that triggers some internal processing and then checks if it succeeded. For that case, Plantestic 2.0 provides a special variant variable named `tester` that can — like any other variant variable — be set directly in a variant block in the PlantUML file or as an environment variable. Here is an example:
+
+```puml
+@startvariant
+tester = "T"
+@endvariant
+
+@startuml
+actor T
+autoactivate on
+T -> A : request(POST, "/triggerInteralAction")
+return response(200)
+A -> B : request(GET, "/someInteralAction")
+return response(200)
+T -> A : request(GET, "/didInternalActionSucceed")
+return response(200)
+@enduml
+```
+
+In that case, as we set `T` to be the tester, only the two requests made by `T` will be tested while the test for the communication of `A` with `B` will be skipped.
+
 ### Standalone Execution
+
 1. Create a PlantUML sequence diagram. Note the input requirements above. 
 2. Save the sequence diagram. 
 3. Call the command `./gradlew run --args="--input=<path/to/sequence/diagram/diagram_name.puml> --output <output_dir>"`.
