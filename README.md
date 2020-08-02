@@ -300,12 +300,11 @@ Bob -> Alice : async[1] request(POST, "/result/{id}", { value: 42 })
 @enduml
 ```
 
-The general format for an async config is as follows:
+An async configuration may contain arbitrarily many `async[ID]=...` statements. Its general format is as follows:
 ```puml
 @startasyncconfig
-
 async[ID] = <ACTOR> request(...) response(...) timeout(TIMEOUT, INTEVAL)?
-
+async[ID2] = <ACTOR> request(...) response(...) timeout(TIMEOUT, INTEVAL)?
 @endasyncconfig
 ```
 
@@ -313,10 +312,10 @@ With:
 * `<ACTOR>` = the Service to query
 * `request(...)` = the request to send, identical to the usual request syntax
 * `response(...)` = the response to expect, identical to the usual response syntax
-* `timeout(TIMEOUT, INTERVAL)` = optional timeout after which the test will stop trying to obtain the
-  expected response and fail and time interval (may be omitted) between sending the request
-
-Between `@startasyncconfig` und `@endasyncconfig` you may specify arbitrarily many async configurations.
+* `timeout(TIMEOUT, INTERVAL)` = optional TIMEOUT and INTERVAL configuration. TIMEOUT specifies the amount of time 
+  after which the testcase will stop trying to obtain the expected response and fail. INTERVAL may be omitted and 
+  specifies the amount of time the testcase will wait in between sending requests. Refer to [Waiting](#waiting) to learn 
+  about time specification, especially concerning units.
 
 ## Waiting
 
