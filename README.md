@@ -56,46 +56,62 @@ public void test() throws ScriptException, InterruptedException {
 ```
 
 ## Features
-<!--TODO: UPDATE THIS SECTION -> NEW FEATURES & REPHRASE/UPDATE OLD ONES-->
 
 **Plantestic 2.0 is universal in that it can run in any IDE.**
 
 For this, Plantestic 2.0 uses Gradle. Original Eclipse dependencies are used! 
 
-**Plantestic 2.0  is user-friendly.**
+**Plantestic 2.0 is user-friendly.**
 
-You set it up by installing Java and downloading Plantestic 2.0.
-You generate a test case by filing a sequence diagram and entering one instruction. 
+1. Download java and Plantestic 2.0
+2. Generate test cases by executing a single cli instruction
 
-**Plantestic 2.0 has a powerful condition evaluation.**
+**Plantestic 2.0 comes with a custom Web IDE.**
 
-A sequence diagram can contain alternative or optional interactions that it invokes under a certain condition. 
-Plantestic 2.0 will evaluate any condition that conforms to JavaScript. 
-For this, it uses a JavaScript engine.  
+Plantestic 2.0 includes a Web IDE with which you can easily create and edit your PlantUML diagrams
+[how to use](###Integrated-PlantUML-IDE).
 
-**You can pass parameters to your sequence diagram if you wish to customize its flows.**
+**Plantestic 2.0 features useful error messages.**
 
-For example, you no longer need to reveal security-critical information such as passwords in your sequence diagram or
-accompanying configuration files. Plantestic 2.0 evaluates the parameters using templating.
+Gone are the days of endless pondering why testcase won't generate properly since Plantestic 2.0 will
+give you helpful, inline error messages both in the Web IDE and the CLI.
 
 **Plantestic 2.0 is actor oriented.**
 
 Each testcase request retains information about the actors involved, allowing you to 
 either test the entire sequence or just requests from a certain actor.
 
-**You can add a delay option to messages.**
+**Plantestic 2.0 supports specifying variables both at compile and at runtime.**
 
-Annotating a request with `wait(time)`allows you to include general waits in your sequence diagram.
+Use testcase variants to set variables at testcase generation time or use environment variables to set them dynamically at runtime.
+The latter feature is especially important to, f.e., input secrets like usernames or passwords. Compared to plantestic 1.0,
+you are therefore no longer forced to store secrets in plaintext files. Plantestic 2.0 uses templating to inject variables into
+the testcase execution flow.
 
-**Web IDE.**
+**Plantestic 2.0 has a powerful condition evaluation.**
 
-Plantestic 2.0 includes a Web IDE with which you can easily create and edit your PlantUML diagrams
-[how to use](###Integrated-PlantUML-IDE).
+A sequence diagram can contain alternative or optional interactions that are invoked under certain conditionons.
+Plantestic 2.0 permits specifying these conditions using JavaScript and will evaluate them dynamically at runtime.
 
-**Automated checking with swagger API.**
+**Plantestic 2.0 supports more PUML than ever before.**
 
-Plantestic 2.0 checks request and response parameters and variables agains swagger API definitions.
+Plantestic 2.0 comes with builtin support for arbitrarily nested groups, returns statements and PlantUML delay syntax.
 
+**Plantestic 2.0 automatically validates your sequence diagrams against the swagger API.**
+
+Plantestic 2.0 checks request and response parameters and variables against swagger API definitions.
+
+**Plantestic 2.0 has a brand new pipeline at its core.**
+
+* all new PlantUML grammar that was written from the ground up to be stable and feature rich, resulting
+  in way more flexibility and robustness than Plantestic 1.0
+* all new QVT transformations that are significantly more robust than Plantestic 1.0
+* all new Metamodel-Magic
+* all new Acceleo code generation 
+
+**Plantestic 2.0 supports adding delay to testcases.**
+
+Use the standard PlantUML delay syntax `... wait(time) ...`  to generate Thread.sleep() statements in your tests.
 
 ## Installation
 1. Install Java SE Development Kit 8. 
