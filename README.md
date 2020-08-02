@@ -422,10 +422,10 @@ note over Bob : this is a\nmultiline note
 # Contributors
 
 2020
-- [Max Ammann](https://github.com/maxammann)
-- [Dominik Horn](https://github.com/DominikHorn)
-- [Elias Keis](https://github.com/elKei24)
-- [Alexander Zellner](https://github.com/AlexanderZellner)
+- [Max Ammann](https://github.com/maxammann) *
+- [Dominik Horn](https://github.com/DominikHorn) *
+- [Elias Keis](https://github.com/elKei24) *
+- [Alexander Zellner](https://github.com/AlexanderZellner) *
 
 \* contributed equally
 
