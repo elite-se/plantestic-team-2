@@ -18,7 +18,7 @@ with status code 200 and a message that reads "hi there":
 
 The following shows the plantUML specification, from which the model was derived.
 
-```
+```puml
 @startuml
 
 actor Alice as A
@@ -156,13 +156,13 @@ Plantestic 2.0 adds some features to the PlantUML Grammar, all of which are desc
 Plantestic 2.0 recognizes request specifications in PlantUML Message descriptions. Generally, a request 
 is expressed as a function call with a request Method, request Route and the optional parameter spec.
 
-```
+```puml
 A -> B : request(<GET|POST|PUT|DELETE|PATCH>, <route>, <optional parameter spec>)
 ```
 
 The following examples all constitute valid requests:
 
-```
+```puml
 Alice ->  Bob : request(GET, "/weather")
 
 Alice --> Bob : request(GET, "/weather")
@@ -177,7 +177,7 @@ Plantestic 2.0 recognizes response specifications in PlantUML Message descriptio
 Generally, a response is expressed as a function call with one or more acceptable status codes and 
 optional descriptions and an optional parameter spec.
 
-```
+```puml
 B -> A : response(<((INT DESCRIPTION?) (|| INT DESCRIPTION?)*)>, <optional parameter spec>)
 
 return response(<((INT DESCRIPTION?) (|| INT DESCRIPTION?)*)>, <optional parameter spec>)
@@ -185,7 +185,7 @@ return response(<((INT DESCRIPTION?) (|| INT DESCRIPTION?)*)>, <optional paramet
 
 The following examples all constitute valid responses:
 
-```
+```puml
 Bob -> Alice : response(200, { weather: "sunny" })
 
 return response(200, { weather: "sunny")
@@ -213,7 +213,7 @@ Instead, a test case should ensure that after at most 10 seconds Alice has recei
 Since it is in general not possible to automatically match asynchronous requests to their responses,
 these requests must be annotated with an ID (> 0!) using the format `async[ID]`, e.g.:
 
-```
+```puml
 @startuml
 
 Alice -> Bob : async[1] request(POST, "tasks/{id}")
@@ -229,8 +229,7 @@ Bob -> Alice : async[1] request(POST, "/result/{id}", { value: 42 })
 Since we can not easily inject a middleman between Bob and Alice to catch the asynchronous 
 response, additional information, mainly an endpoint that can be queried to check for the
 asynchronous response must be specified in the PlantUML file, e.g.:
-
-```
+```puml
 @startasyncconfig
 async[1] = Alice request(GET, "/did_bob_call") response(200, { value: 42 })
 @endasyncconfig
@@ -248,7 +247,7 @@ Bob -> Alice : async[1] request(POST, "/result/{id}", { value: 42 })
 ```
 
 The general format for an async config is as follows:
-```
+```puml
 @startasyncconfig
 
 async[ID] = <ACTOR> request(...) response(...) timeout(TIMEOUT, INTEVAL)?
@@ -320,7 +319,7 @@ All environment variables are accessible in the sequence diagrams via string sub
 This means you can add the text `${SECRET_PASSWORD}` in the sequence diagram and export 
 the variable before running the tests via the Gradle plugin:
 
-```
+```console
 export SECRET_PASSWORD=1234656
 ./gradlew test
 ```
@@ -368,7 +367,7 @@ The grammer supports all of the official PlantUml syntax except for the special
 multiline syntax, e.g., for notes. To achieve multiline notes, simply use the
 literal '\n' in the description of your notes:
 
-```
+```puml
 note over Bob : this is a\nmultiline note
 ```
 
