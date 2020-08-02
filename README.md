@@ -242,7 +242,7 @@ The following examples all constitute valid responses:
 ```puml
 Bob -> Alice : response(200, { weather: "sunny" })
 
-return response(200, { weather: "sunny")
+return response(200, { weather: "sunny" })
 
 Bob -> Alice : response(410 || 418 I_AM_A_TEAPOT)
 
