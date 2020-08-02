@@ -201,7 +201,69 @@ Responses may specify multiple acceptable response codes and an optional descrip
 to make their semantic intent explicit.
 
 #### Async Requests
-TODO: ADD DESCRIPTION
+Plantestic 2.0 allows testing asynchronous requests, i.e., requests where the immediate REST response is not of real interest but instead 
+the asynchronous action triggered in the background. Take for example the following interaction:
+
+![](doc/imgs/async-problem.png)
+
+In this case it is not really of interest to test for Bob's immediate '200 ACCEPTED' response. 
+Instead, a test case should ensure that after at most 10 seconds Alice has received the result
+'42' from Bob.
+
+Since it is in general not possible to automatically match asynchronous requests to their responses,
+these requests must be annotated with an ID (> 0!) using the format `async[ID]`, e.g.:
+
+```
+@startuml
+
+Alice -> Bob : async[1] request(POST, "tasks/{id}")
+return response(200 ACCEPTED)
+
+... wait(10s) ...
+
+Bob -> Alice : async[1] request(POST, "/result/{id}", { value: 42 })
+
+@enduml
+```
+
+Since we can not easily inject a middleman between Bob and Alice to catch the asynchronous 
+response, additional information, mainly an endpoint that can be queried to check for the
+asynchronous response must be specified in the PlantUML file, e.g.:
+
+```
+@startasyncconfig
+async[1] = Alice request(GET, "/did_bob_call") response(200, { value: 42 })
+@endasyncconfig
+
+@startuml
+
+Alice -> Bob : async[1] request(POST, "tasks/{id}")
+return response(200 ACCEPTED)
+
+... wait(10s) ...
+
+Bob -> Alice : async[1] request(POST, "/result/{id}", { value: 42 })
+
+@enduml
+```
+
+The general format for an async config is as follows:
+```
+@startasyncconfig
+
+async[ID] = <ACTOR> request(...) response(...) timeout(TIMEOUT, INTEVAL)?
+
+@endasyncconfig
+```
+
+With:
+* `<ACTOR>` = the Service to query
+* `request(...)` = the request to send, identical to the usual request syntax
+* `response(...)` = the response to expect, identical to the usual response syntax
+* `timeout(TIMEOUT, INTERVAL)` = optional timeout after which the test will stop trying to obtain the
+  expected response and fail and time interval (may be omitted) between sending the request
+
+Between `@startasyncconfig` und `@endasyncconfig` you may specify arbitrarily many async configurations.
 
 #### Waiting
 
