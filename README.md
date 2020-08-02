@@ -327,7 +327,7 @@ export SECRET_PASSWORD=1234656
 
 #### Tester
 
-Usually you do not want to test each and every request in the PlantUML file. Instead you may want to point out a special test actor that triggers some internal processing and then checks if it succeeded. For that case, Plantestic 2.0 provides a special variant variable named `tester` that can — like any other variant variable — be set directly in a variant block in the PlantUML file or as an environment variable. Here is an example:
+Usually you do not want to test each and every request in the PlantUML file. Instead you may want to point out a special test actor that triggers some internal processing and then checks if it succeeded. For that case, Plantestic 2.0 provides a special variant variable named `tester` that can — like any other variant variable — be set directly in a variant block in the PlantUML file or as an environment variable. The latter option **permits choosing the Tester dynamically at runtime** without having to generate multiple test files. Here is an example:
 
 ```puml
 @startvariant
