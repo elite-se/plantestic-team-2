@@ -1,3 +1,28 @@
+# Table of Contents
+* [Purpose](#purpose)
+* [Motivation](#motivation)
+* [Minimal Example](#minimal-example)
+* [Features](#features)
+* [Installation](#installation)
+* [How to use](#how-to-use)
+	* [Usage as Gradle plugin](#usage-as-gradle-plugin)
+	* [Standalone Execution](#standalone-execution)
+	* [Integrated PlantUML IDE](#integrated-plantuml-ide)
+* [Test Specification](#test-specification)
+	* [Sequence Diagram Format](#sequence-diagram-format)
+	* [Request Specification](#request-specification)
+	* [Response Specification](#response-specification)
+	* [Async Requests](#async-requests)
+	* [Waiting](#waiting)
+	* [Conditionals](#conditionals)
+	* [Templating](#templating)
+	* [Variants](#variants)
+	* [Environment variables](#environment-variables)
+	* [Tester](#tester)
+	* [PlantUML Grammar](#plantuml-grammar)
+* [Limitations](#limitations)
+* [Contributors](#contributors)
+
 # Purpose
 Plantestic 2.0 the continuation of the [plantestic project](https://github.com/FionaGuerin/plantestic). It is a test case generation tool which transforms sequence diagrams written in PlantUML into REST java testcases. Each test case verifies one procedure 
 of interactions by sequentially invoking the requests and asserting for the 
