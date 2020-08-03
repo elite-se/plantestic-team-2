@@ -43,10 +43,11 @@ object PumlParser {
 		var str = "\n\n"
 		
 		resource.getErrors().forEach {
-			str += "Error in line ${it.getLine()}, column ${it.getColumn()} while parsing ${file.getName()}:\n\n"
-			val lineNr = it.getLine()-1;
-			str += "  ${lines[lineNr]}\n"
-			(0..it.getColumn()).forEach { str += " " }
+			val line = lines[it.getLine()-1]
+			val column = it.getColumn() - (line.length - line.trim().length)
+			str += "Error in line ${it.getLine()}, column ${column} while parsing ${file.getName()}:\n\n"
+			str += "  ${line.trim()}\n"
+			(0..column).forEach { str += " " }
 			str += "\u001B[31m⎺ ${it.getMessage()}\u001B[0m\n"
 		}
 		
